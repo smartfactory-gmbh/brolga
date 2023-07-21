@@ -1,0 +1,11 @@
+<.simple_form :let={f} for={@changeset} action={@action}>
+  <.error :if={@changeset.action}>
+    Oops, something went wrong! Please check the errors below.
+  </.error>
+  <.input field={f[:name]} type="text" label="Name" />
+  <.input field={f[:url]} type="text" label="Url" />
+  <.input field={f[:interval_in_minutes]} type="number" label="Interval in minutes" />
+  <:actions>
+    <.button>Save Monitor</.button>
+  </:actions>
+</.simple_form>

@@ -1,0 +1,25 @@
+<.header>
+  Listing Monitors
+  <:actions>
+    <.link href={~p"/monitors/new"}>
+      <.button>New Monitor</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="monitors" rows={@monitors} row_click={&JS.navigate(~p"/monitors/#{&1}")}>
+  <:col :let={monitor} label="Name"><%= monitor.name %></:col>
+  <:col :let={monitor} label="Url"><%= monitor.url %></:col>
+  <:col :let={monitor} label="Interval in minutes"><%= monitor.interval_in_minutes %></:col>
+  <:action :let={monitor}>
+    <div class="sr-only">
+      <.link navigate={~p"/monitors/#{monitor}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/monitors/#{monitor}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={monitor}>
+    <.link href={~p"/monitors/#{monitor}"} method="delete" data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>

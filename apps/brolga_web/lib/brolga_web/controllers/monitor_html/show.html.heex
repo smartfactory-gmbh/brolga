@@ -1,0 +1,17 @@
+<.header>
+  Monitor <%= @monitor.id %>
+  <:subtitle>This is a monitor record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/monitors/#{@monitor}/edit"}>
+      <.button>Edit monitor</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @monitor.name %></:item>
+  <:item title="Url"><%= @monitor.url %></:item>
+  <:item title="Interval in minutes"><%= @monitor.interval_in_minutes %></:item>
+</.list>
+
+<.back navigate={~p"/monitors"}>Back to monitors</.back>
