@@ -17,7 +17,7 @@ defmodule BrolgaWeb.Router do
   scope "/", BrolgaWeb do
     pipe_through :browser
 
-    get "/", PageController, :home
+    get "/", PageController, :dashboard
   end
 
   # Other scopes may use custom stacks.

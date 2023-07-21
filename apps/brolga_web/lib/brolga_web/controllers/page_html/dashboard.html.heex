@@ -1,0 +1,12 @@
+<.flash_group flash={@flash} />
+<div class="">
+  <h1 class="text-3xl font-bold">Dashboard</h1>
+  <div class="grid grid-cols-3 mt-4">
+    <%= for monitor <- @monitors do %>
+      <div class="rounded p-8 border border-gray-300 flex flex-col items-start">
+        <div class="font-bold"><%= monitor.name %></div>
+        <div class="text-gray-500"><%= monitor.url %></div>
+      </div>
+    <% end %>
+  </div>
+</div>

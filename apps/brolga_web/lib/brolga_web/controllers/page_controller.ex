@@ -1,9 +1,9 @@
 defmodule BrolgaWeb.PageController do
   use BrolgaWeb, :controller
+  alias Brolga.{Monitor,Repo}
 
-  def home(conn, _params) do
-    # The home page is often custom made,
-    # so skip the default app layout.
-    render(conn, :home, layout: false)
+  def dashboard(conn, _params) do
+    monitors = Monitor |> Repo.all
+    render(conn, :dashboard, monitors: monitors)
   end
 end
