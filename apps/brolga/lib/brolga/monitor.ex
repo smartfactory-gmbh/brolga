@@ -1,4 +1,9 @@
 defmodule Brolga.Monitor do
+  @moduledoc """
+  Monitor object definition.
+  This represent a target that should be monitored. It does not
+  contains the actual ping results
+  """
   use Ecto.Schema
   import Ecto.Changeset
 

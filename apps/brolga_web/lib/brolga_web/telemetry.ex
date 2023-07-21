@@ -1,4 +1,8 @@
 defmodule BrolgaWeb.Telemetry do
+  @moduledoc """
+  Default telemetry module for the Phoenix dashboard
+  """
+
   use Supervisor
   import Telemetry.Metrics
 
