@@ -11,6 +11,8 @@
   <:col :let={monitor} label="Name"><%= monitor.name %></:col>
   <:col :let={monitor} label="Url"><%= monitor.url %></:col>
   <:col :let={monitor} label="Interval in minutes"><%= monitor.interval_in_minutes %></:col>
+  <:col :let={monitor} label="Timeout in seconds"><%= monitor.timeout_in_seconds %></:col>
+  <:col :let={monitor} label="Active"><%= monitor.active %></:col>
   <:action :let={monitor}>
     <div class="sr-only">
       <.link navigate={~p"/monitors/#{monitor}"}>Show</.link>

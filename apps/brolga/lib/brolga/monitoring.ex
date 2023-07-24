@@ -65,6 +65,10 @@ defmodule Brolga.Monitoring do
     result
   end
 
+  @spec update_monitor(
+          Brolga.Monitoring.Monitor.t(),
+          :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}
+        ) :: any
   @doc """
   Updates a monitor.
 

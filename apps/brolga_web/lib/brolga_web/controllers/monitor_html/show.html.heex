@@ -12,6 +12,8 @@
   <:item title="Name"><%= @monitor.name %></:item>
   <:item title="Url"><%= @monitor.url %></:item>
   <:item title="Interval in minutes"><%= @monitor.interval_in_minutes %></:item>
+  <:item title="Timeout in seconds"><%= @monitor.timeout_in_seconds %></:item>
+  <:item title="Active?"><%= @monitor.active %></:item>
 </.list>
 
 <.back navigate={~p"/monitors"}>Back to monitors</.back>

@@ -5,6 +5,8 @@
   <.input field={f[:name]} type="text" label="Name" />
   <.input field={f[:url]} type="text" label="Url" />
   <.input field={f[:interval_in_minutes]} type="number" label="Interval in minutes" />
+  <.input field={f[:timeout_in_seconds]} type="number" label="Timeout in seconds" />
+  <.input field={f[:active]} type="checkbox" label="Active?" />
   <:actions>
     <.button>Save Monitor</.button>
   </:actions>
