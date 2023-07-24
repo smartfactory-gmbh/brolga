@@ -34,7 +34,14 @@ defmodule BrolgaWatcher.Worker do
   @spec process(Monitor.t()) :: no_return
   defp process(%Monitor{url: url, timeout_in_seconds: timeout} = monitor) do
     HTTPoison.start()
-    case HTTPoison.get(url, timeout: timeout * 1000) do
+
+    headers = []
+    options = [
+      timeout: timeout * 1000,
+      follow_redirect: true
+    ]
+
+    case HTTPoison.get(url, headers, options) do
       {:ok, response} ->
         validate_response(response, monitor)
       {:error, _error} ->
