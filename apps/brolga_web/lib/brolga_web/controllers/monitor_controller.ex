@@ -27,7 +27,7 @@ defmodule BrolgaWeb.MonitorController do
   end
 
   def show(conn, %{"id" => id}) do
-    monitor = Monitoring.get_monitor!(id)
+    monitor = Monitoring.get_monitor_with_results!(id)
     render(conn, :show, monitor: monitor)
   end
 

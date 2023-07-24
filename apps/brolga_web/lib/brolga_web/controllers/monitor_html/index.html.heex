@@ -10,9 +10,13 @@
 <.table id="monitors" rows={@monitors} row_click={&JS.navigate(~p"/monitors/#{&1}")}>
   <:col :let={monitor} label="Name"><%= monitor.name %></:col>
   <:col :let={monitor} label="Url"><%= monitor.url %></:col>
-  <:col :let={monitor} label="Interval in minutes"><%= monitor.interval_in_minutes %></:col>
-  <:col :let={monitor} label="Timeout in seconds"><%= monitor.timeout_in_seconds %></:col>
-  <:col :let={monitor} label="Active"><%= monitor.active %></:col>
+  <:col :let={monitor} label="Latest checks">
+    <div class="flex flex-row gap-1">
+      <%= for result <- monitor.monitor_results do %>
+        <div class={["h-full", "rounded", "w-1"] ++ [(if result.reached, do: "bg-green-500", else: "bg-red-500")]}>&nbsp;</div>
+      <% end %>
+    </div>
+  </:col>
   <:action :let={monitor}>
     <div class="sr-only">
       <.link navigate={~p"/monitors/#{monitor}"}>Show</.link>

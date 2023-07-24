@@ -1,4 +1,5 @@
 defmodule Brolga.Monitoring.Monitor do
+  alias Brolga.Monitoring.MonitorResult
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -12,7 +13,8 @@ defmodule Brolga.Monitoring.Monitor do
     active: boolean(),
   }
 
-  @primary_key {:id, Ecto.UUID, autogenerate: true}
+  @primary_key {:id, :binary_id, autogenerate: true}
+  @foreign_key_type :binary_id
 
   schema "monitors" do
     field :name, :string
@@ -20,6 +22,8 @@ defmodule Brolga.Monitoring.Monitor do
     field :interval_in_minutes, :integer
     field :active, :boolean, default: true
     field :timeout_in_seconds, :integer, default: 10
+
+    has_many :monitor_results, MonitorResult, preload_order: [desc: :inserted_at]
 
     timestamps()
   end

@@ -20,15 +20,25 @@ defmodule BrolgaWatcher.Worker do
     run(monitor_id)
   end
 
+  @spec validate_response(HTTPoison.Response.t(), Monitor.t()) :: no_return
+  defp validate_response(response, monitor) do
+    {success, _message} = if response.status_code in 200..300 do
+      {true, "Successful hit: #{response.status_code}"}
+    else
+      {false, "Error: #{response.body}"}
+    end
+    Monitoring.create_monitor_result(%{reached: success, monitor_id: monitor.id})
+
+  end
+
   @spec process(Monitor.t()) :: no_return
-  defp process(%Monitor{url: url, name: name, timeout_in_seconds: timeout}) do
+  defp process(%Monitor{url: url, timeout_in_seconds: timeout} = monitor) do
     HTTPoison.start()
     case HTTPoison.get(url, timeout: timeout * 1000) do
-      {:ok, _response} ->
-        :logger.info("Ping to #{name} suceeded")
-      {:error, error} ->
-        :logger.error("Ping to #{name} failed")
-        IO.inspect(error)
+      {:ok, response} ->
+        validate_response(response, monitor)
+      {:error, _error} ->
+        Monitoring.create_monitor_result(%{reached: false, monitor_id: monitor.id})
     end
   end
 

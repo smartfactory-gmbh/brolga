@@ -19,4 +19,18 @@ defmodule Brolga.MonitoringFixtures do
 
     monitor
   end
+
+  @doc """
+  Generate a monitor_result.
+  """
+  def monitor_result_fixture(attrs \\ %{}) do
+    {:ok, monitor_result} =
+      attrs
+      |> Enum.into(%{
+        reached: true
+      })
+      |> Brolga.Monitoring.create_monitor_result()
+
+    monitor_result
+  end
 end

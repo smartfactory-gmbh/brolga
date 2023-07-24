@@ -16,4 +16,10 @@
   <:item title="Active?"><%= @monitor.active %></:item>
 </.list>
 
+<div class="flex flex-row-reverse mt-8 gap-2">
+  <%= for result <- @monitor.monitor_results do %>
+    <div class={["w-[4%]", "h-8", "rounded"] ++ [(if result.reached, do: "bg-green-500", else: "bg-red-500")]}>&nbsp;</div>
+  <% end %>
+</div>
+
 <.back navigate={~p"/monitors"}>Back to monitors</.back>
