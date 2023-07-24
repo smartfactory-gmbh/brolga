@@ -2,6 +2,14 @@ defmodule Brolga.Monitoring.Monitor do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @type t :: %__MODULE__{
+    name: String.t(),
+    url: String.t(),
+    interval_in_minutes: non_neg_integer(),
+    updated_at: DateTime.t(),
+    inserted_at: DateTime.t(),
+  }
+
   @primary_key {:id, Ecto.UUID, autogenerate: true}
 
   schema "monitors" do
