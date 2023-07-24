@@ -50,9 +50,19 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor(attrs \\ %{}) do
-    %Monitor{}
+    result = %Monitor{}
     |> Monitor.changeset(attrs)
     |> Repo.insert()
+
+    case result do
+      {:ok, monitor} ->
+        # An new worker is started, matching this new monitor
+        spec = {BrolgaWatcher.Worker, monitor.id}
+        DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+      _ -> nil
+    end
+
+    result
   end
 
   @doc """
