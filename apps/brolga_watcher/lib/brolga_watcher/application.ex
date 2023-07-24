@@ -3,8 +3,7 @@ defmodule BrolgaWatcher.Application do
   # for more information on OTP Applications
   @moduledoc false
 
-  alias Brolga.Repo
-  alias Brolga.Monitoring.Monitor
+  alias Brolga.Monitoring
   use Application
 
   @impl true
@@ -22,9 +21,9 @@ defmodule BrolgaWatcher.Application do
   end
 
   defp start_watchers() do
-    Repo.all(Monitor)
-    |> Enum.each(fn monitor ->
-      spec = {BrolgaWatcher.Worker, monitor.id}
+    Monitoring.list_active_monitor_ids()
+    |> Enum.each(fn monitor_id ->
+      spec = {BrolgaWatcher.Worker, monitor_id}
       DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
     end)
   end

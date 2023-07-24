@@ -21,6 +21,10 @@ defmodule Brolga.Monitoring do
     Repo.all(Monitor)
   end
 
+  def list_active_monitor_ids do
+    Repo.all(from m in Monitor, select: m.id, where: m.active == true)
+  end
+
   @doc """
   Gets a single monitor.
 
@@ -36,6 +40,7 @@ defmodule Brolga.Monitoring do
 
   """
   def get_monitor!(id), do: Repo.get!(Monitor, id)
+  def get_active_monitor!(id), do: Repo.get_by!(Monitor, [id: id, active: true])
 
   @doc """
   Creates a monitor.
@@ -71,6 +76,7 @@ defmodule Brolga.Monitoring do
         ) :: any
   @doc """
   Updates a monitor.
+  If "active" is set to "true", then a worker is fired up to ping the target
 
   ## Examples
 
@@ -82,9 +88,21 @@ defmodule Brolga.Monitoring do
 
   """
   def update_monitor(%Monitor{} = monitor, attrs) do
-    monitor
+    result = monitor
     |> Monitor.changeset(attrs)
     |> Repo.update()
+
+    if attrs |> Map.get("active") == "true" do
+      case result do
+        {:ok, monitor} ->
+          # An new worker is started, matching this new monitor, since it has been enabled
+          spec = {BrolgaWatcher.Worker, monitor.id}
+          DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+        _ -> nil
+      end
+    end
+
+    result
   end
 
   @doc """

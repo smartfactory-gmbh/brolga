@@ -1,7 +1,7 @@
 defmodule BrolgaWatcher.Worker do
   use Task
+  alias Brolga.Monitoring
   alias Brolga.Monitoring.Monitor
-  alias Brolga.Repo
 
   def start_link(monitor_id) do
     Task.start_link(__MODULE__, :run, [monitor_id])
@@ -21,10 +21,10 @@ defmodule BrolgaWatcher.Worker do
   end
 
   @spec process(Monitor.t()) :: no_return
-  defp process(%Monitor{url: url, name: name}) do
+  defp process(%Monitor{url: url, name: name, timeout_in_seconds: timeout}) do
     HTTPoison.start()
-    case HTTPoison.get(url) do
-      {:ok, response} ->
+    case HTTPoison.get(url, timeout: timeout * 1000) do
+      {:ok, _response} ->
         :logger.info("Ping to #{name} suceeded")
       {:error, error} ->
         :logger.error("Ping to #{name} failed")
@@ -34,6 +34,6 @@ defmodule BrolgaWatcher.Worker do
 
   @spec refresh_monitor(Ecto.UUID.t()) :: Monitor.t()
   defp refresh_monitor(monitor_id) do
-    Monitor |> Repo.get!(monitor_id)
+    Monitoring.get_active_monitor!(monitor_id)
   end
 end
