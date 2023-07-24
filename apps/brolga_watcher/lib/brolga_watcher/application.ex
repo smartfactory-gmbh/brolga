@@ -24,8 +24,7 @@ defmodule BrolgaWatcher.Application do
   defp start_watchers() do
     Monitoring.list_active_monitor_ids()
     |> Enum.each(fn monitor_id ->
-      spec = {BrolgaWatcher.Worker, monitor_id}
-      DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+      BrolgaWatcher.Worker.start(monitor_id)
     end)
   end
 end

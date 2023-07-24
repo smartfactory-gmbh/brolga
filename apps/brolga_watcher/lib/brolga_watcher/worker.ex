@@ -46,4 +46,25 @@ defmodule BrolgaWatcher.Worker do
   defp refresh_monitor(monitor_id) do
     Monitoring.get_active_monitor!(monitor_id)
   end
+
+  def start(monitor_id) do
+
+    # If it was running, kill it first
+    stop(monitor_id)
+
+    spec = {__MODULE__, monitor_id}
+    {:ok, worker_id} = DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+
+
+    BrolgaWatcher.Redix.store!("monitor-#{monitor_id}", to_string(:erlang.pid_to_list(worker_id)))
+    :logger.debug("Monitor #{monitor_id} has been started")
+  end
+
+  def stop(monitor_id) do
+    pid = BrolgaWatcher.Redix.get!("monitor-#{monitor_id}")
+    if pid do
+      DynamicSupervisor.terminate_child(BrolgaWatcher.DynamicSupervisor, :erlang.list_to_pid(to_charlist(pid)))
+    end
+    :logger.debug("Monitor #{monitor_id} has been stopped")
+  end
 end

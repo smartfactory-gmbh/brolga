@@ -78,8 +78,7 @@ defmodule Brolga.Monitoring do
     case result do
       {:ok, monitor} ->
         # An new worker is started, matching this new monitor
-        spec = {BrolgaWatcher.Worker, monitor.id}
-        DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+        BrolgaWatcher.Worker.start(monitor.id)
       _ -> nil
     end
 
@@ -108,14 +107,12 @@ defmodule Brolga.Monitoring do
     |> Monitor.changeset(attrs)
     |> Repo.update()
 
-    if attrs |> Map.get("active") == "true" do
-      case result do
-        {:ok, monitor} ->
-          # An new worker is started, matching this new monitor, since it has been enabled
-          spec = {BrolgaWatcher.Worker, monitor.id}
-          DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
-        _ -> nil
-      end
+    case result do
+      {:ok, monitor} ->
+        # Note: we start it *even* if active = false, because it will cleanup previous workers as well
+        # if active is false, it will stop directly anyway
+        BrolgaWatcher.Worker.start(monitor.id)
+      _ -> nil
     end
 
     result
@@ -134,6 +131,7 @@ defmodule Brolga.Monitoring do
 
   """
   def delete_monitor(%Monitor{} = monitor) do
+    BrolgaWatcher.Worker.stop(monitor.id)
     Repo.delete(monitor)
   end
 
