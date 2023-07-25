@@ -52,9 +52,13 @@ defmodule Brolga.Monitoring do
 
   """
   def get_monitor!(id), do: Repo.get!(Monitor, id)
-  def get_monitor_with_results!(id) do
+  def get_monitor_with_details!(id) do
     results_query = from r in MonitorResult, order_by: [desc: r.inserted_at], limit: 25
-    monitor_query = from m in Monitor, where: m.id == ^id, preload: [monitor_results: ^results_query]
+    monitor_query = from m in Monitor, where: m.id == ^id, preload: [
+      :monitor_tags,
+      :incidents,
+      monitor_results: ^results_query
+    ]
     Repo.one!(monitor_query)
   end
   def get_active_monitor!(id), do: Repo.get_by!(Monitor, [id: id, active: true])

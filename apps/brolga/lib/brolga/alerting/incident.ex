@@ -1,10 +1,11 @@
 defmodule Brolga.Alerting.Incident do
   use Ecto.Schema
   import Ecto.Changeset
+  alias Brolga.Monitoring.Monitor
 
   @type t :: %__MODULE__{
     id: Ecto.UUID.t(),
-    monitor: Brolga.Monitoring.Monitor.t(),
+    monitor: Monitor.t(),
     updated_at: DateTime.t(),
     inserted_at: DateTime.t(),
     started_at: DateTime.t(),

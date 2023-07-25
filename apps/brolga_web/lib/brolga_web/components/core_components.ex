@@ -416,6 +416,7 @@ defmodule BrolgaWeb.CoreComponents do
 
   slot :inner_block, required: true
   slot :subtitle
+  slot :extra
   slot :actions
 
   def header(assigns) do
@@ -428,6 +429,9 @@ defmodule BrolgaWeb.CoreComponents do
         <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
           <%= render_slot(@subtitle) %>
         </p>
+        <div :if={@extra != []}>
+          <%= render_slot(@extra) %>
+        </div>
       </div>
       <div class="flex-none"><%= render_slot(@actions) %></div>
     </header>
