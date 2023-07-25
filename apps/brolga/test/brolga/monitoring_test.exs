@@ -114,4 +114,58 @@ defmodule Brolga.MonitoringTest do
       assert %Ecto.Changeset{} = Monitoring.change_monitor_result(monitor_result)
     end
   end
+
+  describe "monitor_tags" do
+    alias Brolga.Monitoring.MonitorTag
+
+    import Brolga.MonitoringFixtures
+
+    @invalid_attrs %{name: nil}
+
+    test "list_monitor_tags/0 returns all monitor_tags" do
+      monitor_tag = monitor_tag_fixture()
+      assert Monitoring.list_monitor_tags() == [monitor_tag]
+    end
+
+    test "get_monitor_tag!/1 returns the monitor_tag with given id" do
+      monitor_tag = monitor_tag_fixture()
+      assert Monitoring.get_monitor_tag!(monitor_tag.id) == monitor_tag
+    end
+
+    test "create_monitor_tag/1 with valid data creates a monitor_tag" do
+      valid_attrs = %{name: "some name"}
+
+      assert {:ok, %MonitorTag{} = monitor_tag} = Monitoring.create_monitor_tag(valid_attrs)
+      assert monitor_tag.name == "some name"
+    end
+
+    test "create_monitor_tag/1 with invalid data returns error changeset" do
+      assert {:error, %Ecto.Changeset{}} = Monitoring.create_monitor_tag(@invalid_attrs)
+    end
+
+    test "update_monitor_tag/2 with valid data updates the monitor_tag" do
+      monitor_tag = monitor_tag_fixture()
+      update_attrs = %{name: "some updated name"}
+
+      assert {:ok, %MonitorTag{} = monitor_tag} = Monitoring.update_monitor_tag(monitor_tag, update_attrs)
+      assert monitor_tag.name == "some updated name"
+    end
+
+    test "update_monitor_tag/2 with invalid data returns error changeset" do
+      monitor_tag = monitor_tag_fixture()
+      assert {:error, %Ecto.Changeset{}} = Monitoring.update_monitor_tag(monitor_tag, @invalid_attrs)
+      assert monitor_tag == Monitoring.get_monitor_tag!(monitor_tag.id)
+    end
+
+    test "delete_monitor_tag/1 deletes the monitor_tag" do
+      monitor_tag = monitor_tag_fixture()
+      assert {:ok, %MonitorTag{}} = Monitoring.delete_monitor_tag(monitor_tag)
+      assert_raise Ecto.NoResultsError, fn -> Monitoring.get_monitor_tag!(monitor_tag.id) end
+    end
+
+    test "change_monitor_tag/1 returns a monitor_tag changeset" do
+      monitor_tag = monitor_tag_fixture()
+      assert %Ecto.Changeset{} = Monitoring.change_monitor_tag(monitor_tag)
+    end
+  end
 end

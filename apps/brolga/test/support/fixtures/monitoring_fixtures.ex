@@ -33,4 +33,23 @@ defmodule Brolga.MonitoringFixtures do
 
     monitor_result
   end
+
+  @doc """
+  Generate a unique monitor_tag name.
+  """
+  def unique_monitor_tag_name, do: "some name#{System.unique_integer([:positive])}"
+
+  @doc """
+  Generate a monitor_tag.
+  """
+  def monitor_tag_fixture(attrs \\ %{}) do
+    {:ok, monitor_tag} =
+      attrs
+      |> Enum.into(%{
+        name: unique_monitor_tag_name()
+      })
+      |> Brolga.Monitoring.create_monitor_tag()
+
+    monitor_tag
+  end
 end

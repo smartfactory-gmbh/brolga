@@ -2,7 +2,7 @@ defmodule BrolgaWeb.MonitorController do
   use BrolgaWeb, :controller
 
   alias Brolga.Monitoring
-  alias Brolga.Monitoring.Monitor
+  alias Brolga.Monitoring.{Monitor,MonitorTag}
 
   def index(conn, _params) do
     monitors = Monitoring.list_monitors()
@@ -33,12 +33,21 @@ defmodule BrolgaWeb.MonitorController do
 
   def edit(conn, %{"id" => id}) do
     monitor = Monitoring.get_monitor!(id)
+    |> Brolga.Repo.preload(:monitor_tags)
+
+    tags = Monitoring.list_monitor_tags()
+    |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
+
     changeset = Monitoring.change_monitor(monitor)
-    render(conn, :edit, monitor: monitor, changeset: changeset)
+    render(conn, :edit, monitor: monitor, changeset: changeset, tags: tags)
   end
 
   def update(conn, %{"id" => id, "monitor" => monitor_params}) do
     monitor = Monitoring.get_monitor!(id)
+    |> Brolga.Repo.preload(:monitor_tags)
+
+    tags = Monitoring.list_monitor_tags()
+    |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
 
     case Monitoring.update_monitor(monitor, monitor_params) do
       {:ok, monitor} ->
@@ -47,7 +56,7 @@ defmodule BrolgaWeb.MonitorController do
         |> redirect(to: ~p"/monitors/#{monitor}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :edit, monitor: monitor, changeset: changeset)
+        render(conn, :edit, monitor: monitor, changeset: changeset, tags: tags)
     end
   end
 

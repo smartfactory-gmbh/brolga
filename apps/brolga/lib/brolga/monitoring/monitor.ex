@@ -1,9 +1,11 @@
 defmodule Brolga.Monitoring.Monitor do
-  alias Brolga.Monitoring.MonitorResult
+  alias Brolga.Monitoring
+  alias Brolga.Monitoring.{MonitorResult,MonitorTag}
   use Ecto.Schema
   import Ecto.Changeset
 
   @type t :: %__MODULE__{
+    id: Ecto.UUID.t(),
     name: String.t(),
     url: String.t(),
     interval_in_minutes: non_neg_integer(),
@@ -24,6 +26,7 @@ defmodule Brolga.Monitoring.Monitor do
     field :timeout_in_seconds, :integer, default: 10
 
     has_many :monitor_results, MonitorResult, preload_order: [desc: :inserted_at]
+    many_to_many :monitor_tags, MonitorTag, join_through: "monitors_tags", on_replace: :delete
 
     timestamps()
   end

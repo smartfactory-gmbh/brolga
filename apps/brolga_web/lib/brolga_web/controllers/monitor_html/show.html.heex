@@ -1,5 +1,5 @@
 <.header>
-  Monitor <%= @monitor.id %>
+  Monitor <%= @monitor.name %>
   <:subtitle>This is a monitor record from your database.</:subtitle>
   <:actions>
     <.link href={~p"/monitors/#{@monitor}/edit"}>
@@ -9,6 +9,7 @@
 </.header>
 
 <.list>
+  <:item title="ID"><%= @monitor.id %></:item>
   <:item title="Name"><%= @monitor.name %></:item>
   <:item title="Url"><%= @monitor.url %></:item>
   <:item title="Interval in minutes"><%= @monitor.interval_in_minutes %></:item>

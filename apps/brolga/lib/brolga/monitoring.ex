@@ -4,6 +4,7 @@ defmodule Brolga.Monitoring do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset, only: [put_assoc: 3]
   alias Brolga.Repo
 
   alias Brolga.Monitoring.Monitor
@@ -103,8 +104,10 @@ defmodule Brolga.Monitoring do
 
   """
   def update_monitor(%Monitor{} = monitor, attrs) do
+    tags = get_monitor_tags!(attrs["monitor_tags"])
     result = monitor
     |> Monitor.changeset(attrs)
+    |> put_assoc(:monitor_tags, tags)
     |> Repo.update()
 
     case result do
@@ -242,5 +245,103 @@ defmodule Brolga.Monitoring do
   """
   def change_monitor_result(%MonitorResult{} = monitor_result, attrs \\ %{}) do
     MonitorResult.changeset(monitor_result, attrs)
+  end
+
+  alias Brolga.Monitoring.MonitorTag
+
+  @doc """
+  Returns the list of monitor_tags.
+
+  ## Examples
+
+      iex> list_monitor_tags()
+      [%MonitorTag{}, ...]
+
+  """
+  def list_monitor_tags do
+    Repo.all(MonitorTag)
+  end
+
+  @doc """
+  Gets a single monitor_tag.
+
+  Raises `Ecto.NoResultsError` if the Monitor tag does not exist.
+
+  ## Examples
+
+      iex> get_monitor_tag!(123)
+      %MonitorTag{}
+
+      iex> get_monitor_tag!(456)
+      ** (Ecto.NoResultsError)
+
+  """
+  def get_monitor_tag!(id), do: Repo.get!(MonitorTag, id)
+
+  def get_monitor_tags!(ids), do: Repo.all(from t in MonitorTag, where: t.id in ^ids)
+
+  @doc """
+  Creates a monitor_tag.
+
+  ## Examples
+
+      iex> create_monitor_tag(%{field: value})
+      {:ok, %MonitorTag{}}
+
+      iex> create_monitor_tag(%{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def create_monitor_tag(attrs \\ %{}) do
+    %MonitorTag{}
+    |> MonitorTag.changeset(attrs)
+    |> Repo.insert()
+  end
+
+  @doc """
+  Updates a monitor_tag.
+
+  ## Examples
+
+      iex> update_monitor_tag(monitor_tag, %{field: new_value})
+      {:ok, %MonitorTag{}}
+
+      iex> update_monitor_tag(monitor_tag, %{field: bad_value})
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def update_monitor_tag(%MonitorTag{} = monitor_tag, attrs) do
+    monitor_tag
+    |> MonitorTag.changeset(attrs)
+    |> Repo.update()
+  end
+
+  @doc """
+  Deletes a monitor_tag.
+
+  ## Examples
+
+      iex> delete_monitor_tag(monitor_tag)
+      {:ok, %MonitorTag{}}
+
+      iex> delete_monitor_tag(monitor_tag)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def delete_monitor_tag(%MonitorTag{} = monitor_tag) do
+    Repo.delete(monitor_tag)
+  end
+
+  @doc """
+  Returns an `%Ecto.Changeset{}` for tracking monitor_tag changes.
+
+  ## Examples
+
+      iex> change_monitor_tag(monitor_tag)
+      %Ecto.Changeset{data: %MonitorTag{}}
+
+  """
+  def change_monitor_tag(%MonitorTag{} = monitor_tag, attrs \\ %{}) do
+    MonitorTag.changeset(monitor_tag, attrs)
   end
 end

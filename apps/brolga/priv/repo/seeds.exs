@@ -9,3 +9,6 @@
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
+
+Brolga.Monitoring.create_monitor_tag(%{name: "Prod"})
+Brolga.Monitoring.create_monitor_tag(%{name: "Test"})
