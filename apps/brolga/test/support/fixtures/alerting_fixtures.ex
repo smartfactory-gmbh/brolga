@@ -11,8 +11,8 @@ defmodule Brolga.AlertingFixtures do
     {:ok, incident} =
       attrs
       |> Enum.into(%{
-        start: ~N[2023-07-24 09:21:00],
-        end: ~N[2023-07-24 09:21:00]
+        started_at: ~N[2023-07-24 09:21:00],
+        ended_at: ~N[2023-07-24 09:21:00]
       })
       |> Brolga.Alerting.create_incident()
 

@@ -5,7 +5,9 @@ defmodule Brolga.Alerting do
 
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
+  alias Brolga.Email.IncidentEmail
   alias Brolga.Repo
+  alias Brolga.Mailer
 
   alias Brolga.Alerting.Incident
 
@@ -91,15 +93,37 @@ defmodule Brolga.Alerting do
   end
 
   def open_incident(monitor) do
-    create_incident(%{
+    results = create_incident(%{
       started_at: DateTime.utc_now(),
       monitor_id: monitor.id
     })
+
+    case results do
+      {:ok, incident} ->
+        incident
+        |> Repo.preload(:monitor)
+        |> IncidentEmail.new_incident()
+        |> Mailer.deliver
+      _ -> nil
+    end
+
+    results
   end
 
   def close_incident(monitor) do
     incident = Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
-    update_incident(incident, %{ended_at: DateTime.utc_now()})
+    results = update_incident(incident, %{ended_at: DateTime.utc_now()})
+
+    case results do
+      {:ok, incident} ->
+        incident
+        |> Repo.preload(:monitor)
+        |> IncidentEmail.incidient_resolved()
+        |> Mailer.deliver
+      _ -> nil
+    end
+
+    results
   end
 
 

@@ -9,9 +9,22 @@
 # move said applications out of the umbrella.
 import Config
 
+config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+
 # Configure Mix tasks and generators
 config :brolga,
-  ecto_repos: [Brolga.Repo]
+  ecto_repos: [Brolga.Repo],
+  default_timezone: System.get_env("BROLGA_DEFAULT_TZ", "Etc/UTC"),
+  incident_mail_config: [
+    from: {
+      System.get_env("BROLGA_INCIDENT_MAIL_FROM_NAME", "Example"),
+      System.get_env("BROLGA_INCIDENT_MAIL_FROM_EMAIL", "test@Example.com"),
+    },
+    to: {
+      System.get_env("BROLGA_INCIDENT_MAIL_TO_NAME", "Example recipient"),
+      System.get_env("BROLGA_INCIDENT_MAIL_TO_EMAIL", "test-recipient@Example.com"),
+    },
+  ]
 
 # Configures the mailer
 #
