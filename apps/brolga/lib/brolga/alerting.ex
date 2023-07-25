@@ -4,6 +4,7 @@ defmodule Brolga.Alerting do
   """
 
   import Ecto.Query, warn: false
+  import Ecto.Changeset, only: [put_assoc: 3]
   alias Brolga.Repo
 
   alias Brolga.Alerting.Incident
@@ -88,6 +89,19 @@ defmodule Brolga.Alerting do
   def delete_incident(%Incident{} = incident) do
     Repo.delete(incident)
   end
+
+  def open_incident(monitor) do
+    create_incident(%{
+      started_at: DateTime.utc_now(),
+      monitor_id: monitor.id
+    })
+  end
+
+  def close_incident(monitor) do
+    incident = Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
+    update_incident(incident, %{ended_at: DateTime.utc_now()})
+  end
+
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking incident changes.

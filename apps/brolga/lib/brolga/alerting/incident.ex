@@ -26,7 +26,7 @@ defmodule Brolga.Alerting.Incident do
   @doc false
   def changeset(incident, attrs) do
     incident
-    |> cast(attrs, [:started_at, :ended_at])
+    |> cast(attrs, [:started_at, :ended_at, :monitor_id])
     |> validate_required([:started_at])
   end
 end

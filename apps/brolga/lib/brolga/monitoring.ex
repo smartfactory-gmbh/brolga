@@ -9,6 +9,7 @@ defmodule Brolga.Monitoring do
 
   alias Brolga.Monitoring.Monitor
   alias Brolga.Monitoring.MonitorResult
+  alias Brolga.Alerting
 
   @doc """
   Returns the list of monitors.
@@ -108,7 +109,12 @@ defmodule Brolga.Monitoring do
 
   """
   def update_monitor(%Monitor{} = monitor, attrs) do
-    tags = get_monitor_tags!(attrs["monitor_tags"])
+    tags = if attrs["monitor_tags"] do
+      get_monitor_tags!(attrs["monitor_tags"])
+    else
+      []
+    end
+
     result = monitor
     |> Monitor.changeset(attrs)
     |> put_assoc(:monitor_tags, tags)
@@ -199,9 +205,30 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor_result(attrs \\ %{}) do
-    %MonitorResult{}
+    result = %MonitorResult{}
     |> MonitorResult.changeset(attrs)
     |> Repo.insert()
+
+    case result do
+      {:ok, monitor_result} ->
+        monitor = get_monitor_with_details!(monitor_result.monitor_id)
+        last_results = monitor.monitor_results
+        |> Enum.slice(0..2)
+        |> Enum.map(fn monitor_result -> monitor_result.reached end)
+
+        case last_results do
+          [true, true, false] ->
+            # If reached correctly twice, we close the incident
+            Alerting.close_incident(monitor)
+          [false, false, true] ->
+            # If reached incorrectly twice, we open an incident
+            Alerting.open_incident(monitor)
+          _ -> nil
+        end
+      _ -> nil
+    end
+
+    result
   end
 
   @doc """

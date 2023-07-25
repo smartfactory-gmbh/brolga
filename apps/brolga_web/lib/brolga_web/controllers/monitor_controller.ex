@@ -10,11 +10,17 @@ defmodule BrolgaWeb.MonitorController do
   end
 
   def new(conn, _params) do
+    tags = Monitoring.list_monitor_tags()
+    |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
+
     changeset = Monitoring.change_monitor(%Monitor{})
-    render(conn, :new, changeset: changeset)
+    render(conn, :new, changeset: changeset, tags: tags)
   end
 
   def create(conn, %{"monitor" => monitor_params}) do
+    tags = Monitoring.list_monitor_tags()
+    |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
+
     case Monitoring.create_monitor(monitor_params) do
       {:ok, monitor} ->
         conn
@@ -22,7 +28,7 @@ defmodule BrolgaWeb.MonitorController do
         |> redirect(to: ~p"/monitors/#{monitor}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :new, changeset: changeset)
+        render(conn, :new, changeset: changeset, tags: tags)
     end
   end
 
