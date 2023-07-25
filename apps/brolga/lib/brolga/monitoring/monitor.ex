@@ -1,6 +1,7 @@
 defmodule Brolga.Monitoring.Monitor do
   alias Brolga.Monitoring
   alias Brolga.Monitoring.{MonitorResult,MonitorTag}
+  alias Brolga.Alerting.Incident
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -26,6 +27,7 @@ defmodule Brolga.Monitoring.Monitor do
     field :timeout_in_seconds, :integer, default: 10
 
     has_many :monitor_results, MonitorResult, preload_order: [desc: :inserted_at]
+    has_many :incidents, Incident, preload_order: [desc: :started_at]
     many_to_many :monitor_tags, MonitorTag, join_through: "monitors_tags", on_replace: :delete
 
     timestamps()
