@@ -22,12 +22,16 @@ defmodule BrolgaWatcher.Worker do
 
   @spec validate_response(HTTPoison.Response.t(), Monitor.t()) :: no_return
   defp validate_response(response, monitor) do
-    {success, _message} = if response.status_code in 200..300 do
+    {success, message} = if response.status_code in 200..300 do
       {true, "Successful hit: #{response.status_code}"}
     else
       {false, "Error: #{response.body}"}
     end
-    Monitoring.create_monitor_result(%{reached: success, monitor_id: monitor.id})
+    Monitoring.create_monitor_result(%{
+      reached: success,
+      monitor_id: monitor.id,
+      message: String.slice(message, 0..255)
+    })
 
   end
 
