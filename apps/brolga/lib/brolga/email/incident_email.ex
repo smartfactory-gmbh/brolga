@@ -30,7 +30,7 @@ defmodule Brolga.Email.IncidentEmail do
     |> text_body(@text_body_down |> String.replace("__NAME__", incident.monitor.name))
   end
 
-  def incidient_resolved(incident) do
+  def incident_resolved(incident) do
     [from: from, to: to] = @mail_config
     new()
     |> to(to)

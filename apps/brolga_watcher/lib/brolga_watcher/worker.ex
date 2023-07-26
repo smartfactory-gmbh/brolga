@@ -30,7 +30,7 @@ defmodule BrolgaWatcher.Worker do
     Monitoring.create_monitor_result(%{
       reached: success,
       monitor_id: monitor.id,
-      message: String.slice(message, 0..255)
+      message: String.slice(message, 0..254)
     })
 
   end

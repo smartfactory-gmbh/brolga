@@ -18,6 +18,10 @@ defmodule Brolga.Application do
       # {Brolga.Worker, arg}
     ]
 
-    Supervisor.start_link(children, strategy: :one_for_one, name: Brolga.Supervisor)
+    results = Supervisor.start_link(children, strategy: :one_for_one, name: Brolga.Supervisor)
+
+    Brolga.AlertNotifiers.log_enabled_notifiers()
+
+    results
   end
 end

@@ -102,8 +102,7 @@ defmodule Brolga.Alerting do
       {:ok, incident} ->
         incident
         |> Repo.preload(:monitor)
-        |> IncidentEmail.new_incident()
-        |> Mailer.deliver
+        |> Brolga.AlertNotifiers.new_incident()
       _ -> nil
     end
 
@@ -118,8 +117,7 @@ defmodule Brolga.Alerting do
       {:ok, incident} ->
         incident
         |> Repo.preload(:monitor)
-        |> IncidentEmail.incidient_resolved()
-        |> Mailer.deliver
+        |> Brolga.AlertNotifiers.incident_resolved()
       _ -> nil
     end
 

@@ -85,3 +85,9 @@ config :brolga_watcher,
     username: nil,
     password: nil,
   ]
+
+# Only enable the mail notifier so we avoid spamming 3rd party services
+config :brolga, Brolga.AlertNotifiers,
+  notifiers: [
+    Brolga.AlertNotifiers.EmailNotifier
+  ]

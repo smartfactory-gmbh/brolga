@@ -3,6 +3,7 @@ defmodule Brolga.AlertNotifiers.EmailNotifier do
   @moduledoc false
   alias Brolga.Mailer
   alias Brolga.Email.IncidentEmail
+  alias Brolga.Email.TestNotificationEmail
 
   @spec new_incident(Brolga.Alerting.Incident.t()) :: :ok | :error
   def new_incident(incident) do
@@ -11,7 +12,7 @@ defmodule Brolga.AlertNotifiers.EmailNotifier do
     |> Mailer.deliver
 
     case results do
-      :ok -> :ok
+      {:ok, _} -> :ok
       _ -> :error
     end
   end
@@ -19,11 +20,22 @@ defmodule Brolga.AlertNotifiers.EmailNotifier do
   @spec incident_resolved(Brolga.Alerting.Incident.t()) :: :ok | :error
   def incident_resolved(incident) do
     results = incident
-    |> IncidentEmail.incidient_resolved()
+    |> IncidentEmail.incident_resolved()
     |> Mailer.deliver
 
     case results do
-      :ok -> :ok
+      {:ok, _} -> :ok
+      _ -> :error
+    end
+  end
+
+  @spec test_notification() :: :ok | :error
+  def test_notification() do
+    results = TestNotificationEmail.test_notification()
+    |> Mailer.deliver
+
+    case results do
+      {:ok, _} -> :ok
       _ -> :error
     end
   end
