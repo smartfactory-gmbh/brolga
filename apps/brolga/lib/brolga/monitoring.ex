@@ -5,6 +5,7 @@ defmodule Brolga.Monitoring do
 
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
+  alias Brolga.Alerting.Incident
   alias Brolga.Repo
 
   alias Brolga.Monitoring.Monitor
@@ -61,13 +62,14 @@ defmodule Brolga.Monitoring do
 
   def get_monitor_with_details!(id) do
     results_query = from r in MonitorResult, order_by: [desc: r.inserted_at], limit: 25
+    incidents_query = from i in Incident, order_by: [desc: i.started_at], limit: 5
 
     monitor_query =
       from m in Monitor,
         where: m.id == ^id,
         preload: [
           :monitor_tags,
-          :incidents,
+          incidents: ^incidents_query,
           monitor_results: ^results_query
         ]
 
