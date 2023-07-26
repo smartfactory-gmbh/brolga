@@ -1,4 +1,3 @@
-
 defmodule Brolga.AlertNotifiers.SlackNotifier do
   @moduledoc false
 
@@ -14,34 +13,41 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
   @spec new_incident(Brolga.Alerting.Incident.t()) :: :ok | :error
   def new_incident(incident) do
     incident_timestamp = incident.started_at |> DateTime.to_unix()
+
     send(%{
       icon_emoji: ":x:",
-      blocks: [%{
-        type: "section",
-        text: %{
-          type: "mrkdwn",
-          text: "An incident occurred"
+      blocks: [
+        %{
+          type: "section",
+          text: %{
+            type: "mrkdwn",
+            text: "An incident occurred"
+          }
         }
-      }],
-      attachments: [%{
-        color: @error_color,
-        blocks: [
-          %{
-            type: "section",
-            text: %{
-              type: "mrkdwn",
-              text: "The monitor *#{incident.monitor.name}* failed to reach the host at url #{incident.monitor.url}"
+      ],
+      attachments: [
+        %{
+          color: @error_color,
+          blocks: [
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text:
+                  "The monitor *#{incident.monitor.name}* failed to reach the host at url #{incident.monitor.url}"
+              }
+            },
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text:
+                  "Time of alert: <!date^#{incident_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.started_at)}>"
+              }
             }
-          },
-          %{
-            type: "section",
-            text: %{
-              type: "mrkdwn",
-              text: "Time of alert: <!date^#{incident_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.started_at)}>"
-            }
-          },
-        ]
-      }]
+          ]
+        }
+      ]
     })
   end
 
@@ -52,39 +58,46 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
 
     send(%{
       icon_emoji: ":white_check_mark:",
-      blocks: [%{
-        type: "section",
-        text: %{
-          type: "mrkdwn",
-          text: "An incident has been resolved"
+      blocks: [
+        %{
+          type: "section",
+          text: %{
+            type: "mrkdwn",
+            text: "An incident has been resolved"
+          }
         }
-      }],
-      attachments: [%{
-        color: @success_color,
-        blocks: [
-          %{
-            type: "section",
-            text: %{
-              type: "mrkdwn",
-              text: "The monitor *#{incident.monitor.name}* can reach again the host at url #{incident.monitor.url}"
+      ],
+      attachments: [
+        %{
+          color: @success_color,
+          blocks: [
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text:
+                  "The monitor *#{incident.monitor.name}* can reach again the host at url #{incident.monitor.url}"
+              }
+            },
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text:
+                  "Time of alert: <!date^#{incident_start_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.started_at)}>"
+              }
+            },
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text:
+                  "Time of resolution: <!date^#{incident_end_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.ended_at)}>"
+              }
             }
-          },
-          %{
-            type: "section",
-            text: %{
-              type: "mrkdwn",
-              text: "Time of alert: <!date^#{incident_start_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.started_at)}>"
-            }
-          },
-          %{
-            type: "section",
-            text: %{
-              type: "mrkdwn",
-              text: "Time of resolution: <!date^#{incident_end_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.ended_at)}>"
-            }
-          },
-        ]
-      }]
+          ]
+        }
+      ]
     })
   end
 
@@ -107,12 +120,13 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
             type: "mrkdwn",
             text: "If you see this message in Slack, it's working well :smile:"
           }
-        },
+        }
       ]
     })
   end
 
   defp send(data) do
+<<<<<<< HEAD
     [username: username, channel: channel, webhook_url: webhook_url] = get_config()
 
     case webhook_url do
@@ -129,5 +143,20 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
           _ -> :error
         end
       end
+=======
+    encoded_data = data |> Map.merge(%{username: @username, channel: @channel}) |> Jason.encode!()
+
+    case HTTPoison.post(@webhook_url, encoded_data, @headers) do
+      {:ok, response} ->
+        if response.status_code in 200..299 do
+          :ok
+        else
+          :error
+        end
+
+      _ ->
+        :error
+    end
+>>>>>>> c7409cd (chore: reformat files)
   end
 end

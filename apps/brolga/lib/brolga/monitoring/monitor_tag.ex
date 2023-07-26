@@ -4,9 +4,9 @@ defmodule Brolga.Monitoring.MonitorTag do
   alias Brolga.Monitoring.Monitor
 
   @type t :: %__MODULE__{
-    id: Ecto.UUID.t(),
-    name: String.t(),
-  }
+          id: Ecto.UUID.t(),
+          name: String.t()
+        }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

@@ -21,16 +21,21 @@ defmodule Brolga.Monitoring do
 
   """
   def list_monitors do
-    monitor_query = from m in Monitor, as: :monitor,
-      join: r in assoc(m, :monitor_results),
-      inner_lateral_join: latest_results in subquery(
-        from MonitorResult,
-        where: [monitor_id: parent_as(:monitor).id],
-        order_by: [desc: :inserted_at],
-        limit: 25,
-        select: [:id, :reached]
-      ), on: latest_results.id == r.id,
-      preload: [monitor_results: r]
+    monitor_query =
+      from m in Monitor,
+        as: :monitor,
+        join: r in assoc(m, :monitor_results),
+        inner_lateral_join:
+          latest_results in subquery(
+            from MonitorResult,
+              where: [monitor_id: parent_as(:monitor).id],
+              order_by: [desc: :inserted_at],
+              limit: 25,
+              select: [:id, :reached]
+          ),
+        on: latest_results.id == r.id,
+        preload: [monitor_results: r]
+
     Repo.all(monitor_query)
   end
 
@@ -53,16 +58,23 @@ defmodule Brolga.Monitoring do
 
   """
   def get_monitor!(id), do: Repo.get!(Monitor, id)
+
   def get_monitor_with_details!(id) do
     results_query = from r in MonitorResult, order_by: [desc: r.inserted_at], limit: 25
-    monitor_query = from m in Monitor, where: m.id == ^id, preload: [
-      :monitor_tags,
-      :incidents,
-      monitor_results: ^results_query
-    ]
+
+    monitor_query =
+      from m in Monitor,
+        where: m.id == ^id,
+        preload: [
+          :monitor_tags,
+          :incidents,
+          monitor_results: ^results_query
+        ]
+
     Repo.one!(monitor_query)
   end
-  def get_active_monitor!(id), do: Repo.get_by!(Monitor, [id: id, active: true])
+
+  def get_active_monitor!(id), do: Repo.get_by!(Monitor, id: id, active: true)
 
   @doc """
   Creates a monitor.
@@ -77,15 +89,18 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor(attrs \\ %{}) do
-    result = %Monitor{}
-    |> Monitor.changeset(attrs)
-    |> Repo.insert()
+    result =
+      %Monitor{}
+      |> Monitor.changeset(attrs)
+      |> Repo.insert()
 
     case result do
       {:ok, monitor} ->
         # An new worker is started, matching this new monitor
         BrolgaWatcher.Worker.start(monitor.id)
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     result
@@ -109,23 +124,27 @@ defmodule Brolga.Monitoring do
 
   """
   def update_monitor(%Monitor{} = monitor, attrs) do
-    tags = if attrs["monitor_tags"] do
-      get_monitor_tags!(attrs["monitor_tags"])
-    else
-      []
-    end
+    tags =
+      if attrs["monitor_tags"] do
+        get_monitor_tags!(attrs["monitor_tags"])
+      else
+        []
+      end
 
-    result = monitor
-    |> Monitor.changeset(attrs)
-    |> put_assoc(:monitor_tags, tags)
-    |> Repo.update()
+    result =
+      monitor
+      |> Monitor.changeset(attrs)
+      |> put_assoc(:monitor_tags, tags)
+      |> Repo.update()
 
     case result do
       {:ok, monitor} ->
         # Note: we start it *even* if active = false, because it will cleanup previous workers as well
         # if active is false, it will stop directly anyway
         BrolgaWatcher.Worker.start(monitor.id)
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     result
@@ -205,27 +224,35 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor_result(attrs \\ %{}) do
-    result = %MonitorResult{}
-    |> MonitorResult.changeset(attrs)
-    |> Repo.insert()
+    result =
+      %MonitorResult{}
+      |> MonitorResult.changeset(attrs)
+      |> Repo.insert()
 
     case result do
       {:ok, monitor_result} ->
         monitor = get_monitor_with_details!(monitor_result.monitor_id)
-        last_results = monitor.monitor_results
-        |> Enum.slice(0..2)
-        |> Enum.map(fn monitor_result -> monitor_result.reached end)
+
+        last_results =
+          monitor.monitor_results
+          |> Enum.slice(0..2)
+          |> Enum.map(fn monitor_result -> monitor_result.reached end)
 
         case last_results do
           [true, true, false] ->
             # If reached correctly twice, we close the incident
             Alerting.close_incident(monitor)
+
           [false, false, true] ->
             # If reached incorrectly twice, we open an incident
             Alerting.open_incident(monitor)
-          _ -> nil
+
+          _ ->
+            nil
         end
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     result

@@ -83,7 +83,7 @@ config :brolga_watcher,
     host: "localhost",
     port: 6379,
     username: nil,
-    password: nil,
+    password: nil
   ]
 
 # Only enable the mail notifier so we avoid spamming 3rd party services

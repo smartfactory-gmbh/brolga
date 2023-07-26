@@ -2,17 +2,21 @@ defmodule BrolgaWatcher.Redix do
   @pool_size 5
 
   def child_spec(_args) do
-
     [
       host: host,
       port: port,
       username: username,
-      password: password,
+      password: password
     ] = Application.get_env(:brolga_watcher, :redis)
 
-    children = for index <- 0..(@pool_size - 1) do
-      Supervisor.child_spec({Redix, host: host, port: port, username: username, password: password, name: :"redix_#{index}"}, id: {Redix, index})
-    end
+    children =
+      for index <- 0..(@pool_size - 1) do
+        Supervisor.child_spec(
+          {Redix,
+           host: host, port: port, username: username, password: password, name: :"redix_#{index}"},
+          id: {Redix, index}
+        )
+      end
 
     %{
       id: RedixSupervisor,
@@ -36,5 +40,4 @@ defmodule BrolgaWatcher.Redix do
   def get!(key) do
     command!(["GET", key])
   end
-
 end

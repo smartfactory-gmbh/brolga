@@ -37,5 +37,5 @@ config :brolga_watcher,
     host: "localhost",
     port: 6379,
     username: nil,
-    password: nil,
+    password: nil
   ]

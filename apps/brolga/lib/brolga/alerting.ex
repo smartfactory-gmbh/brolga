@@ -93,24 +93,29 @@ defmodule Brolga.Alerting do
   end
 
   def open_incident(monitor) do
-    results = create_incident(%{
-      started_at: DateTime.utc_now(),
-      monitor_id: monitor.id
-    })
+    results =
+      create_incident(%{
+        started_at: DateTime.utc_now(),
+        monitor_id: monitor.id
+      })
 
     case results do
       {:ok, incident} ->
         incident
         |> Repo.preload(:monitor)
         |> Brolga.AlertNotifiers.new_incident()
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     results
   end
 
   def close_incident(monitor) do
-    incident = Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
+    incident =
+      Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
+
     results = update_incident(incident, %{ended_at: DateTime.utc_now()})
 
     case results do
@@ -118,12 +123,13 @@ defmodule Brolga.Alerting do
         incident
         |> Repo.preload(:monitor)
         |> Brolga.AlertNotifiers.incident_resolved()
-      _ -> nil
+
+      _ ->
+        nil
     end
 
     results
   end
-
 
   @doc """
   Returns an `%Ecto.Changeset{}` for tracking incident changes.

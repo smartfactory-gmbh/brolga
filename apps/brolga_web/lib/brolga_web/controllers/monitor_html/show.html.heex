@@ -26,7 +26,11 @@
 
 <div class="flex flex-row-reverse mt-8 gap-2">
   <%= for result <- @monitor.monitor_results do %>
-    <div class={["w-[4%]", "h-8", "rounded"] ++ [(if result.reached, do: "bg-green-500", else: "bg-red-500")]}>&nbsp;</div>
+    <div class={
+      ["w-[4%]", "h-8", "rounded"] ++ [if(result.reached, do: "bg-green-500", else: "bg-red-500")]
+    }>
+      &nbsp;
+    </div>
   <% end %>
 </div>
 
@@ -34,18 +38,17 @@
 
 <div class="mt-4 flex flex-col gap-4">
   <%= for incident <- @monitor.incidents do %>
-  <div class={[
-    "border p-4 rounded drop-shadow",
-    incident.ended_at && "border-green-500 bg-green-100 text-green-950",
-    !incident.ended_at && "border-red-500 bg-red-100 text-red-950",
-  ]}>
-    Incident started at <%= incident.started_at %>
-    <%= if incident.ended_at do %>
-      <p>The issue has been resolved at <%= incident.ended_at %></p>
-    <% else %>
-
-    <% end %>
-  </div>
+    <div class={[
+      "border p-4 rounded drop-shadow",
+      incident.ended_at && "border-green-500 bg-green-100 text-green-950",
+      !incident.ended_at && "border-red-500 bg-red-100 text-red-950"
+    ]}>
+      Incident started at <%= incident.started_at %>
+      <%= if incident.ended_at do %>
+        <p>The issue has been resolved at <%= incident.ended_at %></p>
+      <% else %>
+      <% end %>
+    </div>
   <% end %>
 </div>
 

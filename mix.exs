@@ -7,7 +7,7 @@ defmodule Brolga.Umbrella.MixProject do
       version: "0.1.0",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases(),
+      aliases: aliases()
     ]
   end
 
@@ -28,7 +28,7 @@ defmodule Brolga.Umbrella.MixProject do
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 0.0.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:tzdata, "~> 1.1"},
+      {:tzdata, "~> 1.1"}
     ]
   end
 

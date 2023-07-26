@@ -18,12 +18,12 @@ config :brolga,
   incident_mail_config: [
     from: {
       System.get_env("BROLGA_INCIDENT_MAIL_FROM_NAME", "Example"),
-      System.get_env("BROLGA_INCIDENT_MAIL_FROM_EMAIL", "test@Example.com"),
+      System.get_env("BROLGA_INCIDENT_MAIL_FROM_EMAIL", "test@Example.com")
     },
     to: {
       System.get_env("BROLGA_INCIDENT_MAIL_TO_NAME", "Example recipient"),
-      System.get_env("BROLGA_INCIDENT_MAIL_TO_EMAIL", "test-recipient@Example.com"),
-    },
+      System.get_env("BROLGA_INCIDENT_MAIL_TO_EMAIL", "test-recipient@Example.com")
+    }
   ]
 
 # Configures the mailer
@@ -79,13 +79,12 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-
 config :brolga_watcher,
   redis: [
     host: nil,
     port: nil,
     username: nil,
-    password: nil,
+    password: nil
   ]
 
 # Import environment specific config. This must remain at the bottom

@@ -1,20 +1,20 @@
 defmodule Brolga.Monitoring.Monitor do
   alias Brolga.Monitoring
-  alias Brolga.Monitoring.{MonitorResult,MonitorTag}
+  alias Brolga.Monitoring.{MonitorResult, MonitorTag}
   alias Brolga.Alerting.Incident
   use Ecto.Schema
   import Ecto.Changeset
 
   @type t :: %__MODULE__{
-    id: Ecto.UUID.t(),
-    name: String.t(),
-    url: String.t(),
-    interval_in_minutes: non_neg_integer(),
-    updated_at: DateTime.t(),
-    inserted_at: DateTime.t(),
-    timeout_in_seconds: non_neg_integer(),
-    active: boolean(),
-  }
+          id: Ecto.UUID.t(),
+          name: String.t(),
+          url: String.t(),
+          interval_in_minutes: non_neg_integer(),
+          updated_at: DateTime.t(),
+          inserted_at: DateTime.t(),
+          timeout_in_seconds: non_neg_integer(),
+          active: boolean()
+        }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -42,6 +42,9 @@ defmodule Brolga.Monitoring.Monitor do
     |> validate_length(:url, min: 5)
     |> validate_number(:interval_in_minutes, greater_than_or_equal_to: 0)
     |> validate_number(:timeout_in_seconds, greater_than_or_equal_to: 1)
-    |> check_constraint(:timeout_in_seconds, name: :timout_lower_than_interval, message: "Timout cannot exceed the interval timing")
+    |> check_constraint(:timeout_in_seconds,
+      name: :timout_lower_than_interval,
+      message: "Timout cannot exceed the interval timing"
+    )
   end
 end

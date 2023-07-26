@@ -35,7 +35,12 @@ defmodule Brolga.MonitoringTest do
 
     test "update_monitor/2 with valid data updates the monitor" do
       monitor = monitor_fixture()
-      update_attrs = %{name: "some updated name", url: "some updated url", interval_in_minutes: 43}
+
+      update_attrs = %{
+        name: "some updated name",
+        url: "some updated url",
+        interval_in_minutes: 43
+      }
 
       assert {:ok, %Monitor{} = monitor} = Monitoring.update_monitor(monitor, update_attrs)
       assert monitor.name == "some updated name"
@@ -81,7 +86,9 @@ defmodule Brolga.MonitoringTest do
     test "create_monitor_result/1 with valid data creates a monitor_result" do
       valid_attrs = %{reached: true}
 
-      assert {:ok, %MonitorResult{} = monitor_result} = Monitoring.create_monitor_result(valid_attrs)
+      assert {:ok, %MonitorResult{} = monitor_result} =
+               Monitoring.create_monitor_result(valid_attrs)
+
       assert monitor_result.reached == true
     end
 
@@ -93,20 +100,28 @@ defmodule Brolga.MonitoringTest do
       monitor_result = monitor_result_fixture()
       update_attrs = %{reached: false}
 
-      assert {:ok, %MonitorResult{} = monitor_result} = Monitoring.update_monitor_result(monitor_result, update_attrs)
+      assert {:ok, %MonitorResult{} = monitor_result} =
+               Monitoring.update_monitor_result(monitor_result, update_attrs)
+
       assert monitor_result.reached == false
     end
 
     test "update_monitor_result/2 with invalid data returns error changeset" do
       monitor_result = monitor_result_fixture()
-      assert {:error, %Ecto.Changeset{}} = Monitoring.update_monitor_result(monitor_result, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Monitoring.update_monitor_result(monitor_result, @invalid_attrs)
+
       assert monitor_result == Monitoring.get_monitor_result!(monitor_result.id)
     end
 
     test "delete_monitor_result/1 deletes the monitor_result" do
       monitor_result = monitor_result_fixture()
       assert {:ok, %MonitorResult{}} = Monitoring.delete_monitor_result(monitor_result)
-      assert_raise Ecto.NoResultsError, fn -> Monitoring.get_monitor_result!(monitor_result.id) end
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Monitoring.get_monitor_result!(monitor_result.id)
+      end
     end
 
     test "change_monitor_result/1 returns a monitor_result changeset" do
@@ -147,13 +162,18 @@ defmodule Brolga.MonitoringTest do
       monitor_tag = monitor_tag_fixture()
       update_attrs = %{name: "some updated name"}
 
-      assert {:ok, %MonitorTag{} = monitor_tag} = Monitoring.update_monitor_tag(monitor_tag, update_attrs)
+      assert {:ok, %MonitorTag{} = monitor_tag} =
+               Monitoring.update_monitor_tag(monitor_tag, update_attrs)
+
       assert monitor_tag.name == "some updated name"
     end
 
     test "update_monitor_tag/2 with invalid data returns error changeset" do
       monitor_tag = monitor_tag_fixture()
-      assert {:error, %Ecto.Changeset{}} = Monitoring.update_monitor_tag(monitor_tag, @invalid_attrs)
+
+      assert {:error, %Ecto.Changeset{}} =
+               Monitoring.update_monitor_tag(monitor_tag, @invalid_attrs)
+
       assert monitor_tag == Monitoring.get_monitor_tag!(monitor_tag.id)
     end
 

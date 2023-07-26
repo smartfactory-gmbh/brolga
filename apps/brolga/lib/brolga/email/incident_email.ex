@@ -22,6 +22,7 @@ defmodule Brolga.Email.IncidentEmail do
 
   def new_incident(incident) do
     [from: from, to: to] = @mail_config
+
     new()
     |> to(to)
     |> from(from)
@@ -32,6 +33,7 @@ defmodule Brolga.Email.IncidentEmail do
 
   def incident_resolved(incident) do
     [from: from, to: to] = @mail_config
+
     new()
     |> to(to)
     |> from(from)

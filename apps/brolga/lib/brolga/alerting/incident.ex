@@ -4,13 +4,13 @@ defmodule Brolga.Alerting.Incident do
   alias Brolga.Monitoring.Monitor
 
   @type t :: %__MODULE__{
-    id: Ecto.UUID.t(),
-    monitor: Monitor.t(),
-    updated_at: DateTime.t(),
-    inserted_at: DateTime.t(),
-    started_at: DateTime.t(),
-    ended_at: DateTime.t(),
-  }
+          id: Ecto.UUID.t(),
+          monitor: Monitor.t(),
+          updated_at: DateTime.t(),
+          inserted_at: DateTime.t(),
+          started_at: DateTime.t(),
+          ended_at: DateTime.t()
+        }
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id

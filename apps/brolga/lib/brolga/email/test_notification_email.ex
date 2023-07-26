@@ -14,6 +14,7 @@ defmodule Brolga.Email.TestNotificationEmail do
 
   def test_notification() do
     [from: from, to: to] = @mail_config
+
     new()
     |> to(to)
     |> from(from)
