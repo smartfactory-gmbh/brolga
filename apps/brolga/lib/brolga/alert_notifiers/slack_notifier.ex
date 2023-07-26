@@ -1,6 +1,9 @@
 defmodule Brolga.AlertNotifiers.SlackNotifier do
   @moduledoc false
 
+  alias Brolga.Alerting.Incident
+  use Timex
+
   @headers [{"Accept", "application/json"}]
 
   @error_color "#DF3617"
@@ -10,9 +13,9 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
     Application.get_env(:brolga, :notifiers)[:slack]
   end
 
-  @spec new_incident(Brolga.Alerting.Incident.t()) :: :ok | :error
+  @spec new_incident(Incident.t()) :: :ok | :error
   def new_incident(incident) do
-    incident_timestamp = incident.started_at |> DateTime.to_unix()
+    incident_timestamp = incident.started_at |> Timex.to_unix()
 
     send(%{
       icon_emoji: ":x:",
@@ -51,10 +54,12 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
     })
   end
 
-  @spec incident_resolved(Brolga.Alerting.Incident.t()) :: :ok | :error
+  @spec incident_resolved(Incident.t()) :: :ok | :error
   def incident_resolved(incident) do
-    incident_start_timestamp = incident.started_at |> DateTime.to_unix()
-    incident_end_timestamp = incident.ended_at |> DateTime.to_unix()
+    incident_start_timestamp = incident.started_at |> Timex.to_unix()
+    incident_end_timestamp = incident.ended_at |> Timex.to_unix()
+
+    elapsed = Incident.formatted_duration(incident)
 
     send(%{
       icon_emoji: ":white_check_mark:",
@@ -94,6 +99,13 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
                 text:
                   "Time of resolution: <!date^#{incident_end_timestamp}^{date_short} {time_secs}|#{DateTime.to_string(incident.ended_at)}>"
               }
+            },
+            %{
+              type: "section",
+              text: %{
+                type: "mrkdwn",
+                text: "Downtime duration: #{elapsed}"
+              }
             }
           ]
         }
@@ -126,13 +138,16 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
   end
 
   defp send(data) do
-<<<<<<< HEAD
     [username: username, channel: channel, webhook_url: webhook_url] = get_config()
 
     case webhook_url do
-      nil -> :error
+      nil ->
+        :error
+
       url ->
-        encoded_data = data |> Map.merge(%{username: username, channel: channel}) |> Jason.encode!()
+        encoded_data =
+          data |> Map.merge(%{username: username, channel: channel}) |> Jason.encode!()
+
         case HTTPoison.post(url, encoded_data, @headers) do
           {:ok, response} ->
             if response.status_code in 200..299 do
@@ -140,23 +155,10 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
             else
               :error
             end
-          _ -> :error
-        end
-      end
-=======
-    encoded_data = data |> Map.merge(%{username: @username, channel: @channel}) |> Jason.encode!()
 
-    case HTTPoison.post(@webhook_url, encoded_data, @headers) do
-      {:ok, response} ->
-        if response.status_code in 200..299 do
-          :ok
-        else
-          :error
+          _ ->
+            :error
         end
-
-      _ ->
-        :error
     end
->>>>>>> c7409cd (chore: reformat files)
   end
 end

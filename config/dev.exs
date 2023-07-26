@@ -90,4 +90,5 @@ config :brolga_watcher,
 config :brolga, Brolga.AlertNotifiers,
   notifiers: [
     Brolga.AlertNotifiers.EmailNotifier
+    # Brolga.AlertNotifiers.SlackNotifier
   ]

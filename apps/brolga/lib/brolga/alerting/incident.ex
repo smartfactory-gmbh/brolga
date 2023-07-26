@@ -29,4 +29,20 @@ defmodule Brolga.Alerting.Incident do
     |> cast(attrs, [:started_at, :ended_at, :monitor_id])
     |> validate_required([:started_at])
   end
+
+  @spec duration(t()) :: {hours :: integer, minutes :: integer}
+  def duration(incident) do
+    {hours, minutes, _, _} =
+      Timex.diff(incident.started_at, incident.ended_at, :duration)
+      |> Timex.Duration.abs()
+      |> Timex.Duration.to_clock()
+
+    {hours, minutes}
+  end
+
+  @spec formatted_duration(t()) :: String.t()
+  def formatted_duration(incident) do
+    {hours, minutes} = duration(incident)
+    "#{hours}h #{minutes}m"
+  end
 end
