@@ -1,4 +1,9 @@
 defmodule Brolga.Email.IncidentEmail do
+  @moduledoc """
+  Email module responsible for generating ready-to-send emails for
+  both when a monitor is up or down
+  """
+
   import Swoosh.Email
   alias Brolga.Alerting.Incident
 
@@ -20,6 +25,7 @@ defmodule Brolga.Email.IncidentEmail do
   __NAME__ is up
   """
 
+  @spec new_incident(incident :: Incident.t()) :: Swoosh.Email.t()
   def new_incident(incident) do
     [from: from, to: to] = @mail_config
 
@@ -31,6 +37,7 @@ defmodule Brolga.Email.IncidentEmail do
     |> text_body(@text_body_down |> String.replace("__NAME__", incident.monitor.name))
   end
 
+  @spec incident_resolved(incident :: Incident.t()) :: Swoosh.Email.t()
   def incident_resolved(incident) do
     [from: from, to: to] = @mail_config
 

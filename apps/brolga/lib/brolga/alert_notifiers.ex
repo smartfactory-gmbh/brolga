@@ -1,4 +1,20 @@
 defmodule Brolga.AlertNotifiers do
+  @moduledoc """
+  Central logic to be called when a notification should be sent through
+  the configured notifiers (i.e. `Brolga.AlertNotifiers.EmailNotifier`).
+
+  You can configure the active notifiers in the config like follow:
+
+  ```ex
+  config :brolga, Brolga.AlertNotifiers,
+    notifiers: [
+      Brolga.AlertNotifiers.EmailNotifier,
+      Brolga.AlertNotifiers.SlackNotifier,
+      # Whatever other notifiers could be available
+    ]
+  ```
+  """
+
   @notifiers Application.compile_env(:brolga, [__MODULE__, :notifiers], [
                Brolga.AlertNotifiers.EmailNotifier,
                Brolga.AlertNotifiers.SlackNotifier
@@ -20,8 +36,7 @@ defmodule Brolga.AlertNotifiers do
     notifiers =
       @notifiers
       |> Enum.map(&Atom.to_string(&1))
-      |> Enum.map(&String.trim_leading(&1, "Elixir."))
-      |> Enum.join(", ")
+      |> Enum.map_join(", ", &String.trim_leading(&1, "Elixir."))
 
     :logger.info("Enabled notifiers: #{notifiers}")
   end

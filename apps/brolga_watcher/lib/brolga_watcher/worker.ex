@@ -1,4 +1,13 @@
 defmodule BrolgaWatcher.Worker do
+  @moduledoc """
+  This module contains the logic for the woker in charge of
+  periodically ping a target and correctly report the result.
+
+  They are spawned under a DynamicSupervisor so they can be
+  started and stopped on the fly. This will happen when a monitor
+  is updated.
+  """
+
   use Task
   alias Brolga.Monitoring
   alias Brolga.Monitoring.Monitor

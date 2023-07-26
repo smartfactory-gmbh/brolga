@@ -1,4 +1,9 @@
 defmodule Brolga.Monitoring.MonitorResult do
+  @moduledoc """
+  Represent the result that can be reported after a ping
+  on a monitor, performed by a worker.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
 

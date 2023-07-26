@@ -1,4 +1,13 @@
 defmodule Brolga.Alerting.Incident do
+  @moduledoc """
+  Represents an event where a monitor could not be reached.
+
+  Implicitly, it can only be in two states:
+
+  - `ended_at` is `nil`, so the target is still not responding
+  - `ended_at` contains a value, so the target is up again and the incident is closed
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Brolga.Monitoring.Monitor

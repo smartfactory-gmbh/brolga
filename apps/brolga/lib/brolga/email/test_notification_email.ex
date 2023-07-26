@@ -1,6 +1,9 @@
 defmodule Brolga.Email.TestNotificationEmail do
+  @moduledoc """
+  Simplistic email sent for testing the email client config
+  """
+
   import Swoosh.Email
-  alias Brolga.Alerting.Incident
 
   @mail_config Application.compile_env!(:brolga, :incident_mail_config)
 

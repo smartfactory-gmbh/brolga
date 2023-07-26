@@ -1,4 +1,8 @@
 defmodule Brolga.Monitoring.MonitorTag do
+  @moduledoc """
+  Represents a tag that can be attached to multiple monitors.
+  """
+
   use Ecto.Schema
   import Ecto.Changeset
   alias Brolga.Monitoring.Monitor

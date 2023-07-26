@@ -1,5 +1,10 @@
 defmodule Brolga.Monitoring.Monitor do
-  alias Brolga.Monitoring
+  @moduledoc """
+  A model that represents a target to be watched.
+  Updating a monitor will stop (if it was running) and restart the
+  corresponding worker.
+  """
+
   alias Brolga.Monitoring.{MonitorResult, MonitorTag}
   alias Brolga.Alerting.Incident
   use Ecto.Schema

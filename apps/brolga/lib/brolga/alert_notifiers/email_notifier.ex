@@ -1,5 +1,6 @@
 defmodule Brolga.AlertNotifiers.EmailNotifier do
   @moduledoc false
+
   alias Brolga.Mailer
   alias Brolga.Email.IncidentEmail
   alias Brolga.Email.TestNotificationEmail
