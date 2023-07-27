@@ -18,7 +18,9 @@ defmodule Brolga.Monitoring.Monitor do
           updated_at: DateTime.t(),
           inserted_at: DateTime.t(),
           timeout_in_seconds: non_neg_integer(),
-          active: boolean()
+          active: boolean(),
+          is_down: boolean() | nil,
+          uptime: float() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -36,6 +38,9 @@ defmodule Brolga.Monitoring.Monitor do
     many_to_many :monitor_tags, MonitorTag, join_through: "monitors_tags", on_replace: :delete
 
     timestamps()
+
+    field(:is_down, :boolean, virtual: true)
+    field(:uptime, :float, virtual: true)
   end
 
   @doc false

@@ -1,7 +1,13 @@
 defmodule BrolgaWeb.PageController do
   use BrolgaWeb, :controller
 
+  alias Brolga.Monitoring
+
   def dashboard(conn, _params) do
-    render(conn, :dashboard)
+    monitors = Monitoring.list_monitors()
+
+    conn
+    |> put_layout(false)
+    |> render(:dashboard, monitors: monitors)
   end
 end

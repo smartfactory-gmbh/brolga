@@ -13,4 +13,14 @@ defmodule Brolga.Utils do
   def format_datetime!(datetime) do
     Timex.format!(datetime, @datetime_format)
   end
+
+  @spec float_to_percentage_format(float()) :: String.t()
+  @spec float_to_percentage_format(Decimal.t()) :: String.t()
+  def float_to_percentage_format(%Decimal{} = number),
+    do: float_to_percentage_format(Decimal.to_float(number))
+
+  def float_to_percentage_format(number) do
+    rounded = Float.round(number * 100, 1)
+    "#{rounded}%"
+  end
 end

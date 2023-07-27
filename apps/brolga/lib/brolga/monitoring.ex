@@ -3,6 +3,9 @@ defmodule Brolga.Monitoring do
   The Monitoring context.
   """
 
+  @uptime_lookback_days 30
+
+  import Brolga.CustomSql
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
   alias Brolga.Alerting.Incident
@@ -11,6 +14,7 @@ defmodule Brolga.Monitoring do
   alias Brolga.Monitoring.Monitor
   alias Brolga.Monitoring.MonitorResult
   alias Brolga.Alerting
+  alias Brolga.Alerting.Incident
 
   @doc """
   Returns the list of monitors.
@@ -22,6 +26,19 @@ defmodule Brolga.Monitoring do
 
   """
   def list_monitors do
+    lookback_start = Timex.now() |> Timex.shift(days: -@uptime_lookback_days)
+
+    down_monitor_ids =
+      from i in Incident,
+        where: is_nil(i.ended_at),
+        select: i.monitor_id
+
+    uptime_query =
+      from mr in MonitorResult,
+        where: mr.inserted_at >= ^lookback_start,
+        group_by: mr.monitor_id,
+        select: %{monitor_id: mr.monitor_id, uptime: avg(case_when(mr.reached, 1, 0))}
+
     monitor_query =
       from m in Monitor,
         as: :monitor,
@@ -35,7 +52,15 @@ defmodule Brolga.Monitoring do
               select: [:id, :reached]
           ),
         on: latest_results.id == r.id,
-        preload: [monitor_results: r]
+        join: up in subquery(uptime_query),
+        on: up.monitor_id == m.id,
+        preload: [monitor_results: r],
+        order_by: m.name,
+        # The select below populates the virtual field(s), since they are not persisted
+        select_merge: %{
+          is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
+          uptime: up.uptime
+        }
 
     Repo.all(monitor_query)
   end
@@ -61,6 +86,19 @@ defmodule Brolga.Monitoring do
   def get_monitor!(id), do: Repo.get!(Monitor, id)
 
   def get_monitor_with_details!(id) do
+    lookback_start = Timex.now() |> Timex.shift(days: -@uptime_lookback_days)
+
+    down_monitor_ids =
+      from i in Incident,
+        where: is_nil(i.ended_at),
+        select: i.monitor_id
+
+    uptime_query =
+      from mr in MonitorResult,
+        where: mr.inserted_at >= ^lookback_start,
+        group_by: mr.monitor_id,
+        select: %{monitor_id: mr.monitor_id, uptime: avg(case_when(mr.reached, 1, 0))}
+
     results_query = from r in MonitorResult, order_by: [desc: r.inserted_at], limit: 25
     incidents_query = from i in Incident, order_by: [desc: i.started_at], limit: 5
 
@@ -71,7 +109,13 @@ defmodule Brolga.Monitoring do
           :monitor_tags,
           incidents: ^incidents_query,
           monitor_results: ^results_query
-        ]
+        ],
+        join: up in subquery(uptime_query),
+        on: up.monitor_id == m.id,
+        select_merge: %{
+          is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
+          uptime: up.uptime
+        }
 
     Repo.one!(monitor_query)
   end
