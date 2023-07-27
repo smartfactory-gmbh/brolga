@@ -10,7 +10,11 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
   @success_color "#2EB886"
 
   defp get_config do
-    Application.get_env(:brolga, :notifiers)[:slack]
+    Application.get_env(:brolga, :slack_notifier)
+  end
+
+  def enabled? do
+    get_config()[:enabled] == true
   end
 
   @spec new_incident(Incident.t()) :: :ok | :error
@@ -138,7 +142,10 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
   end
 
   defp send(data) do
-    [username: username, channel: channel, webhook_url: webhook_url] = get_config()
+    config = get_config()
+    username = config[:username]
+    channel = config[:channel]
+    webhook_url = config[:webhook_url]
 
     case webhook_url do
       nil ->
@@ -148,17 +155,21 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
         encoded_data =
           data |> Map.merge(%{username: username, channel: channel}) |> Jason.encode!()
 
-        case HTTPoison.post(url, encoded_data, @headers) do
-          {:ok, response} ->
-            if response.status_code in 200..299 do
-              :ok
-            else
-              :error
-            end
+        make_request(url, encoded_data)
+    end
+  end
 
-          _ ->
-            :error
+  defp make_request(url, encoded_data) do
+    case HTTPoison.post(url, encoded_data, @headers) do
+      {:ok, response} ->
+        if response.status_code in 200..299 do
+          :ok
+        else
+          :error
         end
+
+      _ ->
+        :error
     end
   end
 end

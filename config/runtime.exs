@@ -16,6 +16,8 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  config :brolga, :utils, default_timezone: System.get_env("BROLGA_DEFAULT_TZ", "Etc/UTC")
+
   config :brolga, Brolga.Repo,
     # ssl: true,
     url: database_url,
@@ -102,4 +104,20 @@ if config_env() == :prod do
   #     config :swoosh, :api_client, Swoosh.ApiClient.Hackney
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
+  config :brolga, :email_notifier,
+    enabled: System.get_env("BROLGA_EMAIL_NOTIFIER_ENABLED", "false") == "true",
+    from: {
+      System.get_env("BROLGA_EMAIL_NOTIFIER_FROM_NAME", ""),
+      System.get_env("BROLGA_EMAIL_NOTIFIER_FROM_EMAIL", "test@Example.com")
+    },
+    to: {
+      System.get_env("BROLGA_EMAIL_NOTIFIER_TO_NAME", ""),
+      System.get_env("BROLGA_EMAIL_NOTIFIER_TO_EMAIL")
+    }
+
+  config :brolga, :slack_notifier,
+    enabled: System.get_env("BROLGA_SLACK_NOTIFIER_ENABLED", "false") == "true",
+    webhook_url: System.get_env("BROLGA_SLACK_NOTIFIER_WEBHOOK_URL", nil),
+    username: System.get_env("BROLGA_SLACK_NOTIFIER_USERNAME", nil),
+    channel: System.get_env("BROLGA_SLACK_NOTIFIER_CHANNEL", nil)
 end

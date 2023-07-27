@@ -5,6 +5,14 @@ defmodule Brolga.AlertNotifiers.EmailNotifier do
   alias Brolga.Email.IncidentEmail
   alias Brolga.Email.TestNotificationEmail
 
+  defp get_config do
+    Application.get_env(:brolga, :email_notifier)
+  end
+
+  def enabled? do
+    get_config()[:enabled] == true
+  end
+
   @spec new_incident(Brolga.Alerting.Incident.t()) :: :ok | :error
   def new_incident(incident) do
     results =

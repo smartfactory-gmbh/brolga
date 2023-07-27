@@ -9,9 +9,15 @@ defmodule Brolga.Utils do
   @date_format "{D}.{M}.{YYYY}"
   @datetime_format "#{@time_format} #{@date_format}"
 
+  defp get_config do
+    Application.get_env(:brolga, :utils)
+  end
+
   @spec format_datetime!(DateTime.t()) :: String.t()
   def format_datetime!(datetime) do
-    Timex.format!(datetime, @datetime_format)
+    config = get_config()
+    default_tz = config[:default_timezone]
+    datetime |> Timex.Timezone.convert(default_tz) |> Timex.format!(@datetime_format)
   end
 
   @spec float_to_percentage_format(float()) :: String.t()

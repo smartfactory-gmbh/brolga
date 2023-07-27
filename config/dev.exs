@@ -86,9 +86,27 @@ config :brolga_watcher,
     password: nil
   ]
 
-# Only enable the mail notifier so we avoid spamming 3rd party services
-config :brolga, Brolga.AlertNotifiers,
-  notifiers: [
-    Brolga.AlertNotifiers.EmailNotifier
-    # Brolga.AlertNotifiers.SlackNotifier
-  ]
+# In case you want to test a notifier in particular, configure it below
+# You most likely don't want to commit them, so use the `local.exs` config
+# file, which is ignored by git
+
+config :brolga, :email_notifier,
+  enabled: true,
+  from: {
+    "Exemple admin",
+    "admin@example.com"
+  },
+  to: {
+    "Example recipient",
+    "recipient@example.com"
+  }
+
+# config :brolga, :slack_notifier,
+#   enabled: false,
+#   webhook_url: "",
+#   username: "Brolga",
+#   channel: "#sysops"
+
+if File.exists?("config/local.exs") do
+  import_config "local.exs"
+end

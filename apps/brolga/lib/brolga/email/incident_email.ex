@@ -7,7 +7,9 @@ defmodule Brolga.Email.IncidentEmail do
   import Swoosh.Email
   alias Brolga.Alerting.Incident
 
-  @mail_config Application.compile_env!(:brolga, :incident_mail_config)
+  defp get_config do
+    Application.get_env(:brolga, :email_notifier)
+  end
 
   @html_body_down """
   <h2>__NAME__ is down</h2>
@@ -27,11 +29,11 @@ defmodule Brolga.Email.IncidentEmail do
 
   @spec new_incident(incident :: Incident.t()) :: Swoosh.Email.t()
   def new_incident(incident) do
-    [from: from, to: to] = @mail_config
+    config = get_config()
 
     new()
-    |> to(to)
-    |> from(from)
+    |> to(config[:to])
+    |> from(config[:from])
     |> subject("A new incident occurred")
     |> html_body(@html_body_down |> String.replace("__NAME__", incident.monitor.name))
     |> text_body(@text_body_down |> String.replace("__NAME__", incident.monitor.name))
@@ -39,11 +41,11 @@ defmodule Brolga.Email.IncidentEmail do
 
   @spec incident_resolved(incident :: Incident.t()) :: Swoosh.Email.t()
   def incident_resolved(incident) do
-    [from: from, to: to] = @mail_config
+    config = get_config()
 
     new()
-    |> to(to)
-    |> from(from)
+    |> to(config[:to])
+    |> from(config[:from])
     |> subject("An incident has been resolved")
     |> html_body(@html_body_up |> String.replace("__NAME__", incident.monitor.name))
     |> text_body(@text_body_up |> String.replace("__NAME__", incident.monitor.name))

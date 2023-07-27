@@ -13,18 +13,9 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 # Configure Mix tasks and generators
 config :brolga,
-  ecto_repos: [Brolga.Repo],
-  default_timezone: System.get_env("BROLGA_DEFAULT_TZ", "Etc/UTC"),
-  incident_mail_config: [
-    from: {
-      System.get_env("BROLGA_INCIDENT_MAIL_FROM_NAME", "Example"),
-      System.get_env("BROLGA_INCIDENT_MAIL_FROM_EMAIL", "test@Example.com")
-    },
-    to: {
-      System.get_env("BROLGA_INCIDENT_MAIL_TO_NAME", "Example recipient"),
-      System.get_env("BROLGA_INCIDENT_MAIL_TO_EMAIL", "test-recipient@Example.com")
-    }
-  ]
+  ecto_repos: [Brolga.Repo]
+
+config :brolga, :utils, default_timezone: "Etc/UTC"
 
 # Configures the mailer
 #
@@ -87,10 +78,12 @@ config :brolga_watcher,
     password: nil
   ]
 
-# Import environment specific config. This must remain at the bottom
-# of this file so it overrides the configuration defined above.
-import_config "#{config_env()}.exs"
-
 config :pre_commit,
   commands: ["format --check-formatted", "credo"],
   verbose: true
+
+config :brolga, Brolga.Monitoring, worker: BrolgaWatcher.Worker
+
+# Import environment specific config. This must remain at the bottom
+# of this file so it overrides the configuration defined above.
+import_config "#{config_env()}.exs"
