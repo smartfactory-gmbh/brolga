@@ -8,6 +8,7 @@ if [ -d "/config" ]; then
     fi
 fi
 
-mix phx.digest
+mix ecto.migrate
+mix run apps/brolga/priv/repo/seeds.exs
 
 $1

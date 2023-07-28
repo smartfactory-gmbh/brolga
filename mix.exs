@@ -11,6 +11,12 @@ defmodule Brolga.Umbrella.MixProject do
     ]
   end
 
+  def application do
+    [
+      extra_applications: [:inets]
+    ]
+  end
+
   # Dependencies can be Hex packages:
   #
   #   {:mydep, "~> 0.3.0"}

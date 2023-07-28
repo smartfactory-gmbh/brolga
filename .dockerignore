@@ -1,4 +1,5 @@
-.git
-.elixir_ls
+.*
+!.docker
 _build
 deps
+docker-compose*

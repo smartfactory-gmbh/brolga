@@ -1,0 +1,46 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:15-alpine
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: brolga
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 5s
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis-data:/data
+    command: ["redis-server", "--save", "60", "1"]
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli", "--raw", "incr", "ping"]
+      interval: 5s
+
+
+  brolga:
+    build:
+      # Should be changed once the image is published to DockerHub
+      context: .
+      dockerfile: .docker/Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "4000:4000"
+    environment:
+      DATABASE_URL: "postgres://postgres:postgres@db/brolga"
+      BROLGA_REDIS_HOST: redis
+      SECRET_KEY_BASE: 9WAXlLWMehEKcGi6o/SJjrPgls7X+vswSxdBWiIuuXRNvNEyyH50esphx+vjQoHx
+
+
+volumes:
+  db-data:
+  redis-data:
