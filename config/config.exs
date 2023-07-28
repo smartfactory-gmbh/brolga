@@ -82,7 +82,9 @@ config :pre_commit,
   commands: ["format --check-formatted", "credo"],
   verbose: true
 
-config :brolga, Brolga.Monitoring, worker: BrolgaWatcher.Worker
+config :brolga, :monitoring,
+  attempts_before_notification: 1,
+  uptime_lookback_days: 30
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

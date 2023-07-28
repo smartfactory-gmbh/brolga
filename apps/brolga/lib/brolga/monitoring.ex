@@ -4,6 +4,7 @@ defmodule Brolga.Monitoring do
   """
 
   @uptime_lookback_days 30
+  @attempts_before_notification 1
 
   import Brolga.CustomSql
   import Ecto.Query, warn: false
@@ -16,6 +17,10 @@ defmodule Brolga.Monitoring do
   alias Brolga.Alerting
   alias Brolga.Alerting.Incident
 
+  defp get_config do
+    Application.get_env(:brolga, :monitoring)
+  end
+
   @doc """
   Returns the list of monitors.
 
@@ -26,7 +31,8 @@ defmodule Brolga.Monitoring do
 
   """
   def list_monitors do
-    lookback_start = Timex.now() |> Timex.shift(days: -@uptime_lookback_days)
+    config = get_config()
+    lookback_start = Timex.now() |> Timex.shift(days: -config[:uptime_lookback_days])
 
     down_monitor_ids =
       from i in Incident,
@@ -86,7 +92,8 @@ defmodule Brolga.Monitoring do
   def get_monitor!(id), do: Repo.get!(Monitor, id)
 
   def get_monitor_with_details!(id) do
-    lookback_start = Timex.now() |> Timex.shift(days: -@uptime_lookback_days)
+    config = get_config()
+    lookback_start = Timex.now() |> Timex.shift(days: -config[:uptime_lookback_days])
 
     down_monitor_ids =
       from i in Incident,
@@ -257,6 +264,11 @@ defmodule Brolga.Monitoring do
   """
   def get_monitor_result!(id), do: Repo.get!(MonitorResult, id)
 
+  defp get_closed_incident_pattern do
+    config = get_config()
+    (0..(config[:attempts_before_notification] - 1) |> Enum.map(fn _i -> true end)) ++ [false]
+  end
+
   @doc """
   Creates a monitor_result.
 
@@ -270,6 +282,8 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor_result(attrs \\ %{}) do
+    config = get_config()
+
     result =
       %MonitorResult{}
       |> MonitorResult.changeset(attrs)
@@ -281,15 +295,18 @@ defmodule Brolga.Monitoring do
 
         last_results =
           monitor.monitor_results
-          |> Enum.slice(0..2)
+          |> Enum.slice(0..config[:attempts_before_notification])
           |> Enum.map(fn monitor_result -> monitor_result.reached end)
 
+        closed_incident = get_closed_incident_pattern()
+        open_incident = closed_incident |> Enum.map(fn value -> not value end)
+
         case last_results do
-          [true, true, false] ->
+          ^closed_incident ->
             # If reached correctly twice, we close the incident
             Alerting.close_incident(monitor)
 
-          [false, false, true] ->
+          ^open_incident ->
             # If reached incorrectly twice, we open an incident
             Alerting.open_incident(monitor)
 

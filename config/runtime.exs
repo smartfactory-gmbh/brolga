@@ -18,6 +18,11 @@ if config_env() == :prod do
 
   config :brolga, :utils, default_timezone: System.get_env("BROLGA_DEFAULT_TZ", "Etc/UTC")
 
+  config :brolga, :monitoring,
+    attempts_before_notification:
+      Integer.parse(System.get_env("BROLGA_ATTEMPTS_BEFORE_NOTIFICATION", "1")),
+    uptime_lookback_days: Integer.parse(System.get_env("BROLGA_UPTIME_LOOKBACK_DAYS", "30"))
+
   config :brolga, Brolga.Repo,
     # ssl: true,
     url: database_url,
