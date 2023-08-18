@@ -78,10 +78,6 @@ config :brolga_watcher,
     password: nil
   ]
 
-config :pre_commit,
-  commands: ["format --check-formatted", "credo"],
-  verbose: true
-
 config :brolga, :monitoring,
   attempts_before_notification: 1,
   uptime_lookback_days: 30
