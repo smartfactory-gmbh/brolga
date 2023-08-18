@@ -29,13 +29,6 @@ config :logger, level: :info
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
 
-# Uncomment the notifiers that should be enabled
-config :brolga, Brolga.AlertNotifiers,
-  notifiers: [
-    # Brolga.AlertNotifiers.EmailNotifier,
-    # Brolga.AlertNotifiers.SlackNotifier,
-  ]
-
 # Redis config
 config :brolga, :redis,
   host: "localhost",
