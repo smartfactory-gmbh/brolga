@@ -24,10 +24,7 @@ services:
 
 
   brolga:
-    build:
-      # Should be changed once the image is published to DockerHub
-      context: .
-      dockerfile: .docker/Dockerfile
+    image: smfsysops/brolga:0.0.1
     depends_on:
       db:
         condition: service_healthy
@@ -37,7 +34,7 @@ services:
       - "4000:4000"
     environment:
       DATABASE_URL: "postgres://postgres:postgres@db/brolga"
-      BROLGA_REDIS_HOST: redis
+      REDIS_HOST: redis
       SECRET_KEY_BASE: 9WAXlLWMehEKcGi6o/SJjrPgls7X+vswSxdBWiIuuXRNvNEyyH50esphx+vjQoHx
 
 
