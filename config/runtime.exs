@@ -16,12 +16,12 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :brolga, :utils, default_timezone: System.get_env("BROLGA_DEFAULT_TZ", "Etc/UTC")
+  config :brolga, :utils, default_timezone: System.get_env("DEFAULT_TZ", "Etc/UTC")
 
   config :brolga, :monitoring,
     attempts_before_notification:
-      String.to_integer(System.get_env("BROLGA_ATTEMPTS_BEFORE_NOTIFICATION", "1")),
-    uptime_lookback_days: String.to_integer(System.get_env("BROLGA_UPTIME_LOOKBACK_DAYS", "30"))
+      String.to_integer(System.get_env("ATTEMPTS_BEFORE_NOTIFICATION", "1")),
+    uptime_lookback_days: String.to_integer(System.get_env("UPTIME_LOOKBACK_DAYS", "30"))
 
   config :brolga, Brolga.Repo,
     # ssl: true,
@@ -30,10 +30,10 @@ if config_env() == :prod do
     socket_options: maybe_ipv6
 
   config :brolga, :redis,
-    host: System.get_env("BROLGA_REDIS_HOST", "localhost"),
-    port: String.to_integer(System.get_env("BROLGA_REDIS_PORT", "6379")),
-    username: System.get_env("BROLGA_REDIS_USER"),
-    password: System.get_env("BROLGA_REDIS_PASSWORD")
+    host: System.get_env("REDIS_HOST", "localhost"),
+    port: String.to_integer(System.get_env("REDIS_PORT", "6379")),
+    username: System.get_env("REDIS_USER"),
+    password: System.get_env("REDIS_PASSWORD")
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -119,19 +119,19 @@ if config_env() == :prod do
   #
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
   config :brolga, :email_notifier,
-    enabled: System.get_env("BROLGA_EMAIL_NOTIFIER_ENABLED", "false") == "true",
+    enabled: System.get_env("EMAIL_NOTIFIER_ENABLED", "false") == "true",
     from: {
-      System.get_env("BROLGA_EMAIL_NOTIFIER_FROM_NAME", ""),
-      System.get_env("BROLGA_EMAIL_NOTIFIER_FROM_EMAIL", "test@Example.com")
+      System.get_env("EMAIL_NOTIFIER_FROM_NAME", ""),
+      System.get_env("EMAIL_NOTIFIER_FROM_EMAIL", "test@example.com")
     },
     to: {
-      System.get_env("BROLGA_EMAIL_NOTIFIER_TO_NAME", ""),
-      System.get_env("BROLGA_EMAIL_NOTIFIER_TO_EMAIL")
+      System.get_env("EMAIL_NOTIFIER_TO_NAME", ""),
+      System.get_env("EMAIL_NOTIFIER_TO_EMAIL")
     }
 
   config :brolga, :slack_notifier,
-    enabled: System.get_env("BROLGA_SLACK_NOTIFIER_ENABLED", "false") == "true",
-    webhook_url: System.get_env("BROLGA_SLACK_NOTIFIER_WEBHOOK_URL", nil),
-    username: System.get_env("BROLGA_SLACK_NOTIFIER_USERNAME", nil),
-    channel: System.get_env("BROLGA_SLACK_NOTIFIER_CHANNEL", nil)
+    enabled: System.get_env("SLACK_NOTIFIER_ENABLED", "false") == "true",
+    webhook_url: System.get_env("SLACK_NOTIFIER_WEBHOOK_URL", nil),
+    username: System.get_env("SLACK_NOTIFIER_USERNAME", nil),
+    channel: System.get_env("SLACK_NOTIFIER_CHANNEL", nil)
 end
