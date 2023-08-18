@@ -45,8 +45,8 @@ defmodule Brolga.Monitoring do
     monitor_query =
       from m in Monitor,
         as: :monitor,
-        join: r in assoc(m, :monitor_results),
-        inner_lateral_join:
+        left_join: r in assoc(m, :monitor_results),
+        left_lateral_join:
           latest_results in subquery(
             from MonitorResult,
               where: [monitor_id: parent_as(:monitor).id],
@@ -55,14 +55,14 @@ defmodule Brolga.Monitoring do
               select: [:id, :reached]
           ),
         on: latest_results.id == r.id,
-        join: up in subquery(uptime_query),
+        left_join: up in subquery(uptime_query),
         on: up.monitor_id == m.id,
         preload: [monitor_results: r],
         order_by: m.name,
         # The select below populates the virtual field(s), since they are not persisted
         select_merge: %{
           is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
-          uptime: up.uptime
+          uptime: up.uptime |> coalesce(0)
         }
 
     Repo.all(monitor_query)
@@ -114,7 +114,7 @@ defmodule Brolga.Monitoring do
           incidents: ^incidents_query,
           monitor_results: ^results_query
         ],
-        join: up in subquery(uptime_query),
+        left_join: up in subquery(uptime_query),
         on: up.monitor_id == m.id,
         select_merge: %{
           is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
@@ -147,7 +147,7 @@ defmodule Brolga.Monitoring do
     case result do
       {:ok, monitor} ->
         # An new worker is started, matching this new monitor
-        BrolgaWatcher.Worker.start(monitor.id)
+        Brolga.Watcher.Worker.start(monitor.id)
 
       _ ->
         nil
@@ -191,7 +191,7 @@ defmodule Brolga.Monitoring do
       {:ok, monitor} ->
         # Note: we start it *even* if active = false, because it will cleanup previous workers as well
         # if active is false, it will stop directly anyway
-        BrolgaWatcher.Worker.start(monitor.id)
+        Brolga.Watcher.Worker.start(monitor.id)
 
       _ ->
         nil
@@ -213,7 +213,7 @@ defmodule Brolga.Monitoring do
 
   """
   def delete_monitor(%Monitor{} = monitor) do
-    BrolgaWatcher.Worker.stop(monitor.id)
+    Brolga.Watcher.Worker.stop(monitor.id)
     Repo.delete(monitor)
   end
 

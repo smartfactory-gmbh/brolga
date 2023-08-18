@@ -13,7 +13,10 @@ defmodule Brolga.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:mix]
+      ]
     ]
   end
 
@@ -42,7 +45,11 @@ defmodule Brolga.MixProject do
       {:jason, "~> 1.2"},
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
-      {:timex, "~> 3.0"}
+      {:timex, "~> 3.0"},
+      {:httpoison, "~> 2.0"},
+      {:redix, "~> 1.2"},
+      {:mox, "~> 1.0", only: :test},
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
 

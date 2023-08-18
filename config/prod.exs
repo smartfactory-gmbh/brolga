@@ -37,10 +37,8 @@ config :brolga, Brolga.AlertNotifiers,
   ]
 
 # Redis config
-config :brolga_watcher,
-  redis: [
-    host: "localhost",
-    port: 6379,
-    username: nil,
-    password: nil
-  ]
+config :brolga, :redis,
+  host: "localhost",
+  port: 6379,
+  username: nil,
+  password: nil

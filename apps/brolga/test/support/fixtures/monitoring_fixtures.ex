@@ -4,10 +4,14 @@ defmodule Brolga.MonitoringFixtures do
   entities via the `Brolga.Monitoring` context.
   """
 
+  import Mox
+
   @doc """
   Generate a monitor.
   """
   def monitor_fixture(attrs \\ %{}) do
+    expect(Brolga.Watcher.WorkerMock, :start, fn _id -> :ok end)
+
     {:ok, monitor} =
       attrs
       |> Enum.into(%{

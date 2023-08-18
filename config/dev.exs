@@ -82,13 +82,11 @@ config :swoosh, :api_client, false
 # in production as building large stacktraces may be expensive.
 config :phoenix, :stacktrace_depth, 20
 
-config :brolga_watcher,
-  redis: [
-    host: "localhost",
-    port: 6379,
-    username: nil,
-    password: nil
-  ]
+config :brolga, :redis,
+  host: "localhost",
+  port: 6379,
+  username: nil,
+  password: nil
 
 # In case you want to test a notifier in particular, configure it below
 # You most likely don't want to commit them, so use the `local.exs` config

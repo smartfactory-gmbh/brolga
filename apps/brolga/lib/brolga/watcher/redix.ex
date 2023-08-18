@@ -1,4 +1,4 @@
-defmodule BrolgaWatcher.Redix do
+defmodule Brolga.Watcher.Redix do
   @moduledoc """
   Customer Redix module for redis management.
   Provides a small API to forward commands to a pool of redis workers
@@ -11,7 +11,7 @@ defmodule BrolgaWatcher.Redix do
       port: port,
       username: username,
       password: password
-    ] = Application.get_env(:brolga_watcher, :redis)
+    ] = Application.get_env(:brolga, :redis)
 
     children =
       for index <- 0..(@pool_size - 1) do

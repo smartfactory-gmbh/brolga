@@ -21,11 +21,11 @@ defmodule Brolga.AlertingTest do
     end
 
     test "create_incident/1 with valid data creates a incident" do
-      valid_attrs = %{start: ~N[2023-07-24 09:21:00], end: ~N[2023-07-24 09:21:00]}
+      valid_attrs = %{started_at: ~N[2023-07-24 09:21:00], ended_at: ~N[2023-07-24 09:21:00]}
 
       assert {:ok, %Incident{} = incident} = Alerting.create_incident(valid_attrs)
-      assert incident.started_at == ~N[2023-07-24 09:21:00]
-      assert incident.ended_at == ~N[2023-07-24 09:21:00]
+      assert incident.started_at == ~U[2023-07-24 09:21:00Z]
+      assert incident.ended_at == ~U[2023-07-24 09:21:00Z]
     end
 
     test "create_incident/1 with invalid data returns error changeset" do
@@ -37,8 +37,8 @@ defmodule Brolga.AlertingTest do
       update_attrs = %{start: ~N[2023-07-25 09:21:00], end: ~N[2023-07-25 09:21:00]}
 
       assert {:ok, %Incident{} = incident} = Alerting.update_incident(incident, update_attrs)
-      assert incident.started_at == ~N[2023-07-25 09:21:00]
-      assert incident.ended_at == ~N[2023-07-25 09:21:00]
+      assert incident.started_at == ~U[2023-07-24 09:21:00Z]
+      assert incident.ended_at == ~U[2023-07-24 09:21:00Z]
     end
 
     test "update_incident/2 with invalid data returns error changeset" do

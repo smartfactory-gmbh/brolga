@@ -1,4 +1,4 @@
-defmodule BrolgaWatcher.Application do
+defmodule Brolga.Watcher.Application do
   # See https://hexdocs.pm/elixir/Application.html
   # for more information on OTP Applications
   @moduledoc false
@@ -9,9 +9,9 @@ defmodule BrolgaWatcher.Application do
   @impl true
   def start(_type, _args) do
     children = [
-      # Starts a worker by calling: BrolgaWatcher.Worker.start_link(arg)
-      {DynamicSupervisor, strategy: :one_for_one, name: BrolgaWatcher.DynamicSupervisor},
-      BrolgaWatcher.Redix
+      # Starts a worker by calling: Brolga.Watcher.Worker.start_link(arg)
+      {DynamicSupervisor, strategy: :one_for_one, name: Brolga.Watcher.DynamicSupervisor},
+      Brolga.Watcher.Redix
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -24,7 +24,7 @@ defmodule BrolgaWatcher.Application do
   defp start_watchers() do
     Monitoring.list_active_monitor_ids()
     |> Enum.each(fn monitor_id ->
-      BrolgaWatcher.Worker.start(monitor_id)
+      Brolga.Watcher.Worker.start(monitor_id)
     end)
   end
 end
