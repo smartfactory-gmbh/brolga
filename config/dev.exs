@@ -1,7 +1,7 @@
 import Config
 
 config :pre_commit,
-  commands: ["format --check-formatted", "credo"],
+  commands: ["format --check-formatted", "credo", "dialyzer"],
   verbose: true
 
 # Configure your database
