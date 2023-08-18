@@ -13,7 +13,10 @@ defmodule BrolgaWeb.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      dialyzer: [
+        plt_add_apps: [:mix]
+      ]
     ]
   end
 
@@ -50,7 +53,8 @@ defmodule BrolgaWeb.MixProject do
       {:gettext, "~> 0.20"},
       {:brolga, in_umbrella: true},
       {:jason, "~> 1.2"},
-      {:plug_cowboy, "~> 2.5"}
+      {:plug_cowboy, "~> 2.5"},
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
 
