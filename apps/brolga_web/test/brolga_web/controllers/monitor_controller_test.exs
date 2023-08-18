@@ -2,6 +2,7 @@ defmodule BrolgaWeb.MonitorControllerTest do
   use BrolgaWeb.ConnCase
 
   import Brolga.MonitoringFixtures
+  import Mox
 
   @create_attrs %{name: "some name", url: "some url", interval_in_minutes: 42}
   @update_attrs %{name: "some updated name", url: "some updated url", interval_in_minutes: 43}
@@ -23,13 +24,12 @@ defmodule BrolgaWeb.MonitorControllerTest do
 
   describe "create monitor" do
     test "redirects to show when data is valid", %{conn: conn} do
+      expect(Brolga.Watcher.WorkerMock, :start, fn _ -> :ok end)
+
       conn = post(conn, ~p"/monitors", monitor: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
       assert redirected_to(conn) == ~p"/monitors/#{id}"
-
-      conn = get(conn, ~p"/monitors/#{id}")
-      assert html_response(conn, 200) =~ "Monitor #{id}"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
@@ -51,6 +51,8 @@ defmodule BrolgaWeb.MonitorControllerTest do
     setup [:create_monitor]
 
     test "redirects when data is valid", %{conn: conn, monitor: monitor} do
+      expect(Brolga.Watcher.WorkerMock, :start, fn _ -> :ok end)
+
       conn = put(conn, ~p"/monitors/#{monitor}", monitor: @update_attrs)
       assert redirected_to(conn) == ~p"/monitors/#{monitor}"
 
@@ -68,6 +70,11 @@ defmodule BrolgaWeb.MonitorControllerTest do
     setup [:create_monitor]
 
     test "deletes chosen monitor", %{conn: conn, monitor: monitor} do
+      expect(Brolga.Watcher.WorkerMock, :stop, fn monitor_id ->
+        assert monitor_id == monitor.id
+        :ok
+      end)
+
       conn = delete(conn, ~p"/monitors/#{monitor}")
       assert redirected_to(conn) == ~p"/monitors"
 

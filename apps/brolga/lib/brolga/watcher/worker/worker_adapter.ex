@@ -1,4 +1,4 @@
-defmodule BrolgaWatcher.Worker do
+defmodule Brolga.Watcher.Worker.WorkerAdapter do
   @moduledoc """
   This module contains the logic for the woker in charge of
   periodically ping a target and correctly report the result.
@@ -7,6 +7,8 @@ defmodule BrolgaWatcher.Worker do
   started and stopped on the fly. This will happen when a monitor
   is updated.
   """
+
+  @behaviour Brolga.Watcher.Worker.WorkerBehaviour
 
   use Task
   alias Brolga.Monitoring
@@ -70,27 +72,35 @@ defmodule BrolgaWatcher.Worker do
     Monitoring.get_active_monitor!(monitor_id)
   end
 
+  @impl Brolga.Watcher.Worker.WorkerBehaviour
   def start(monitor_id) do
     # If it was running, kill it first
     stop(monitor_id)
 
     spec = {__MODULE__, monitor_id}
-    {:ok, worker_id} = DynamicSupervisor.start_child(BrolgaWatcher.DynamicSupervisor, spec)
+    {:ok, worker_id} = DynamicSupervisor.start_child(Brolga.Watcher.DynamicSupervisor, spec)
 
-    BrolgaWatcher.Redix.store!("monitor-#{monitor_id}", to_string(:erlang.pid_to_list(worker_id)))
+    Brolga.Watcher.Redix.store!(
+      "monitor-#{monitor_id}",
+      to_string(:erlang.pid_to_list(worker_id))
+    )
+
     :logger.debug("Monitor #{monitor_id} has been started")
+    :ok
   end
 
+  @impl Brolga.Watcher.Worker.WorkerBehaviour
   def stop(monitor_id) do
-    pid = BrolgaWatcher.Redix.get!("monitor-#{monitor_id}")
+    pid = Brolga.Watcher.Redix.get!("monitor-#{monitor_id}")
 
     if pid do
       DynamicSupervisor.terminate_child(
-        BrolgaWatcher.DynamicSupervisor,
+        Brolga.Watcher.DynamicSupervisor,
         :erlang.list_to_pid(to_charlist(pid))
       )
     end
 
     :logger.debug("Monitor #{monitor_id} has been stopped")
+    :ok
   end
 end

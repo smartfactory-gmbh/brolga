@@ -13,9 +13,11 @@ defmodule Brolga.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Brolga.PubSub},
       # Start Finch
-      {Finch, name: Brolga.Finch}
+      {Finch, name: Brolga.Finch},
       # Start a worker by calling: Brolga.Worker.start_link(arg)
       # {Brolga.Worker, arg}
+      {DynamicSupervisor, strategy: :one_for_one, name: Brolga.Watcher.DynamicSupervisor},
+      Brolga.Watcher.Redix
     ]
 
     results = Supervisor.start_link(children, strategy: :one_for_one, name: Brolga.Supervisor)

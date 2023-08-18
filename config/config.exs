@@ -70,12 +70,15 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :brolga_watcher,
+config :brolga,
   redis: [
     host: nil,
     port: nil,
     username: nil,
     password: nil
+  ],
+  adapters: [
+    watcher_worker: Brolga.Watcher.Worker.WorkerAdapter
   ]
 
 config :brolga, :monitoring,
