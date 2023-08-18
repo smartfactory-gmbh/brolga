@@ -10,5 +10,8 @@
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-Brolga.Monitoring.create_monitor_tag(%{name: "Prod"})
-Brolga.Monitoring.create_monitor_tag(%{name: "Test"})
+if length(Brolga.Monitoring.list_monitor_tags()) == 0 do
+  IO.puts("[*] No tags found, creating default ones...")
+  Brolga.Monitoring.create_monitor_tag(%{name: "Prod"})
+  Brolga.Monitoring.create_monitor_tag(%{name: "Test"})
+end

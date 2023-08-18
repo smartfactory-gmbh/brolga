@@ -20,14 +20,22 @@ if config_env() == :prod do
 
   config :brolga, :monitoring,
     attempts_before_notification:
-      Integer.parse(System.get_env("BROLGA_ATTEMPTS_BEFORE_NOTIFICATION", "1")),
-    uptime_lookback_days: Integer.parse(System.get_env("BROLGA_UPTIME_LOOKBACK_DAYS", "30"))
+      String.to_integer(System.get_env("BROLGA_ATTEMPTS_BEFORE_NOTIFICATION", "1")),
+    uptime_lookback_days: String.to_integer(System.get_env("BROLGA_UPTIME_LOOKBACK_DAYS", "30"))
 
   config :brolga, Brolga.Repo,
     # ssl: true,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
+
+  config :brolga_watcher,
+    redis: [
+      host: System.get_env("BROLGA_REDIS_HOST", "localhost"),
+      port: String.to_integer(System.get_env("BROLGA_REDIS_PORT", "6379")),
+      username: System.get_env("BROLGA_REDIS_USER"),
+      password: System.get_env("BROLGA_REDIS_PASSWORD")
+    ]
 
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
@@ -41,14 +49,17 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
+  port = String.to_integer(System.get_env("PORT") || "4000")
+  host = System.get_env("HOST", "localhost")
+
   config :brolga_web, BrolgaWeb.Endpoint,
     http: [
-      # Enable IPv6 and bind on all interfaces.
-      # Set it to  {0, 0, 0, 0, 0, 0, 0, 1} for local network only access.
-      ip: {0, 0, 0, 0, 0, 0, 0, 0},
-      port: String.to_integer(System.get_env("PORT") || "4000")
+      # Enable IPv4 and bind on all interfaces.
+      ip: {0, 0, 0, 0},
+      port: port
     ],
-    secret_key_base: secret_key_base
+    secret_key_base: secret_key_base,
+    url: [host: host, port: port]
 
   # ## Using releases
   #

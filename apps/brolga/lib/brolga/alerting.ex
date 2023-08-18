@@ -4,10 +4,7 @@ defmodule Brolga.Alerting do
   """
 
   import Ecto.Query, warn: false
-  import Ecto.Changeset, only: [put_assoc: 3]
-  alias Brolga.Email.IncidentEmail
   alias Brolga.Repo
-  alias Brolga.Mailer
 
   alias Brolga.Alerting.Incident
 

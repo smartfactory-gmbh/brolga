@@ -1,6 +1,14 @@
 # BrolgaWatcher
 
-**TODO: Add description**
+This app contains the logic for running periodic watchers on targets
+setup in the Brolga app. Whenever a monitor is getting created/updated/deleted.
+the corresponding watcher process is getting started/stopped/restarted here
+
+### Future considerations
+
+Since there is a cross dependency link between this app and `Brolga`,
+we may consider merging these two applications. Currently such dependencies are
+working, but may confuse some code quality tools
 
 ## Installation
 

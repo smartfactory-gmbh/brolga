@@ -1,5 +1,3 @@
 defmodule BrolgaWatcher do
-  @moduledoc """
-  Documentation for `BrolgaWatcher`.
-  """
+  @moduledoc File.read!(Path.join(__DIR__, "../README.md"))
 end

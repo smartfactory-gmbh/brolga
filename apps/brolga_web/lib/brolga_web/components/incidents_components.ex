@@ -4,8 +4,6 @@ defmodule BrolgaWeb.IncidentComponents do
   """
   use Phoenix.Component
 
-  alias Phoenix.LiveView.JS
-  import BrolgaWeb.Gettext
   import Brolga.Utils
 
   attr :monitor, Brolga.Monitoring.Monitor, required: true

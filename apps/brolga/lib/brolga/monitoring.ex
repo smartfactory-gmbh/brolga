@@ -3,9 +3,6 @@ defmodule Brolga.Monitoring do
   The Monitoring context.
   """
 
-  @uptime_lookback_days 30
-  @attempts_before_notification 1
-
   import Brolga.CustomSql
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]

@@ -9,6 +9,7 @@ defmodule BrolgaWeb.MonitorHTML do
   """
   attr :changeset, Ecto.Changeset, required: true
   attr :action, :string, required: true
+  attr :tags, :list, required: true
 
   def monitor_form(assigns)
 end
