@@ -134,4 +134,8 @@ if config_env() == :prod do
     webhook_url: System.get_env("SLACK_NOTIFIER_WEBHOOK_URL", nil),
     username: System.get_env("SLACK_NOTIFIER_USERNAME", nil),
     channel: System.get_env("SLACK_NOTIFIER_CHANNEL", nil)
+
+  config :brolga, :auth,
+    default_admin_email: System.get_env("DEFAULT_ADMIN_EMAIL"),
+    default_admin_password: System.get_env("DEFAULT_ADMIN_PASSWORD")
 end

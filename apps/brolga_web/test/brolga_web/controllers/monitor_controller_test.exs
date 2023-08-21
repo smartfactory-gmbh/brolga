@@ -8,6 +8,8 @@ defmodule BrolgaWeb.MonitorControllerTest do
   @update_attrs %{name: "some updated name", url: "some updated url", interval_in_minutes: 43}
   @invalid_attrs %{name: nil, url: nil, interval_in_minutes: nil}
 
+  setup :register_and_log_in_user
+
   describe "index" do
     test "lists all monitors", %{conn: conn} do
       conn = get(conn, ~p"/monitors")

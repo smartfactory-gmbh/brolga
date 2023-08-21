@@ -15,3 +15,14 @@ if length(Brolga.Monitoring.list_monitor_tags()) == 0 do
   Brolga.Monitoring.create_monitor_tag(%{name: "Prod"})
   Brolga.Monitoring.create_monitor_tag(%{name: "Test"})
 end
+
+if Brolga.Accounts.count_users() == 0 do
+  auth = Application.fetch_env!(:brolga, :auth)
+
+  credentials = %{
+    email: auth[:default_admin_email],
+    password: auth[:default_admin_password]
+  }
+
+  Brolga.Accounts.register_user(credentials)
+end

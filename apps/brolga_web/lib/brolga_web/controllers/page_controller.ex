@@ -7,7 +7,8 @@ defmodule BrolgaWeb.PageController do
     monitors = Monitoring.list_monitors()
 
     conn
-    |> put_layout(false)
+    |> put_root_layout(false)
+    |> put_layout(html: :fullscreen)
     |> render(:dashboard, monitors: monitors)
   end
 end
