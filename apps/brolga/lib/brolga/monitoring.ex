@@ -14,6 +14,8 @@ defmodule Brolga.Monitoring do
   alias Brolga.Alerting
   alias Brolga.Alerting.Incident
 
+  @last_results_count 25
+
   defp get_config do
     Application.get_env(:brolga, :monitoring)
   end
@@ -45,25 +47,39 @@ defmodule Brolga.Monitoring do
     monitor_query =
       from m in Monitor,
         as: :monitor,
-        left_join: r in assoc(m, :monitor_results),
-        left_lateral_join:
-          latest_results in subquery(
-            from MonitorResult,
-              where: [monitor_id: parent_as(:monitor).id],
-              order_by: [desc: :inserted_at],
-              limit: 25,
-              select: [:id, :reached]
-          ),
-        on: latest_results.id == r.id,
         left_join: up in subquery(uptime_query),
         on: up.monitor_id == m.id,
-        preload: [monitor_results: r],
         order_by: m.name,
         # The select below populates the virtual field(s), since they are not persisted
         select_merge: %{
           is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
           uptime: up.uptime |> coalesce(0)
         }
+
+    Repo.all(monitor_query)
+  end
+
+  def list_monitors_with_latest_results do
+    result_partition_query =
+      from result in MonitorResult,
+        order_by: [desc: :inserted_at],
+        select: %{
+          id: result.id,
+          reached: result.reached,
+          row_number: over(row_number(), :results_partition)
+        },
+        windows: [results_partition: [partition_by: :monitor_id, order_by: [desc: :inserted_at]]]
+
+    results_query =
+      from result in MonitorResult,
+        join: r in subquery(result_partition_query),
+        on: result.id == r.id and r.row_number <= @last_results_count
+
+    monitor_query =
+      from m in Monitor,
+        as: :monitor,
+        preload: [monitor_results: ^results_query],
+        order_by: m.name
 
     Repo.all(monitor_query)
   end

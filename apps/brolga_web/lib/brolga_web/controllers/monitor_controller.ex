@@ -5,7 +5,7 @@ defmodule BrolgaWeb.MonitorController do
   alias Brolga.Monitoring.{Monitor, MonitorTag}
 
   def index(conn, _params) do
-    monitors = Monitoring.list_monitors()
+    monitors = Monitoring.list_monitors_with_latest_results()
     render(conn, :index, monitors: monitors)
   end
 
