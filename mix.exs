@@ -10,6 +10,11 @@ defmodule Brolga.Umbrella.MixProject do
       aliases: aliases(),
       dialyzer: [
         plt_add_apps: [:mix]
+      ],
+      test_coverage: [
+        summary: [
+          threshold: 85
+        ]
       ]
     ]
   end
