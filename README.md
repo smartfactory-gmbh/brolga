@@ -31,26 +31,46 @@ It will serve it on port 4000.
 ### Available settings
 These are the settings you can modify with environment variables (i.e. by putting them in the `environment` key in the compose file)
 
-| Variable                       | Default value      | Notes                                                                                |
-| ------------------------------ | ------------------ | ------------------------------------------------------------------------------------ |
-| `SECRET_KEY_BASE`              | -                  | (required) Random string of at least 64 bytes length                                 |
-| `REDIS_HOST`                   | `localhost`        | Host of the Redis DB                                                                 |
-| `REDIS_PORT`                   | `6379`             | Port to use with the Redis connection                                                |
-| `REDIS_USER`                   | -                  | Username to use with the Redis connection                                            |
-| `REDIS_PASSWORD`               | -                  | Password to use with the Redis connection                                            |
-| `DEFAULT_TZ`                   | `Etc/UTC`          | The default timezone to use for datetime displays                                    |
-| `UPTIME_LOOKBACK_DAYS`         | `30`               | The number of days to take in account when calculating the uptime percentage         |
-| `ATTEMPTS_BEFORE_NOTIFICATION` | `1`                | Number of failed hit to get in order to trigger a notification                       |
-| `DATABASE_URL`                 | -                  | (required) Currently only works with postgres                                        |
-| `EMAIL_NOTIFIER_ENABLED`       | `false`            | Whether the SMTP notifier should be enabled or not                                   |
-| `EMAIL_NOTIFIER_FROM_NAME`     | -                  | (required if enabled)  The "From" user name that will be displayed on sent emails    |
-| `EMAIL_NOTIFIER_FROM_EMAIL`    | `test@example.com` | (required if enabled) The "From" email address that will be displayed on sent emails |
-| `SLACK_NOTIFIER_ENABLED`       | `false`            | Whether the Slack notifier should be enabled or not                                  |
-| `SLACK_NOTIFIER_WEBHOOK_URL`   | -                  | (required if enabled) The webhook url for your Slack app                             |
-| `SLACK_NOTIFIER_USERNAME`      | -                  | The username to use for display (falls back to your app config)                      |
-| `SLACK_NOTIFIER_CHANNEL`       | -                  | The channel to send the message to (falls back to your app config)                   |
+#### General
 
+| Variable                       | Default value | Notes                                                                        |
+| ------------------------------ | ------------- | ---------------------------------------------------------------------------- |
+| `SECRET_KEY_BASE`              | -             | (required) Random string of at least 64 bytes length                         |
+| `REDIS_HOST`                   | `localhost`   | Host of the Redis DB                                                         |
+| `REDIS_PORT`                   | `6379`        | Port to use with the Redis connection                                        |
+| `REDIS_USER`                   | -             | Username to use with the Redis connection                                    |
+| `REDIS_PASSWORD`               | -             | Password to use with the Redis connection                                    |
+| `DEFAULT_TZ`                   | `Etc/UTC`     | The default timezone to use for datetime displays                            |
+| `UPTIME_LOOKBACK_DAYS`         | `30`          | The number of days to take in account when calculating the uptime percentage |
+| `ATTEMPTS_BEFORE_NOTIFICATION` | `1`           | Number of failed hit to get in order to trigger a notification               |
+| `DATABASE_URL`                 | -             | (required) Currently only works with postgres                                |
 
+#### Notifiers configuration
+
+| Variable                     | Default value      | Notes                                                                                |
+| ---------------------------- | ------------------ | ------------------------------------------------------------------------------------ |
+| `EMAIL_NOTIFIER_ENABLED`     | `false`            | Whether the SMTP notifier should be enabled or not                                   |
+| `EMAIL_NOTIFIER_FROM_NAME`   | -                  | (required if enabled)  The "From" user name that will be displayed on sent emails    |
+| `EMAIL_NOTIFIER_FROM_EMAIL`  | `test@example.com` | (required if enabled) The "From" email address that will be displayed on sent emails |
+| `SLACK_NOTIFIER_ENABLED`     | `false`            | Whether the Slack notifier should be enabled or not                                  |
+| `SLACK_NOTIFIER_WEBHOOK_URL` | -                  | (required if enabled) The webhook url for your Slack app                             |
+| `SLACK_NOTIFIER_USERNAME`    | -                  | The username to use for display (falls back to your app config)                      |
+| `SLACK_NOTIFIER_CHANNEL`     | -                  | The channel to send the message to (falls back to your app config)                   |
+
+#### Email configuration
+
+As of now, you can either use SMTP to setup your email configuration, or use Postmark. Please use only one method with the env variables below
+
+| Variable                  | Default value | Notes                                                                |
+| ------------------------- | ------------- | -------------------------------------------------------------------- |
+| `SMTP_HOST`               | -             | (required if using SMTP) The host to use for SMTP communication      |
+| `SMTP_PORT`               | `1025`        | The port to use for SMTP communication                               |
+| `SMTP_USERNAME`           | -             | (required if using SMTP) The username to use for SMTP communication  |
+| `SMTP_PASSWORD`           | -             | (required if using SMTP) The password to use for SMTP  communication |
+| `SMTP_SSL`                | `"true"`      | Whether or not the SMTP connection should use SSL                    |
+| `SMTP_TLS`                | `"true"`      | Whether or not the SMTP connection should use TLS                    |
+| `POSTMARK_API_KEY`        | -             | (required if using Postmark) The API key provided by Postmark        |
+| `POSTMARK_MESSAGE_STREAM` | -             | The message stream to be used in Postmark                            |
 
 ### Security considerations
 

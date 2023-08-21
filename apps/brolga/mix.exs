@@ -50,7 +50,8 @@ defmodule Brolga.MixProject do
       {:httpoison, "~> 2.0"},
       {:redix, "~> 1.2"},
       {:mox, "~> 1.0", only: :test},
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
+      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
+      {:gen_smtp, "~> 1.2"}
     ]
   end
 

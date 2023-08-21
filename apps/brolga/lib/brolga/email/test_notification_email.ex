@@ -20,7 +20,7 @@ defmodule Brolga.Email.TestNotificationEmail do
   def test_notification() do
     config = get_config()
 
-    new()
+    Brolga.Mailer.new()
     |> to(config[:to])
     |> from(config[:from])
     |> subject("Brolga: test notification")
