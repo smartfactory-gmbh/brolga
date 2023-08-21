@@ -31,7 +31,7 @@ defmodule Brolga.Email.IncidentEmail do
   def new_incident(incident) do
     config = get_config()
 
-    new()
+    Brolga.Mailer.new()
     |> to(config[:to])
     |> from(config[:from])
     |> subject("A new incident occurred")
@@ -43,7 +43,7 @@ defmodule Brolga.Email.IncidentEmail do
   def incident_resolved(incident) do
     config = get_config()
 
-    new()
+    Brolga.Mailer.new()
     |> to(config[:to])
     |> from(config[:from])
     |> subject("An incident has been resolved")
