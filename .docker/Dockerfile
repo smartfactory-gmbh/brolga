@@ -1,7 +1,7 @@
 
 from elixir:1.15-alpine
 
-RUN apk add curl --no-cache
+RUN apk add curl g++ make --no-cache
 
 ENV MIX_ENV=prod
 
