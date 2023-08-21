@@ -1,5 +1,8 @@
 import Config
 
+# Only in tests, remove the complexity from the password hashing algorithm
+config :bcrypt_elixir, :log_rounds, 1
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
@@ -37,3 +40,7 @@ config :brolga, :redis,
   port: 6379,
   username: nil,
   password: nil
+
+config :brolga, :auth,
+  default_admin_email: "test-admin@brolga.test",
+  default_admin_password: "test-admin-password"

@@ -109,6 +109,10 @@ config :brolga, :email_notifier,
 #   username: "Brolga",
 #   channel: "#sysops"
 
+config :brolga, :auth,
+  default_admin_email: "dev-admin@brolga.test",
+  default_admin_password: "dev-admin-password"
+
 if File.exists?("config/local.exs") do
   import_config "local.exs"
 end
