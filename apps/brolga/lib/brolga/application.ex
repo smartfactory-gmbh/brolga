@@ -4,6 +4,7 @@ defmodule Brolga.Application do
   @moduledoc false
 
   use Application
+  alias Brolga.Monitoring
 
   @impl true
   def start(_type, _args) do
@@ -22,8 +23,17 @@ defmodule Brolga.Application do
 
     results = Supervisor.start_link(children, strategy: :one_for_one, name: Brolga.Supervisor)
 
+    start_all_watchers()
+
     Brolga.AlertNotifiers.log_enabled_notifiers()
 
     results
+  end
+
+  defp start_all_watchers() do
+    Monitoring.list_active_monitor_ids()
+    |> Enum.each(fn monitor_id ->
+      Brolga.Watcher.Worker.start(monitor_id)
+    end)
   end
 end
