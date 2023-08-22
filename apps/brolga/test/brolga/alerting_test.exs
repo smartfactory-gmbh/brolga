@@ -1,4 +1,5 @@
 defmodule Brolga.AlertingTest do
+  alias Brolga.Monitoring
   use Brolga.DataCase
 
   alias Brolga.Alerting
@@ -7,6 +8,9 @@ defmodule Brolga.AlertingTest do
     alias Brolga.Alerting.Incident
 
     import Brolga.AlertingFixtures
+    import Brolga.MonitoringFixtures
+
+    import Mox
 
     @invalid_attrs %{started_at: nil, ended_at: nil}
 
@@ -56,6 +60,41 @@ defmodule Brolga.AlertingTest do
     test "change_incident/1 returns a incident changeset" do
       incident = incident_fixture()
       assert %Ecto.Changeset{} = Alerting.change_incident(incident)
+    end
+
+    test "open_incident/1 creates a new incident for the given monitor" do
+      monitor = monitor_fixture()
+
+      expect(Brolga.HttpClientMock, :post, fn _url, _data, _headers ->
+        # Sending to slack by default
+        {:ok, %{status_code: 200}}
+      end)
+
+      Alerting.open_incident(monitor)
+
+      monitor = Monitoring.get_monitor_with_details!(monitor.id)
+      assert length(monitor.incidents) == 1
+
+      incident = monitor.incidents |> Enum.at(0)
+      assert incident.ended_at == nil
+    end
+
+    test "close_incident/1 modifies the existing incident" do
+      monitor = monitor_fixture()
+      incident_fixture(%{ended_at: nil, monitor_id: monitor.id})
+
+      expect(Brolga.HttpClientMock, :post, fn _url, _data, _headers ->
+        # Sending to slack by default
+        {:ok, %{status_code: 200}}
+      end)
+
+      Alerting.close_incident(monitor)
+
+      monitor = Monitoring.get_monitor_with_details!(monitor.id)
+      assert length(monitor.incidents) == 1
+
+      incident = monitor.incidents |> Enum.at(0)
+      assert incident.ended_at != nil
     end
   end
 end

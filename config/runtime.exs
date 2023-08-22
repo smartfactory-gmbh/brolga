@@ -124,29 +124,26 @@ if config_env() == :prod do
   # See https://hexdocs.pm/swoosh/Swoosh.html#module-installation for details.
 
   postmark_api_key = System.get_env("POSTMARK_API_KEY", "")
-  mailer_config_set = false
 
-  if postmark_api_key != "" do
-    config :brolga, Brolga.Mailer,
-      adapter: Swoosh.Adapters.Postmark,
-      api_key: postmark_api_key,
-      provider_options: [
-        message_stream: System.get_env("POSTMARK_MESSAGE_STREAM")
-      ]
+  cond do
+    postmark_api_key != "" ->
+      config :brolga, Brolga.Mailer,
+        adapter: Swoosh.Adapters.Postmark,
+        api_key: postmark_api_key,
+        provider_options: [
+          message_stream: System.get_env("POSTMARK_MESSAGE_STREAM")
+        ]
 
-    mailer_config_set = true
-  end
-
-  if not mailer_config_set do
     # Fallback on SMTP
-    config :brolga, Brolga.Mailer,
-      adapter: Swoosh.Adapters.SMTP,
-      relay: System.get_env("SMTP_HOST"),
-      port: String.to_integer(System.get_env("SMTP_PORT", "1025")),
-      username: System.get_env("SMTP_USERNAME"),
-      password: System.get_env("SMTP_PASSWORD"),
-      ssl: System.get_env("SMTP_SSL", "true") == "true",
-      tls: if(System.get_env("SMTP_TLS", "true") == "true", do: :always, else: :never)
+    true ->
+      config :brolga, Brolga.Mailer,
+        adapter: Swoosh.Adapters.SMTP,
+        relay: System.get_env("SMTP_HOST"),
+        port: String.to_integer(System.get_env("SMTP_PORT", "1025")),
+        username: System.get_env("SMTP_USERNAME"),
+        password: System.get_env("SMTP_PASSWORD"),
+        ssl: System.get_env("SMTP_SSL", "true") == "true",
+        tls: if(System.get_env("SMTP_TLS", "true") == "true", do: :always, else: :never)
   end
 
   ###########################################################################

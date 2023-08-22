@@ -11,15 +11,27 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
   @behaviour Brolga.Watcher.Worker.WorkerBehaviour
 
   use Task
+  require Logger
   alias Brolga.Monitoring
   alias Brolga.Monitoring.Monitor
 
-  def start_link(monitor_id) do
-    Task.start_link(__MODULE__, :run, [monitor_id])
+  defp get_http_client do
+    Application.fetch_env!(:brolga, :adapters) |> Keyword.get(:http, HTTPoison)
   end
 
-  @spec run(Ecto.UUID.t()) :: no_return
-  def run(monitor_id) do
+  defp get_redis_client do
+    Application.fetch_env!(:brolga, :adapters) |> Keyword.get(:redis, Brolga.Watcher.Redix)
+  end
+
+  def start_link(monitor_id) do
+    Task.start_link(__MODULE__, :run, [monitor_id, true])
+  end
+
+  @spec run_once(monitor_id :: Ecto.UUID.t()) :: no_return
+  def run_once(monitor_id), do: run(monitor_id, false)
+
+  @spec run(monitor_id :: Ecto.UUID.t(), repeat :: boolean) :: no_return
+  defp run(monitor_id, repeat) do
     start_time = DateTime.now!("Etc/UTC")
     monitor = refresh_monitor(monitor_id)
     process(monitor)
@@ -27,8 +39,10 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
 
     elapsed = DateTime.diff(start_time, end_time)
 
-    Process.sleep(1000 * 60 * monitor.interval_in_minutes - elapsed)
-    run(monitor_id)
+    if repeat do
+      Process.sleep(1000 * 60 * monitor.interval_in_minutes - elapsed)
+      run(monitor_id, true)
+    end
   end
 
   @spec validate_response(HTTPoison.Response.t(), Monitor.t()) :: no_return
@@ -49,7 +63,8 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
 
   @spec process(Monitor.t()) :: no_return
   defp process(%Monitor{url: url, timeout_in_seconds: timeout} = monitor) do
-    HTTPoison.start()
+    client = get_http_client()
+    client.start()
 
     headers = []
 
@@ -58,7 +73,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
       follow_redirect: true
     ]
 
-    case HTTPoison.get(url, headers, options) do
+    case client.get(url, headers, options) do
       {:ok, response} ->
         validate_response(response, monitor)
 
@@ -72,15 +87,30 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     Monitoring.get_active_monitor!(monitor_id)
   end
 
+  @spec get_pid(monitor_id :: Ecto.UUID) :: {:ok, pid()} | {:error, :not_running}
+  def get_pid(monitor_id) do
+    redis_client = get_redis_client()
+    pid = redis_client.get!("monitor-#{monitor_id}")
+
+    if pid do
+      result = :erlang.list_to_pid(to_charlist(pid))
+      {:ok, result}
+    else
+      {:error, :not_running}
+    end
+  end
+
   @impl Brolga.Watcher.Worker.WorkerBehaviour
   def start(monitor_id) do
+    redis_client = get_redis_client()
+
     # If it was running, kill it first
     stop(monitor_id)
 
     spec = {__MODULE__, monitor_id}
     {:ok, worker_id} = DynamicSupervisor.start_child(Brolga.Watcher.DynamicSupervisor, spec)
 
-    Brolga.Watcher.Redix.store!(
+    redis_client.store!(
       "monitor-#{monitor_id}",
       to_string(:erlang.pid_to_list(worker_id))
     )
@@ -91,16 +121,19 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
 
   @impl Brolga.Watcher.Worker.WorkerBehaviour
   def stop(monitor_id) do
-    pid = Brolga.Watcher.Redix.get!("monitor-#{monitor_id}")
+    case get_pid(monitor_id) do
+      {:ok, watcher_pid} ->
+        DynamicSupervisor.terminate_child(
+          Brolga.Watcher.DynamicSupervisor,
+          watcher_pid
+        )
 
-    if pid do
-      DynamicSupervisor.terminate_child(
-        Brolga.Watcher.DynamicSupervisor,
-        :erlang.list_to_pid(to_charlist(pid))
-      )
+        Logger.debug("Monitor #{monitor_id} has been stopped")
+
+      {:error, :not_running} ->
+        Logger.debug("Monitor #{monitor_id} was already stopped")
     end
 
-    :logger.debug("Monitor #{monitor_id} has been stopped")
     :ok
   end
 end

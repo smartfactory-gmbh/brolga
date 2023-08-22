@@ -4,13 +4,29 @@ defmodule Brolga.AlertNotifiers do
   the configured notifiers (i.e. `Brolga.AlertNotifiers.EmailNotifier`).
   """
 
-  @notifiers Application.compile_env(:brolga, [__MODULE__, :notifiers], [
-               Brolga.AlertNotifiers.EmailNotifier,
-               Brolga.AlertNotifiers.SlackNotifier
-             ])
+  require Logger
+
+  @default_notifiers [
+    Brolga.AlertNotifiers.EmailNotifier,
+    Brolga.AlertNotifiers.SlackNotifier
+  ]
+
+  defp get_notifiers do
+    case Application.fetch_env(:brolga, __MODULE__) do
+      {:ok, value} ->
+        case Keyword.get(value, :notifiers, :default) do
+          :default -> @default_notifiers
+          other -> other
+        end
+
+      :error ->
+        @default_notifiers
+    end
+  end
 
   defp enabled_notifiers do
-    Enum.filter(@notifiers, fn notifier -> notifier.enabled? end)
+    get_notifiers()
+    |> Enum.filter(fn notifier -> notifier.enabled? end)
   end
 
   def new_incident(incident) do
@@ -33,6 +49,6 @@ defmodule Brolga.AlertNotifiers do
       |> Enum.map(&Atom.to_string(&1))
       |> Enum.map_join(", ", &String.trim_leading(&1, "Elixir."))
 
-    :logger.info("Enabled notifiers: #{notifiers}")
+    Logger.info("Enabled notifiers: #{notifiers}")
   end
 end

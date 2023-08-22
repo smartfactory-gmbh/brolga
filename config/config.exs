@@ -81,6 +81,8 @@ config :brolga,
     watcher_worker: Brolga.Watcher.Worker.WorkerAdapter
   ]
 
+config :brolga, Brolga.AlertNotifiers, notifiers: :default
+
 config :brolga, :monitoring,
   attempts_before_notification: 1,
   uptime_lookback_days: 30

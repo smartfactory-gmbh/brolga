@@ -1,9 +1,9 @@
 defmodule Brolga.AlertNotifiers.EmailNotifier do
   @moduledoc false
 
-  alias Brolga.Mailer
   alias Brolga.Email.IncidentEmail
   alias Brolga.Email.TestNotificationEmail
+  alias Brolga.Mailer
 
   defp get_config do
     Application.get_env(:brolga, :email_notifier)

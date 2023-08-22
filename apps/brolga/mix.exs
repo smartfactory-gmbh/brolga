@@ -16,6 +16,9 @@ defmodule Brolga.MixProject do
       deps: deps(),
       dialyzer: [
         plt_add_apps: [:mix]
+      ],
+      test_coverage: [
+        ignore_modules: [Brolga.Watcher.Redix, Mix.Tasks.TestNotifiers]
       ]
     ]
   end
