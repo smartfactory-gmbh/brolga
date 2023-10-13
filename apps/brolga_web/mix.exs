@@ -16,6 +16,15 @@ defmodule BrolgaWeb.MixProject do
       deps: deps(),
       dialyzer: [
         plt_add_apps: [:mix]
+      ],
+      test_coverage: [
+        ignore_modules: [
+          BrolgaWeb.Application,
+          BrolgaWeb.Telemetry,
+          BrolgaWeb.Release,
+          BrolgaWeb.PageHTML,
+          BrolgaWeb.Layouts
+        ]
       ]
     ]
   end

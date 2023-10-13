@@ -44,3 +44,20 @@ config :brolga, :redis,
 config :brolga, :auth,
   default_admin_email: "test-admin@brolga.test",
   default_admin_password: "test-admin-password"
+
+config :brolga, :email_notifier,
+  enabled: true,
+  from: {
+    "Exemple admin",
+    "admin@example.com"
+  },
+  to: {
+    "Example recipient",
+    "recipient@example.com"
+  }
+
+config :brolga, :slack_notifier,
+  enabled: true,
+  webhook_url: "https://hooks.slack.com/services/FaKe/WeBhOoK",
+  username: "Brolga",
+  channel: "#sysops"

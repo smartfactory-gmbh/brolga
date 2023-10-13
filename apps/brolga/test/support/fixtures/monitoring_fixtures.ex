@@ -9,6 +9,7 @@ defmodule Brolga.MonitoringFixtures do
   @doc """
   Generate a monitor.
   """
+  @spec monitor_fixture(attrs :: any) :: Brolga.Monitoring.Monitor.t()
   def monitor_fixture(attrs \\ %{}) do
     expect(Brolga.Watcher.WorkerMock, :start, fn _id -> :ok end)
 

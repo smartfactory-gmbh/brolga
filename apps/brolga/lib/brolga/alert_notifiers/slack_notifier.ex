@@ -13,6 +13,14 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
     Application.get_env(:brolga, :slack_notifier)
   end
 
+  defp get_http_client do
+    Keyword.get(
+      Application.get_env(:brolga, :adapters),
+      :http,
+      HTTPoison
+    )
+  end
+
   def enabled? do
     get_config()[:enabled] == true
   end
@@ -160,7 +168,9 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
   end
 
   defp make_request(url, encoded_data) do
-    case HTTPoison.post(url, encoded_data, @headers) do
+    client = get_http_client()
+
+    case client.post(url, encoded_data, @headers) do
       {:ok, response} ->
         if response.status_code in 200..299 do
           :ok

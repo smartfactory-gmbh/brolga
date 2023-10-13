@@ -6,6 +6,7 @@ defmodule Brolga.Alerting do
   import Ecto.Query, warn: false
   alias Brolga.Repo
 
+  alias Brolga.Monitoring.Monitor
   alias Brolga.Alerting.Incident
 
   @doc """
@@ -89,6 +90,7 @@ defmodule Brolga.Alerting do
     Repo.delete(incident)
   end
 
+  @spec open_incident(monitor :: Monitor.t()) :: Incident.t()
   def open_incident(monitor) do
     results =
       create_incident(%{
@@ -109,6 +111,7 @@ defmodule Brolga.Alerting do
     results
   end
 
+  @spec close_incident(monitor :: Monitor.t()) :: Incident.t()
   def close_incident(monitor) do
     incident =
       Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)

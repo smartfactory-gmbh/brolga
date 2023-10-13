@@ -6,7 +6,7 @@ defmodule Brolga.Utils do
   use Timex
 
   @time_format "{h24}:{m}"
-  @date_format "{D}.{M}.{YYYY}"
+  @date_format "{0D}.{0M}.{YYYY}"
   @datetime_format "#{@time_format} #{@date_format}"
 
   defp get_config do

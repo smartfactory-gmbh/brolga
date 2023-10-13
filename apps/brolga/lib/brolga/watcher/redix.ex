@@ -3,6 +3,7 @@ defmodule Brolga.Watcher.Redix do
   Customer Redix module for redis management.
   Provides a small API to forward commands to a pool of redis workers
   """
+  @behaviour Brolga.Watcher.Redix.RedixBehaviour
   @pool_size 5
 
   def child_spec(_args) do
