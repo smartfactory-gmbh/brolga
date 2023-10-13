@@ -31,7 +31,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
   def run_once(monitor_id), do: run(monitor_id, false)
 
   @spec run(monitor_id :: Ecto.UUID.t(), repeat :: boolean) :: no_return
-  defp run(monitor_id, repeat) do
+  def run(monitor_id, repeat) do
     start_time = DateTime.now!("Etc/UTC")
     monitor = refresh_monitor(monitor_id)
     process(monitor)
