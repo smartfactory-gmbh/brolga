@@ -14,9 +14,6 @@ defmodule Brolga.MixProject do
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      dialyzer: [
-        plt_add_apps: [:mix]
-      ],
       test_coverage: [
         ignore_modules: [Brolga.Watcher.Redix, Mix.Tasks.TestNotifiers]
       ]
