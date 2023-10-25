@@ -24,7 +24,7 @@ services:
 
 
   brolga:
-    image: smfsysops/brolga:0.0.1
+    image: smfsysops/brolga:1.0.0
     depends_on:
       db:
         condition: service_healthy
@@ -36,6 +36,15 @@ services:
       DATABASE_URL: "postgres://postgres:postgres@db/brolga"
       REDIS_HOST: redis
       SECRET_KEY_BASE: 9WAXlLWMehEKcGi6o/SJjrPgls7X+vswSxdBWiIuuXRNvNEyyH50esphx+vjQoHx
+      # Change the following to accomodate your needs
+      SLACK_NOTIFIER_ENABLED: "true"
+      SLACK_NOTIFIER_USERNAME: "Brolga"
+      SLACK_NOTIFIER_CHANNEL: "#sysops"
+      DEFAULT_ADMIN_EMAIL: "<your admin email>"
+      DEFAULT_ADMIN_PASSWORD: "<your admin password>"
+      POSTMARK_API_KEY: "<you api key>"
+      POSTMARK_MESSAGE_STREAM: "<your stream>"
+      HOST: "<your host>"  # i.e. brolga.mycompany.com
 
 
 volumes:
