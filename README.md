@@ -1,4 +1,9 @@
+<p align="center">
+    <img src="https://github.com/smartfactory-gmbh/brolga/assets/22151261/8e13d6c8-e01b-4016-a17f-0a10b56532e3" />
+</p>
+
 # Brolga
+
 
 Brolga is a monitoring tool that allows you to setup multiple http(s) endpoints and an interval at which they will get tested by a simple GET request.
 
