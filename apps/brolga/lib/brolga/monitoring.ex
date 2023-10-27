@@ -155,9 +155,17 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor(attrs \\ %{}) do
+    tags =
+      if attrs["monitor_tags"] do
+        get_monitor_tags!(attrs["monitor_tags"])
+      else
+        []
+      end
+
     result =
       %Monitor{}
       |> Monitor.changeset(attrs)
+      |> put_assoc(:monitor_tags, tags)
       |> Repo.insert()
 
     case result do
