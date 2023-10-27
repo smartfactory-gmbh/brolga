@@ -11,7 +11,7 @@ defmodule BrolgaWeb.MonitorLive do
     <div class="grid grid-cols-12 gap-3">
       <%= for monitor <- @monitors do %>
         <div class={[
-          "border p-2 rounded flex flex-col items-center justify-center text-center gap-1",
+          "border p-2 rounded flex flex-col items-center justify-top text-center gap-1",
           monitor.is_down && "border-[#FF3B59]",
           not monitor.is_down && "border-[#78BE20]"
         ]}>
@@ -22,7 +22,7 @@ defmodule BrolgaWeb.MonitorLive do
           ]}>
             <%= float_to_percentage_format(monitor.uptime) %>
           </div>
-          <div class="text-[14px] line-clamp-1"><%= monitor.name %></div>
+          <div class="text-[14px] line-clamp-2 leading-4"><%= monitor.name %></div>
         </div>
       <% end %>
     </div>
