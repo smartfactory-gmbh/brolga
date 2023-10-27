@@ -9,7 +9,7 @@
 
 <.table id="monitors" rows={@monitors} row_click={&JS.navigate(~p"/monitors/#{&1}")}>
   <:col :let={monitor} label="Name"><%= monitor.name %></:col>
-  <:col :let={monitor} label="Url"><%= monitor.url %></:col>
+  <:col :let={monitor} label="Host"><%= monitor.host %></:col>
   <:col :let={monitor} label="Latest checks">
     <div class="flex flex-row-reverse gap-1">
       <%= for result <- monitor.monitor_results do %>

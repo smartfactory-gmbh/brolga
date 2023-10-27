@@ -78,6 +78,31 @@ defmodule Brolga.MonitoringTest do
       monitor = monitor_fixture()
       assert %Ecto.Changeset{} = Monitoring.change_monitor(monitor)
     end
+
+    test "populate_host/1 correctly fills the host field with http" do
+      monitor = monitor_fixture(url: "http://test.com/hello")
+
+      host = monitor |> Monitor.populate_host() |> Map.get("host")
+      assert host = "test.com"
+    end
+
+    test "populate_host/1 correctly fills the host field with https" do
+      monitor = monitor_fixture(url: "http://test.com/hello")
+
+      host = monitor |> Monitor.populate_host() |> Map.get("host")
+      assert host = "test.com"
+    end
+
+    test "populate_hosts/1 correctly fills the host field of a list of monitors" do
+      monitors = [
+        monitor_fixture(url: "http://test.com/hello"),
+        monitor_fixture(url: "https://test1.com/hello/asdfsadf"),
+        monitor_fixture(url: "http://test.tld.com")
+      ]
+
+      hosts = monitors |> Monitor.populate_hosts() |> Enum.map(fn monitor -> monitor.host end)
+      assert hosts = ["test.com", "test1.com", "test.tld.com"]
+    end
   end
 
   describe "monitor_results" do

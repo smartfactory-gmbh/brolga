@@ -20,7 +20,8 @@ defmodule Brolga.Monitoring.Monitor do
           timeout_in_seconds: non_neg_integer(),
           active: boolean(),
           is_down: boolean() | nil,
-          uptime: float() | nil
+          uptime: float() | nil,
+          host: string() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -29,6 +30,7 @@ defmodule Brolga.Monitoring.Monitor do
   schema "monitors" do
     field :name, :string
     field :url, :string
+    field :host, :string, virtual: true
     field :interval_in_minutes, :integer
     field :active, :boolean, default: true
     field :timeout_in_seconds, :integer, default: 10
@@ -56,5 +58,26 @@ defmodule Brolga.Monitoring.Monitor do
       name: :timout_lower_than_interval,
       message: "Timout cannot exceed the interval timing"
     )
+  end
+
+  @spec populate_host(monitor :: t()) :: t()
+  @doc """
+  Populates the virtual host field based on the persisted url field
+  """
+  def populate_host(monitor) do
+    host =
+      Regex.replace(~r"^https?://", monitor.url, "")
+      |> String.split("/")
+      |> Enum.at(0)
+
+    %{monitor | host: host}
+  end
+
+  @spec populate_hosts(monitors :: [t()]) :: [t()]
+  @doc """
+  Populates the host for a whole list of monitors
+  """
+  def populate_hosts(monitors) do
+    monitors |> Enum.map(&populate_host/1)
   end
 end
