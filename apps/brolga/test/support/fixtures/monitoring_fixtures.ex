@@ -11,7 +11,7 @@ defmodule Brolga.MonitoringFixtures do
   """
   @spec monitor_fixture(attrs :: any) :: Brolga.Monitoring.Monitor.t()
   def monitor_fixture(attrs \\ %{}) do
-    expect(Brolga.Watcher.WorkerMock, :start, fn _id -> :ok end)
+    expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
     {:ok, monitor} =
       attrs

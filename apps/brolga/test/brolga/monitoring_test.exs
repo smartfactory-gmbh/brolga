@@ -29,7 +29,7 @@ defmodule Brolga.MonitoringTest do
     test "create_monitor/1 with valid data creates a monitor" do
       valid_attrs = %{name: "some name", url: "some url", interval_in_minutes: 42}
 
-      expect(Brolga.Watcher.WorkerMock, :start, fn _args -> :ok end)
+      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
       assert {:ok, %Monitor{} = monitor} = Monitoring.create_monitor(valid_attrs)
       assert monitor.name == "some name"
@@ -50,7 +50,7 @@ defmodule Brolga.MonitoringTest do
         interval_in_minutes: 43
       }
 
-      expect(Brolga.Watcher.WorkerMock, :start, fn _id -> :ok end)
+      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
       assert {:ok, %Monitor{} = monitor} = Monitoring.update_monitor(monitor, update_attrs)
       assert monitor.name == "some updated name"

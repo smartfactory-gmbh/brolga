@@ -6,6 +6,6 @@ defmodule Brolga.Watcher.Worker.WorkerBehaviour do
   """
   alias Ecto.UUID
 
-  @callback start(monitor_id :: UUID) :: :ok
+  @callback start(monitor_id :: UUID, immediate :: boolean) :: :ok
   @callback stop(monitor_id :: UUID) :: :ok
 end
