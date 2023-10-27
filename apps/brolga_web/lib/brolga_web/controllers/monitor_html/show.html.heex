@@ -1,3 +1,5 @@
+<.back navigate={~p"/monitors"}>Back to monitors</.back>
+
 <.header>
   Monitor <%= @monitor.name %>
   <:subtitle>This is a monitor record from your database.</:subtitle>
@@ -35,5 +37,3 @@
 </div>
 
 <.incidents_list monitor={@monitor} />
-
-<.back navigate={~p"/monitors"}>Back to monitors</.back>
