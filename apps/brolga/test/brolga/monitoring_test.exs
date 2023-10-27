@@ -22,7 +22,8 @@ defmodule Brolga.MonitoringTest do
 
     test "get_monitor!/1 returns the monitor with given id" do
       monitor = monitor_fixture()
-      assert Monitoring.get_monitor!(monitor.id) == monitor
+      result = Monitoring.get_monitor!(monitor.id) |> Brolga.Repo.preload(:monitor_tags)
+      assert result == monitor
     end
 
     test "create_monitor/1 with valid data creates a monitor" do
