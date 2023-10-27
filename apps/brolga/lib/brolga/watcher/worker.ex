@@ -11,6 +11,6 @@ defmodule Brolga.Watcher.Worker do
 
   defp impl, do: Application.get_env(:brolga, :adapters)[:watcher_worker]
 
-  def start(monitor_id), do: impl().start(monitor_id)
+  def start(monitor_id, immediate \\ true), do: impl().start(monitor_id, immediate)
   def stop(monitor_id), do: impl().stop(monitor_id)
 end

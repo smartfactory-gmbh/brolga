@@ -10,6 +10,8 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
 
   @behaviour Brolga.Watcher.Worker.WorkerBehaviour
 
+  @max_delay_in_seconds 120
+
   use Task
   require Logger
   alias Brolga.Monitoring
@@ -23,15 +25,23 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     Application.fetch_env!(:brolga, :adapters) |> Keyword.get(:redis, Brolga.Watcher.Redix)
   end
 
-  def start_link(monitor_id) do
-    Task.start_link(__MODULE__, :run, [monitor_id, true])
+  def start_link({monitor_id, immediate}) do
+    delay =
+      if immediate do
+        0
+      else
+        :rand.uniform(@max_delay_in_seconds)
+      end
+
+    Task.start_link(__MODULE__, :run, [monitor_id, true, delay])
   end
 
   @spec run_once(monitor_id :: Ecto.UUID.t()) :: no_return
   def run_once(monitor_id), do: run(monitor_id, false)
 
-  @spec run(monitor_id :: Ecto.UUID.t(), repeat :: boolean) :: no_return
-  def run(monitor_id, repeat) do
+  @spec run(monitor_id :: Ecto.UUID.t(), repeat :: boolean, delay :: non_neg_integer) :: no_return
+  def run(monitor_id, repeat, delay \\ 0) do
+    Process.sleep(1000 * delay)
     start_time = DateTime.now!("Etc/UTC")
     monitor = refresh_monitor(monitor_id)
     process(monitor)
@@ -40,8 +50,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     elapsed = DateTime.diff(start_time, end_time)
 
     if repeat do
-      Process.sleep(1000 * 60 * monitor.interval_in_minutes - elapsed)
-      run(monitor_id, true)
+      run(monitor_id, true, 1000 * 60 * monitor.interval_in_minutes - elapsed)
     end
   end
 
@@ -101,13 +110,13 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
   end
 
   @impl Brolga.Watcher.Worker.WorkerBehaviour
-  def start(monitor_id) do
+  def start(monitor_id, immediate \\ true) do
     redis_client = get_redis_client()
 
     # If it was running, kill it first
     stop(monitor_id)
 
-    spec = {__MODULE__, monitor_id}
+    spec = {__MODULE__, {monitor_id, immediate}}
     {:ok, worker_id} = DynamicSupervisor.start_child(Brolga.Watcher.DynamicSupervisor, spec)
 
     redis_client.store!(

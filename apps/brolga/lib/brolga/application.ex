@@ -32,8 +32,9 @@ defmodule Brolga.Application do
 
   defp start_all_watchers() do
     Monitoring.list_active_monitor_ids()
+    # starts the watchers with a random delay across the startup window
     |> Enum.each(fn monitor_id ->
-      Brolga.Watcher.Worker.start(monitor_id)
+      Brolga.Watcher.Worker.start(monitor_id, false)
     end)
   end
 end

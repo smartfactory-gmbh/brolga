@@ -26,7 +26,7 @@ defmodule BrolgaWeb.MonitorControllerTest do
 
   describe "create monitor" do
     test "redirects to show when data is valid", %{conn: conn} do
-      expect(Brolga.Watcher.WorkerMock, :start, fn _ -> :ok end)
+      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
       conn = post(conn, ~p"/monitors", monitor: @create_attrs)
 
@@ -53,7 +53,7 @@ defmodule BrolgaWeb.MonitorControllerTest do
     setup [:create_monitor]
 
     test "redirects when data is valid", %{conn: conn, monitor: monitor} do
-      expect(Brolga.Watcher.WorkerMock, :start, fn _ -> :ok end)
+      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
       conn = put(conn, ~p"/monitors/#{monitor}", monitor: @update_attrs)
       assert redirected_to(conn) == ~p"/monitors/#{monitor}"
