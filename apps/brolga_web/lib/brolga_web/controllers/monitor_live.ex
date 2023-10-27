@@ -2,6 +2,7 @@ defmodule BrolgaWeb.MonitorLive do
   use Phoenix.LiveView
   alias Brolga.Monitoring
   import Brolga.Utils
+  use BrolgaWeb, :html
 
   # 1 minute interval
   @refresh_interval 1000 * 60
@@ -10,20 +11,24 @@ defmodule BrolgaWeb.MonitorLive do
     ~H"""
     <div class="grid grid-cols-12 gap-3">
       <%= for monitor <- @monitors do %>
-        <div class={[
-          "border p-2 rounded flex flex-col items-center justify-top text-center gap-1",
-          monitor.is_down && "border-[#FF3B59]",
-          not monitor.is_down && "border-[#78BE20]"
-        ]}>
+        <a target="_blank" href={~p"/monitors/#{monitor.id}"}>
           <div class={[
-            "rounded-sm px-2 py-1",
-            monitor.is_down && "bg-[#FF3B59]",
-            not monitor.is_down && "bg-[#78BE20]"
+            "border h-full p-2 rounded flex flex-col items-center justify-top text-center gap-1",
+            monitor.is_down && "border-[#FF3B59]",
+            not monitor.is_down && "border-[#78BE20]"
           ]}>
-            <%= float_to_percentage_format(monitor.uptime) %>
+            <div class={[
+              "rounded-sm px-2 py-1 flex-0",
+              monitor.is_down && "bg-[#FF3B59]",
+              not monitor.is_down && "bg-[#78BE20]"
+            ]}>
+              <%= float_to_percentage_format(monitor.uptime) %>
+            </div>
+            <div class="flex-1 flex items-center">
+              <div class="text-[14px] line-clamp-2 leading-4"><%= monitor.name %></div>
+            </div>
           </div>
-          <div class="text-[14px] line-clamp-2 leading-4"><%= monitor.name %></div>
-        </div>
+        </a>
       <% end %>
     </div>
     """
