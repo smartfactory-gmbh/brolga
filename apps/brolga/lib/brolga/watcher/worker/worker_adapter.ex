@@ -50,7 +50,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     elapsed = DateTime.diff(start_time, end_time)
 
     if repeat do
-      run(monitor_id, true, 1000 * 60 * monitor.interval_in_minutes - elapsed)
+      run(monitor_id, true, 60 * monitor.interval_in_minutes - elapsed)
     end
   end
 
