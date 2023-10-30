@@ -1,0 +1,15 @@
+<.back navigate={~p"/dashboards"}>Back to dashboards</.back>
+
+<.header>
+  Dashboard <%= @dashboard.id %>
+  <:subtitle>This is a dashboard record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/dashboards/#{@dashboard}/edit"}>
+      <.button>Edit dashboard</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @dashboard.name %></:item>
+</.list>

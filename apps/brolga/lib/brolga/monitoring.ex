@@ -103,6 +103,7 @@ defmodule Brolga.Monitoring do
 
   """
   def get_monitor!(id), do: Repo.get!(Monitor, id)
+  def get_monitors!(ids), do: Repo.all(from m in Monitor, where: m.id in ^ids)
 
   def get_monitor_with_details!(id) do
     config = get_config()

@@ -1,0 +1,13 @@
+<.back navigate={~p"/dashboards"}>Back to dashboards</.back>
+
+<.header>
+  Edit Dashboard <%= @dashboard.id %>
+  <:subtitle>Use this form to manage dashboard records in your database.</:subtitle>
+</.header>
+
+<.dashboard_form
+  tags={@tags}
+  monitors={@monitors}
+  changeset={@changeset}
+  action={~p"/dashboards/#{@dashboard}"}
+/>

@@ -1,0 +1,23 @@
+<.header>
+  Listing Dashboards
+  <:actions>
+    <.link href={~p"/dashboards/new"}>
+      <.button>New Dashboard</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="dashboards" rows={@dashboards} row_click={&JS.navigate(~p"/dashboards/#{&1}")}>
+  <:col :let={dashboard} label="Name"><%= dashboard.name %></:col>
+  <:action :let={dashboard}>
+    <div class="sr-only">
+      <.link navigate={~p"/dashboards/#{dashboard}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/dashboards/#{dashboard}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={dashboard}>
+    <.link href={~p"/dashboards/#{dashboard}"} method="delete" data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>

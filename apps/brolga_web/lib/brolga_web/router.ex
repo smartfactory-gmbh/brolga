@@ -66,6 +66,7 @@ defmodule BrolgaWeb.Router do
     live_session :require_authenticated_user,
       on_mount: [{BrolgaWeb.UserAuth, :ensure_authenticated}] do
       resources "/monitors", MonitorController
+      resources "/dashboards", DashboardController
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
