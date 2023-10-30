@@ -1,4 +1,5 @@
 defmodule BrolgaWeb.Endpoint do
+  use Sentry.PlugCapture
   use Phoenix.Endpoint, otp_app: :brolga_web
 
   # The session will be stored in the cookie and signed,
@@ -22,6 +23,13 @@ defmodule BrolgaWeb.Endpoint do
     from: :brolga_web,
     gzip: false,
     only: BrolgaWeb.static_paths()
+
+  plug Plug.Parsers,
+    parsers: [:urlencoded, :multipart, :json],
+    pass: ["*/*"],
+    json_decoder: Phoenix.json_library()
+
+  plug Sentry.PlugContext
 
   # Code reloading can be explicitly enabled under the
   # :code_reloader configuration of your endpoint.

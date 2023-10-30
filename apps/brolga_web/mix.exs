@@ -59,7 +59,9 @@ defmodule BrolgaWeb.MixProject do
       {:gettext, "~> 0.20"},
       {:brolga, in_umbrella: true},
       {:jason, "~> 1.2"},
+      {:hackney, "~> 1.8"},
       {:plug_cowboy, "~> 2.5"},
+      {:sentry, "~> 8.0"},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
