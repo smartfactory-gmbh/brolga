@@ -32,7 +32,7 @@ defmodule Brolga.DashboardsTest do
     end
 
     test "update_dashboard/2 with valid data updates the dashboard" do
-      dashboard = dashboard_fixture()
+      dashboard = dashboard_fixture() |> Brolga.Repo.preload([:monitor_tags, :monitors])
       update_attrs = %{name: "some updated name"}
 
       assert {:ok, %Dashboard{} = dashboard} =
@@ -42,9 +42,12 @@ defmodule Brolga.DashboardsTest do
     end
 
     test "update_dashboard/2 with invalid data returns error changeset" do
-      dashboard = dashboard_fixture()
+      dashboard = dashboard_fixture() |> Brolga.Repo.preload([:monitor_tags, :monitors])
       assert {:error, %Ecto.Changeset{}} = Dashboards.update_dashboard(dashboard, @invalid_attrs)
-      assert dashboard == Dashboards.get_dashboard!(dashboard.id)
+
+      assert dashboard ==
+               Dashboards.get_dashboard!(dashboard.id)
+               |> Brolga.Repo.preload([:monitor_tags, :monitors])
     end
 
     test "delete_dashboard/1 deletes the dashboard" do

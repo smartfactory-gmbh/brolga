@@ -16,12 +16,18 @@ defmodule BrolgaWeb.DashboardController do
     render(conn, :new, changeset: changeset)
   end
 
+  def set_default(conn, %{"id" => id}) do
+    dashboard = Dashboards.get_dashboard!(id)
+    Dashboards.set_default_dashboard(dashboard)
+    redirect(conn, to: ~p"/admin/dashboards")
+  end
+
   def create(conn, %{"dashboard" => dashboard_params}) do
     case Dashboards.create_dashboard(dashboard_params) do
       {:ok, dashboard} ->
         conn
         |> put_flash(:info, "Dashboard created successfully.")
-        |> redirect(to: ~p"/dashboards/#{dashboard}")
+        |> redirect(to: ~p"/admin/dashboards/#{dashboard}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, :new, changeset: changeset)
@@ -38,21 +44,11 @@ defmodule BrolgaWeb.DashboardController do
       Dashboards.get_dashboard!(id)
       |> Brolga.Repo.preload([:monitor_tags, :monitors])
 
-    tags =
-      Monitoring.list_monitor_tags()
-      |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
-
-    monitors =
-      Monitoring.list_monitors()
-      |> Enum.reduce([], fn %Monitor{id: id, name: name}, acc -> [{name, id} | acc] end)
-
     changeset = Dashboards.change_dashboard(dashboard)
 
     render(conn, :edit,
       dashboard: dashboard,
-      changeset: changeset,
-      tags: tags,
-      monitors: monitors
+      changeset: changeset
     )
   end
 
@@ -73,7 +69,7 @@ defmodule BrolgaWeb.DashboardController do
       {:ok, dashboard} ->
         conn
         |> put_flash(:info, "Dashboard updated successfully.")
-        |> redirect(to: ~p"/dashboards/#{dashboard}")
+        |> redirect(to: ~p"/admin/dashboards/#{dashboard}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
         render(conn, :edit,
@@ -91,6 +87,6 @@ defmodule BrolgaWeb.DashboardController do
 
     conn
     |> put_flash(:info, "Dashboard deleted successfully.")
-    |> redirect(to: ~p"/dashboards")
+    |> redirect(to: ~p"/admin/dashboards")
   end
 end

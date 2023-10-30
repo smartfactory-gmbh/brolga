@@ -1,4 +1,4 @@
-<.back navigate={~p"/monitors"}>Back to monitors</.back>
+<.back navigate={~p"/admin/monitors"}>Back to monitors</.back>
 
 <.header>
   Monitor <%= @monitor.name %>
@@ -11,7 +11,7 @@
     </div>
   </:extra>
   <:actions>
-    <.link href={~p"/monitors/#{@monitor}/edit"}>
+    <.link href={~p"/admin/monitors/#{@monitor}/edit"}>
       <.button>Edit monitor</.button>
     </.link>
   </:actions>

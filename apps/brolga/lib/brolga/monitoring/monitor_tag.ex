@@ -6,6 +6,7 @@ defmodule Brolga.Monitoring.MonitorTag do
   use Ecto.Schema
   import Ecto.Changeset
   alias Brolga.Monitoring.Monitor
+  alias Brolga.Dashboards.Dashboard
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t(),
@@ -18,6 +19,7 @@ defmodule Brolga.Monitoring.MonitorTag do
   schema "monitor_tags" do
     field :name, :string
     many_to_many :monitors, Monitor, join_through: "monitors_tags"
+    many_to_many :dashboards, Dashboard, join_through: "monitor_tags_dashboards"
 
     timestamps()
   end

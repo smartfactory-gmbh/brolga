@@ -7,12 +7,10 @@
   <.input field={f[:interval_in_minutes]} type="number" label="Interval in minutes" />
   <.input field={f[:timeout_in_seconds]} type="number" label="Timeout in seconds" />
   <.input field={f[:active]} type="checkbox" label="Active?" />
-  <.input
+  <.monitor_tags_select
     field={f[:monitor_tags]}
     label="Tags"
-    type="select"
-    multiple="true"
-    options={@tags}
+    multiple={true}
     value={@changeset.data.id && pluck_ids(@changeset.data.monitor_tags)}
   />
   <:actions>

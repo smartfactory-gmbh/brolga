@@ -8,8 +8,7 @@ defmodule BrolgaWeb.UserLoginLiveTest do
     test "renders log in page", %{conn: conn} do
       {:ok, _lv, html} = live(conn, ~p"/users/log_in")
 
-      assert html =~ "Log in"
-      assert html =~ "Register"
+      assert html =~ "Sign in to account"
       assert html =~ "Forgot your password?"
     end
 
@@ -18,7 +17,7 @@ defmodule BrolgaWeb.UserLoginLiveTest do
         conn
         |> log_in_user(user_fixture())
         |> live(~p"/users/log_in")
-        |> follow_redirect(conn, "/monitors")
+        |> follow_redirect(conn, "/admin/monitors")
 
       assert {:ok, _conn} = result
     end
@@ -36,7 +35,7 @@ defmodule BrolgaWeb.UserLoginLiveTest do
 
       conn = submit_form(form, conn)
 
-      assert redirected_to(conn) == ~p"/monitors"
+      assert redirected_to(conn) == ~p"/admin/monitors"
     end
 
     test "redirects to login page with a flash error if there are no valid credentials", %{

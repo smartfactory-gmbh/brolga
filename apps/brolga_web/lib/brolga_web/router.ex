@@ -21,6 +21,7 @@ defmodule BrolgaWeb.Router do
     pipe_through :browser
 
     get "/", PageController, :dashboard
+    get "/:id", PageController, :dashboard
   end
 
   # Other scopes may use custom stacks.
@@ -60,19 +61,21 @@ defmodule BrolgaWeb.Router do
     post "/users/log_in", UserSessionController, :create
   end
 
-  scope "/", BrolgaWeb do
+  scope "/admin/", BrolgaWeb do
     pipe_through [:browser, :require_authenticated_user]
 
     live_session :require_authenticated_user,
       on_mount: [{BrolgaWeb.UserAuth, :ensure_authenticated}] do
+      get "/", MonitorController, :admin
       resources "/monitors", MonitorController
       resources "/dashboards", DashboardController
+      put "/dashboards/:id/set-default", DashboardController, :set_default
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
     end
   end
 
-  scope "/", BrolgaWeb do
+  scope "/admin/", BrolgaWeb do
     pipe_through [:browser]
 
     delete "/users/log_out", UserSessionController, :delete

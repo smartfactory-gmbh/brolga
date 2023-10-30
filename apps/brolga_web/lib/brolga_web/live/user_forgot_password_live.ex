@@ -44,6 +44,6 @@ defmodule BrolgaWeb.UserForgotPasswordLive do
     {:noreply,
      socket
      |> put_flash(:info, info)
-     |> redirect(to: ~p"/monitors")}
+     |> redirect(to: ~p"/admin/monitors")}
   end
 end

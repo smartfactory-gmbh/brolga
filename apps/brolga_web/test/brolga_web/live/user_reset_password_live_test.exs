@@ -97,7 +97,7 @@ defmodule BrolgaWeb.UserResetPasswordLiveTest do
         |> render_click()
         |> follow_redirect(conn, ~p"/users/log_in")
 
-      assert conn.resp_body =~ "Log in"
+      assert conn.resp_body =~ "Sign in to account"
     end
   end
 end

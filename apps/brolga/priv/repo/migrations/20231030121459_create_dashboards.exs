@@ -5,6 +5,7 @@ defmodule Brolga.Repo.Migrations.CreateDashboards do
     create table(:dashboards, primary_key: false) do
       add :id, :binary_id, primary_key: true, null: false
       add :name, :string
+      add :default, :boolean, default: false
 
       timestamps()
     end

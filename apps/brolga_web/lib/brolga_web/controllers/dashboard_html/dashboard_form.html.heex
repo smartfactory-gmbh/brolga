@@ -3,20 +3,18 @@
     Oops, something went wrong! Please check the errors below.
   </.error>
   <.input field={f[:name]} type="text" label="Name" />
-  <.input
+  <.monitor_tags_select
     field={f[:monitor_tags]}
     label="Tags"
     type="select"
     multiple="true"
-    options={@tags}
     value={@changeset.data.id && pluck_ids(@changeset.data.monitor_tags)}
   />
-  <.input
+  <.monitors_select
     field={f[:monitors]}
     label="Monitors"
     type="select"
     multiple="true"
-    options={@monitors}
     value={@changeset.data.id && pluck_ids(@changeset.data.monitors)}
   />
   <:actions>

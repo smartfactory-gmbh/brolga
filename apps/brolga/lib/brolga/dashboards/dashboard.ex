@@ -7,13 +7,13 @@ defmodule Brolga.Dashboards.Dashboard do
   use Ecto.Schema
   import Ecto.Changeset
   import Ecto.Query, warn: false
-  alias Brolga.Repo
 
   alias Brolga.Monitoring.{Monitor, MonitorTag}
 
   @type t :: %__MODULE__{
           id: Ecto.UUID.t(),
           name: String.t(),
+          default: boolean(),
           monitors: [Monitor.t()]
         }
 
@@ -22,6 +22,7 @@ defmodule Brolga.Dashboards.Dashboard do
 
   schema "dashboards" do
     field :name, :string
+    field :default, :boolean, default: false
 
     many_to_many :monitors, Monitor, join_through: "monitors_dashboards", on_replace: :delete
 
@@ -35,11 +36,7 @@ defmodule Brolga.Dashboards.Dashboard do
   @doc false
   def changeset(dashboard, attrs) do
     dashboard
-    |> cast(attrs, [:name])
+    |> cast(attrs, [:name, :default])
     |> validate_required([:name])
-  end
-
-  def resolved_monitors(dashboard) do
-    Brolga.Monitoring.list_monitors() |> where([m], m.dashboards == ^dashboard) |> Repo.all()
   end
 end

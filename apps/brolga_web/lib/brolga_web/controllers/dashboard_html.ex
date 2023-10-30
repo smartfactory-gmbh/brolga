@@ -1,6 +1,8 @@
 defmodule BrolgaWeb.DashboardHTML do
   use BrolgaWeb, :html
 
+  import BrolgaWeb.MonitorComponents
+
   embed_templates "dashboard_html/*"
 
   @doc """

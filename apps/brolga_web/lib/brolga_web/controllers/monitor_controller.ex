@@ -10,27 +10,19 @@ defmodule BrolgaWeb.MonitorController do
   end
 
   def new(conn, _params) do
-    tags =
-      Monitoring.list_monitor_tags()
-      |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
-
     changeset = Monitoring.change_monitor(%Monitor{})
-    render(conn, :new, changeset: changeset, tags: tags)
+    render(conn, :new, changeset: changeset)
   end
 
   def create(conn, %{"monitor" => monitor_params}) do
-    tags =
-      Monitoring.list_monitor_tags()
-      |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
-
     case Monitoring.create_monitor(monitor_params) do
       {:ok, monitor} ->
         conn
         |> put_flash(:info, "Monitor created successfully.")
-        |> redirect(to: ~p"/monitors/#{monitor}")
+        |> redirect(to: ~p"/admin/monitors/#{monitor}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :new, changeset: changeset, tags: tags)
+        render(conn, :new, changeset: changeset)
     end
   end
 
@@ -44,12 +36,8 @@ defmodule BrolgaWeb.MonitorController do
       Monitoring.get_monitor!(id)
       |> Brolga.Repo.preload(:monitor_tags)
 
-    tags =
-      Monitoring.list_monitor_tags()
-      |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
-
     changeset = Monitoring.change_monitor(monitor)
-    render(conn, :edit, monitor: monitor, changeset: changeset, tags: tags)
+    render(conn, :edit, monitor: monitor, changeset: changeset)
   end
 
   def update(conn, %{"id" => id, "monitor" => monitor_params}) do
@@ -57,18 +45,14 @@ defmodule BrolgaWeb.MonitorController do
       Monitoring.get_monitor!(id)
       |> Brolga.Repo.preload(:monitor_tags)
 
-    tags =
-      Monitoring.list_monitor_tags()
-      |> Enum.reduce([], fn %MonitorTag{id: id, name: name}, acc -> [{name, id} | acc] end)
-
     case Monitoring.update_monitor(monitor, monitor_params) do
       {:ok, monitor} ->
         conn
         |> put_flash(:info, "Monitor updated successfully.")
-        |> redirect(to: ~p"/monitors/#{monitor}")
+        |> redirect(to: ~p"/admin/monitors/#{monitor}")
 
       {:error, %Ecto.Changeset{} = changeset} ->
-        render(conn, :edit, monitor: monitor, changeset: changeset, tags: tags)
+        render(conn, :edit, monitor: monitor, changeset: changeset)
     end
   end
 
@@ -78,6 +62,10 @@ defmodule BrolgaWeb.MonitorController do
 
     conn
     |> put_flash(:info, "Monitor deleted successfully.")
-    |> redirect(to: ~p"/monitors")
+    |> redirect(to: ~p"/admin/monitors")
+  end
+
+  def admin(conn, _params) do
+    redirect(conn, to: ~p"/admin/monitors")
   end
 end

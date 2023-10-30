@@ -53,6 +53,41 @@ defmodule Brolga.Dashboards do
   def get_dashboard!(id), do: Repo.get!(Dashboard, id)
 
   @doc """
+  ## Examples
+
+      iex> get_default_dashboard()
+      %Dashboard{}
+
+      iex> get_default_dashboard()
+      nil
+
+  """
+  def get_default_dashboard() do
+    case Repo.one(from d in Dashboard, where: d.default == true) do
+      {:ok, dashboard} -> dashboard
+      _ -> nil
+    end
+  end
+
+  @doc """
+  ## Examples
+
+      iex> get_default_dashboard(dashboard)
+      {:ok, %Dashboard{}}
+
+      iex> set_default_dashboard(dashboard)
+      {:error, %Ecto.Changeset{}}
+
+  """
+  def set_default_dashboard(dashboard) do
+    Repo.update_all(Dashboard, set: [default: false])
+
+    dashboard
+    |> Dashboard.changeset(%{"default" => true})
+    |> Repo.update()
+  end
+
+  @doc """
   Creates a dashboard.
 
   ## Examples

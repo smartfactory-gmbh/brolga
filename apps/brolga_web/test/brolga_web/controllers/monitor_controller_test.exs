@@ -12,14 +12,14 @@ defmodule BrolgaWeb.MonitorControllerTest do
 
   describe "index" do
     test "lists all monitors", %{conn: conn} do
-      conn = get(conn, ~p"/monitors")
+      conn = get(conn, ~p"/admin/monitors")
       assert html_response(conn, 200) =~ "Listing Monitors"
     end
   end
 
   describe "new monitor" do
     test "renders form", %{conn: conn} do
-      conn = get(conn, ~p"/monitors/new")
+      conn = get(conn, ~p"/admin/monitors/new")
       assert html_response(conn, 200) =~ "New Monitor"
     end
   end
@@ -28,14 +28,14 @@ defmodule BrolgaWeb.MonitorControllerTest do
     test "redirects to show when data is valid", %{conn: conn} do
       expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
-      conn = post(conn, ~p"/monitors", monitor: @create_attrs)
+      conn = post(conn, ~p"/admin/monitors", monitor: @create_attrs)
 
       assert %{id: id} = redirected_params(conn)
-      assert redirected_to(conn) == ~p"/monitors/#{id}"
+      assert redirected_to(conn) == ~p"/admin/monitors/#{id}"
     end
 
     test "renders errors when data is invalid", %{conn: conn} do
-      conn = post(conn, ~p"/monitors", monitor: @invalid_attrs)
+      conn = post(conn, ~p"/admin/monitors", monitor: @invalid_attrs)
       assert html_response(conn, 200) =~ "New Monitor"
     end
   end
@@ -44,7 +44,7 @@ defmodule BrolgaWeb.MonitorControllerTest do
     setup [:create_monitor]
 
     test "renders form for editing chosen monitor", %{conn: conn, monitor: monitor} do
-      conn = get(conn, ~p"/monitors/#{monitor}/edit")
+      conn = get(conn, ~p"/admin/monitors/#{monitor}/edit")
       assert html_response(conn, 200) =~ "Edit Monitor"
     end
   end
@@ -55,15 +55,15 @@ defmodule BrolgaWeb.MonitorControllerTest do
     test "redirects when data is valid", %{conn: conn, monitor: monitor} do
       expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
 
-      conn = put(conn, ~p"/monitors/#{monitor}", monitor: @update_attrs)
-      assert redirected_to(conn) == ~p"/monitors/#{monitor}"
+      conn = put(conn, ~p"/admin/monitors/#{monitor}", monitor: @update_attrs)
+      assert redirected_to(conn) == ~p"/admin/monitors/#{monitor}"
 
-      conn = get(conn, ~p"/monitors/#{monitor}")
+      conn = get(conn, ~p"/admin/monitors/#{monitor}")
       assert html_response(conn, 200) =~ "some updated name"
     end
 
     test "renders errors when data is invalid", %{conn: conn, monitor: monitor} do
-      conn = put(conn, ~p"/monitors/#{monitor}", monitor: @invalid_attrs)
+      conn = put(conn, ~p"/admin/monitors/#{monitor}", monitor: @invalid_attrs)
       assert html_response(conn, 200) =~ "Edit Monitor"
     end
   end
@@ -77,11 +77,11 @@ defmodule BrolgaWeb.MonitorControllerTest do
         :ok
       end)
 
-      conn = delete(conn, ~p"/monitors/#{monitor}")
-      assert redirected_to(conn) == ~p"/monitors"
+      conn = delete(conn, ~p"/admin/monitors/#{monitor}")
+      assert redirected_to(conn) == ~p"/admin/monitors"
 
       assert_error_sent 404, fn ->
-        get(conn, ~p"/monitors/#{monitor}")
+        get(conn, ~p"/admin/monitors/#{monitor}")
       end
     end
   end

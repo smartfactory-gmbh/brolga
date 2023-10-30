@@ -29,6 +29,7 @@ end
 
 if Brolga.Dashboards.count_dashboards() == 0 do
   Brolga.Dashboards.create_dashboard(%{
-    name: "Default"
+    name: "Default",
+    default: true
   })
 end
