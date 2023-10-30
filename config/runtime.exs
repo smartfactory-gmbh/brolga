@@ -16,6 +16,22 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
+  # By default, no Sentry DSN is set, it's only set through env variables
+  sentry_dsn = System.get_env("SENTRY_DSN", "")
+
+  if sentry_dsn do
+    config :sentry,
+      dsn: sentry_dsn,
+      environment_name: :prod,
+      enable_source_code_context: true,
+      root_source_code_paths: [File.cwd!()],
+      tags: %{env: "production"},
+      included_environments: [:prod]
+
+    config :logger,
+      backends: [:console, Sentry.LoggerBackend]
+  end
+
   config :brolga, :utils, default_timezone: System.get_env("DEFAULT_TZ", "Etc/UTC")
 
   config :brolga, :monitoring,

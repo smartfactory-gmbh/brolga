@@ -21,7 +21,7 @@ defmodule Brolga.Monitoring.Monitor do
           active: boolean(),
           is_down: boolean() | nil,
           uptime: float() | nil,
-          host: string() | nil
+          host: String.t() | nil
         }
 
   @primary_key {:id, :binary_id, autogenerate: true}
