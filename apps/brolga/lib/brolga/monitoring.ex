@@ -77,7 +77,13 @@ defmodule Brolga.Monitoring do
         where: td.id == ^dashboard_id,
         union: ^direct_monitors
 
-    Repo.all(from m in query, where: m.id in subquery(all_monitors))
+    monitors = Repo.all(from m in query, where: m.id in subquery(all_monitors))
+
+    if monitors == [] do
+      list_monitors()
+    else
+      monitors
+    end
   end
 
   def list_monitors_with_latest_results do

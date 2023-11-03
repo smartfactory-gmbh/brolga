@@ -17,13 +17,6 @@ defmodule BrolgaWeb.Router do
     plug :accepts, ["json"]
   end
 
-  scope "/", BrolgaWeb do
-    pipe_through :browser
-
-    get "/", PageController, :dashboard
-    get "/:id", PageController, :dashboard
-  end
-
   # Other scopes may use custom stacks.
   # scope "/api", BrolgaWeb do
   #   pipe_through :api
@@ -85,5 +78,12 @@ defmodule BrolgaWeb.Router do
       live "/users/confirm/:token", UserConfirmationLive, :edit
       live "/users/confirm", UserConfirmationInstructionsLive, :new
     end
+  end
+
+  scope "/", BrolgaWeb do
+    pipe_through :browser
+
+    get "/", PageController, :dashboard
+    get "/:id", PageController, :dashboard
   end
 end
