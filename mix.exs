@@ -14,6 +14,15 @@ defmodule Brolga.Umbrella.MixProject do
       test_coverage: [
         summary: [
           threshold: 85
+        ],
+        ignore_modules: [
+          BrolgaWeb.Application,
+          BrolgaWeb.Telemetry,
+          BrolgaWeb.Release,
+          BrolgaWeb.PageHTML,
+          BrolgaWeb.Layouts,
+          Brolga.Watcher.Redix,
+          Mix.Tasks.TestNotifiers
         ]
       ]
     ]

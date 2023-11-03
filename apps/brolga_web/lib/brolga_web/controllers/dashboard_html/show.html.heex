@@ -1,0 +1,21 @@
+<.back navigate={~p"/admin/dashboards"}>Back to dashboards</.back>
+
+<.header>
+  Dashboard <%= @dashboard.id %>
+  <:subtitle>This is a dashboard record from your database.</:subtitle>
+  <:actions>
+    <.link href={~p"/admin/dashboards/#{@dashboard}/edit"}>
+      <.button>Edit dashboard</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @dashboard.name %></:item>
+  <:item title="View link">
+    <a target="_blank" class="text-teal-600 hover:text-teal-800" href={~p"/#{@dashboard.id}"}>
+      <%= ~p"/#{@dashboard.id}" %>
+    </a>
+  </:item>
+  <:item title="Default?"><%= @dashboard.default %></:item>
+</.list>

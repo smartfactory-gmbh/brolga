@@ -1,6 +1,6 @@
 defmodule BrolgaWeb.MonitorLive do
   use Phoenix.LiveView
-  alias Brolga.Monitoring
+  alias Brolga.{Monitoring, Dashboards}
   import Brolga.Utils
   use BrolgaWeb, :html
 
@@ -11,7 +11,7 @@ defmodule BrolgaWeb.MonitorLive do
     ~H"""
     <div class="grid grid-cols-12 gap-3">
       <%= for monitor <- @monitors do %>
-        <a target="_blank" href={~p"/monitors/#{monitor.id}"}>
+        <a target="_blank" href={~p"/admin/monitors/#{monitor.id}"}>
           <div class={[
             "border h-full p-2 rounded flex flex-col items-center justify-top text-center gap-1",
             monitor.is_down && "border-[#FF3B59]",
@@ -34,17 +34,33 @@ defmodule BrolgaWeb.MonitorLive do
     """
   end
 
-  def mount(_params, _session, socket) do
-    if connected?(socket), do: Process.send_after(self(), :update, @refresh_interval)
+  defp get_monitors(dashboard) do
+    dashboard =
+      if dashboard == nil do
+        Dashboards.get_default_dashboard()
+      else
+        dashboard
+      end
 
-    monitors = Monitoring.list_monitors()
-    {:ok, assign(socket, monitors: monitors)}
+    if dashboard do
+      Monitoring.list_monitors_for_dashboard(dashboard.id)
+    else
+      []
+    end
   end
 
-  def handle_info(:update, socket) do
+  def mount(_params, session, socket) do
+    if connected?(socket), do: Process.send_after(self(), :update, @refresh_interval)
+
+    dashboard = session["dashboard"]
+    monitors = get_monitors(dashboard)
+    {:ok, assign(socket, monitors: monitors, dashboard: dashboard)}
+  end
+
+  def handle_info(:update, %{assigns: %{dashboard: dashboard}} = socket) do
     Process.send_after(self(), :update, @refresh_interval)
 
-    monitors = Monitoring.list_monitors()
+    monitors = get_monitors(dashboard)
     {:noreply, assign(socket, monitors: monitors)}
   end
 end

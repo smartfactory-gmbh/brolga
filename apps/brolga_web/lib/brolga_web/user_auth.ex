@@ -82,7 +82,7 @@ defmodule BrolgaWeb.UserAuth do
     conn
     |> renew_session()
     |> delete_resp_cookie(@remember_me_cookie)
-    |> redirect(to: ~p"/")
+    |> redirect(to: ~p"/users/log_in")
   end
 
   @doc """
@@ -224,5 +224,5 @@ defmodule BrolgaWeb.UserAuth do
 
   defp maybe_store_return_to(conn), do: conn
 
-  defp signed_in_path(_conn), do: ~p"/monitors"
+  defp signed_in_path(_conn), do: ~p"/admin/monitors"
 end

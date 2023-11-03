@@ -13,16 +13,7 @@ defmodule BrolgaWeb.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      test_coverage: [
-        ignore_modules: [
-          BrolgaWeb.Application,
-          BrolgaWeb.Telemetry,
-          BrolgaWeb.Release,
-          BrolgaWeb.PageHTML,
-          BrolgaWeb.Layouts
-        ]
-      ]
+      deps: deps()
     ]
   end
 

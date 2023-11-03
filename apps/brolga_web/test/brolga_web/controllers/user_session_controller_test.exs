@@ -15,14 +15,14 @@ defmodule BrolgaWeb.UserSessionControllerTest do
         })
 
       assert get_session(conn, :user_token)
-      assert redirected_to(conn) == ~p"/monitors"
+      assert redirected_to(conn) == ~p"/admin/monitors"
 
       # Now do a logged in request and assert on the menu
-      conn = get(conn, ~p"/monitors")
+      conn = get(conn, ~p"/admin/monitors")
       response = html_response(conn, 200)
       assert response =~ user.email
-      assert response =~ ~p"/users/settings"
-      assert response =~ ~p"/users/log_out"
+      assert response =~ ~p"/admin/users/settings"
+      assert response =~ ~p"/admin/users/log_out"
     end
 
     test "logs the user in with remember me", %{conn: conn, user: user} do
@@ -36,7 +36,7 @@ defmodule BrolgaWeb.UserSessionControllerTest do
         })
 
       assert conn.resp_cookies["_brolga_web_user_remember_me"]
-      assert redirected_to(conn) == ~p"/monitors"
+      assert redirected_to(conn) == ~p"/admin/monitors"
     end
 
     test "logs the user in with return to", %{conn: conn, user: user} do
@@ -65,7 +65,7 @@ defmodule BrolgaWeb.UserSessionControllerTest do
           }
         })
 
-      assert redirected_to(conn) == ~p"/monitors"
+      assert redirected_to(conn) == ~p"/admin/monitors"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Account created successfully"
     end
 
@@ -80,7 +80,7 @@ defmodule BrolgaWeb.UserSessionControllerTest do
           }
         })
 
-      assert redirected_to(conn) == ~p"/users/settings"
+      assert redirected_to(conn) == ~p"/admin/users/settings"
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Password updated successfully"
     end
 
@@ -97,15 +97,15 @@ defmodule BrolgaWeb.UserSessionControllerTest do
 
   describe "DELETE /users/log_out" do
     test "logs the user out", %{conn: conn, user: user} do
-      conn = conn |> log_in_user(user) |> delete(~p"/users/log_out")
-      assert redirected_to(conn) == ~p"/"
+      conn = conn |> log_in_user(user) |> delete(~p"/admin/users/log_out")
+      assert redirected_to(conn) == ~p"/users/log_in"
       refute get_session(conn, :user_token)
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Logged out successfully"
     end
 
     test "succeeds even if the user is not logged in", %{conn: conn} do
-      conn = delete(conn, ~p"/users/log_out")
-      assert redirected_to(conn) == ~p"/"
+      conn = delete(conn, ~p"/admin/users/log_out")
+      assert redirected_to(conn) == ~p"/users/log_in"
       refute get_session(conn, :user_token)
       assert Phoenix.Flash.get(conn.assigns.flash, :info) =~ "Logged out successfully"
     end

@@ -1,13 +1,13 @@
 <.header>
   Listing Monitors
   <:actions>
-    <.link href={~p"/monitors/new"}>
+    <.link href={~p"/admin/monitors/new"}>
       <.button>New Monitor</.button>
     </.link>
   </:actions>
 </.header>
 
-<.table id="monitors" rows={@monitors} row_click={&JS.navigate(~p"/monitors/#{&1}")}>
+<.table id="monitors" rows={@monitors} row_click={&JS.navigate(~p"/admin/monitors/#{&1}")}>
   <:col :let={monitor} label="Name"><%= monitor.name %></:col>
   <:col :let={monitor} label="Host"><%= monitor.host %></:col>
   <:col :let={monitor} label="Latest checks">
@@ -24,12 +24,12 @@
   </:col>
   <:action :let={monitor}>
     <div class="sr-only">
-      <.link navigate={~p"/monitors/#{monitor}"}>Show</.link>
+      <.link navigate={~p"/admin/monitors/#{monitor}"}>Show</.link>
     </div>
-    <.link navigate={~p"/monitors/#{monitor}/edit"}>Edit</.link>
+    <.link navigate={~p"/admin/monitors/#{monitor}/edit"}>Edit</.link>
   </:action>
   <:action :let={monitor}>
-    <.link href={~p"/monitors/#{monitor}"} method="delete" data-confirm="Are you sure?">
+    <.link href={~p"/admin/monitors/#{monitor}"} method="delete" data-confirm="Are you sure?">
       Delete
     </.link>
   </:action>

@@ -1,6 +1,7 @@
 defmodule BrolgaWeb.MonitorHTML do
   use BrolgaWeb, :html
   import BrolgaWeb.IncidentComponents
+  import BrolgaWeb.MonitorComponents
 
   embed_templates "monitor_html/*"
 

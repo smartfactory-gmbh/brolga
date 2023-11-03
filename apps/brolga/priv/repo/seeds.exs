@@ -26,3 +26,10 @@ if Brolga.Accounts.count_users() == 0 do
 
   Brolga.Accounts.register_user(credentials)
 end
+
+if Brolga.Dashboards.count_dashboards() == 0 do
+  Brolga.Dashboards.create_dashboard(%{
+    name: "Default",
+    default: true
+  })
+end

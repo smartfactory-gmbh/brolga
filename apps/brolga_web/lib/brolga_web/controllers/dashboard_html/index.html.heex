@@ -1,0 +1,31 @@
+<.header>
+  Listing Dashboards
+  <:actions>
+    <.link href={~p"/admin/dashboards/new"}>
+      <.button>New Dashboard</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table id="dashboards" rows={@dashboards} row_click={&JS.navigate(~p"/admin/dashboards/#{&1}")}>
+  <:col :let={dashboard} label="Name"><%= dashboard.name %></:col>
+  <:col :let={dashboard} label="Is default?"><%= dashboard.default %></:col>
+  <:action :let={dashboard}>
+    <%= if not dashboard.default do %>
+      <.link method="put" href={~p"/admin/dashboards/#{dashboard}/set-default"}>
+        Set default
+      </.link>
+    <% end %>
+  </:action>
+  <:action :let={dashboard}>
+    <div class="sr-only">
+      <.link navigate={~p"/admin/dashboards/#{dashboard}"}>Show</.link>
+    </div>
+    <.link navigate={~p"/admin/dashboards/#{dashboard}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={dashboard}>
+    <.link href={~p"/admin/dashboards/#{dashboard}"} method="delete" data-confirm="Are you sure?">
+      Delete
+    </.link>
+  </:action>
+</.table>

@@ -1,6 +1,6 @@
 <.flash_group flash={@flash} />
 <div class="bg-black text-white h-screen p-8">
   <div class="h-full max-w-[1920px] mx-auto bg-no-repeat bg-[url('/images/smf-logo.svg')] bg-center bg-contain bg-opacity-50">
-    <%= live_render(@conn, BrolgaWeb.MonitorLive) %>
+    <%= live_render(@conn, BrolgaWeb.MonitorLive, session: %{"dashboard" => @dashboard}) %>
   </div>
 </div>

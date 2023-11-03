@@ -6,11 +6,9 @@ defmodule Brolga.Monitoring do
   import Brolga.CustomSql
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
-  alias Brolga.Alerting.Incident
-  alias Brolga.Repo
 
-  alias Brolga.Monitoring.Monitor
-  alias Brolga.Monitoring.MonitorResult
+  alias Brolga.Repo
+  alias Brolga.Monitoring.{Monitor, MonitorResult, MonitorTag}
   alias Brolga.Alerting
   alias Brolga.Alerting.Incident
 
@@ -20,16 +18,7 @@ defmodule Brolga.Monitoring do
     Application.get_env(:brolga, :monitoring)
   end
 
-  @doc """
-  Returns the list of monitors.
-
-  ## Examples
-
-      iex> list_monitors()
-      [%Monitor{}, ...]
-
-  """
-  def list_monitors do
+  defp get_base_monitor_query() do
     config = get_config()
     lookback_start = Timex.now() |> Timex.shift(days: -config[:uptime_lookback_days])
 
@@ -44,19 +33,51 @@ defmodule Brolga.Monitoring do
         group_by: mr.monitor_id,
         select: %{monitor_id: mr.monitor_id, uptime: avg(case_when(mr.reached, 1, 0))}
 
-    monitor_query =
-      from m in Monitor,
-        as: :monitor,
-        left_join: up in subquery(uptime_query),
-        on: up.monitor_id == m.id,
-        order_by: m.name,
-        # The select below populates the virtual field(s), since they are not persisted
-        select_merge: %{
-          is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
-          uptime: up.uptime |> coalesce(0)
-        }
+    from m in Monitor,
+      as: :monitor,
+      left_join: up in subquery(uptime_query),
+      on: up.monitor_id == m.id,
+      order_by: m.name,
+      # The select below populates the virtual field(s), since they are not persisted
+      select_merge: %{
+        is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
+        uptime: up.uptime |> coalesce(0)
+      }
+  end
 
-    Repo.all(monitor_query)
+  @doc """
+  Returns the list of monitors.
+
+  ## Examples
+
+      iex> list_monitors()
+      [%Monitor{}, ...]
+
+  """
+  def list_monitors do
+    Repo.all(get_base_monitor_query())
+  end
+
+  def list_monitors_for_dashboard(dashboard_id) do
+    query = get_base_monitor_query()
+
+    direct_monitors =
+      from m in Monitor,
+        select: m.id,
+        # check the dashboards through the direct relationship
+        join: d in assoc(m, :dashboards),
+        where: d.id == ^dashboard_id
+
+    all_monitors =
+      from m in Monitor,
+        select: m.id,
+        join: t in assoc(m, :monitor_tags),
+        # check the dashboards through the tags relationship
+        join: td in assoc(t, :dashboards),
+        where: td.id == ^dashboard_id,
+        union: ^direct_monitors
+
+    Repo.all(from m in query, where: m.id in subquery(all_monitors))
   end
 
   def list_monitors_with_latest_results do
@@ -103,6 +124,7 @@ defmodule Brolga.Monitoring do
 
   """
   def get_monitor!(id), do: Repo.get!(Monitor, id)
+  def get_monitors!(ids), do: Repo.all(from m in Monitor, where: m.id in ^ids)
 
   def get_monitor_with_details!(id) do
     config = get_config()

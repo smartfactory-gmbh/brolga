@@ -13,10 +13,7 @@ defmodule Brolga.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps(),
-      test_coverage: [
-        ignore_modules: [Brolga.Watcher.Redix, Mix.Tasks.TestNotifiers]
-      ]
+      deps: deps()
     ]
   end
 
