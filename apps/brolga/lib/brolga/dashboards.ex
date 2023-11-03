@@ -63,10 +63,7 @@ defmodule Brolga.Dashboards do
 
   """
   def get_default_dashboard() do
-    case Repo.one(from d in Dashboard, where: d.default == true) do
-      {:ok, dashboard} -> dashboard
-      _ -> nil
-    end
+    Repo.one(from d in Dashboard, where: d.default == true)
   end
 
   @doc """

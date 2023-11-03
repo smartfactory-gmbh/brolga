@@ -2,7 +2,7 @@ defmodule BrolgaWeb.MonitorController do
   use BrolgaWeb, :controller
 
   alias Brolga.Monitoring
-  alias Brolga.Monitoring.{Monitor, MonitorTag}
+  alias Brolga.Monitoring.Monitor
 
   def index(conn, _params) do
     monitors = Monitoring.list_monitors_with_latest_results() |> Monitor.populate_hosts()
