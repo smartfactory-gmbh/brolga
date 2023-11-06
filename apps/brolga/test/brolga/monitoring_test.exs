@@ -164,6 +164,43 @@ defmodule Brolga.MonitoringTest do
       assert length(Monitoring.get_previous_monitor_results_for(m2.id, 0, length: 2)) == 2
     end
 
+    test "cleanup_monitor_results/0 respects the retention days threshold" do
+      monitor = monitor_fixture()
+
+      assert Enum.empty?(Monitoring.list_monitor_results())
+
+      recent_date = Timex.now() |> Timex.shift(days: -32, minutes: 5)
+
+      recent_monitor_result =
+        monitor_result_fixture(%{
+          monitor_id: monitor.id,
+          inserted_at: recent_date,
+          updated_at: recent_date
+        })
+
+      old_date = Timex.now() |> Timex.shift(days: -32, minutes: -5)
+
+      old_monitor_result =
+        monitor_result_fixture(%{
+          monitor_id: monitor.id,
+          inserted_at: old_date,
+          updated_at: old_date
+        })
+
+      assert length(Monitoring.list_monitor_results()) == 2
+
+      Monitoring.cleanup_monitor_results()
+
+      assert length(Monitoring.list_monitor_results()) == 1
+
+      assert recent_monitor_result.id ==
+               Monitoring.get_monitor_result!(recent_monitor_result.id).id
+
+      assert_raise Ecto.NoResultsError, fn ->
+        Monitoring.get_monitor_result!(old_monitor_result.id)
+      end
+    end
+
     test "get_monitor_result!/1 returns the monitor_result with given id" do
       monitor = monitor_fixture()
       monitor_result = monitor_result_fixture(%{monitor_id: monitor.id})

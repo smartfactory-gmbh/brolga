@@ -13,6 +13,8 @@ defmodule Brolga.Monitoring do
   alias Brolga.Alerting.Incident
 
   @last_results_count 25
+  # keeping a bit more than a month to be sure
+  @retention_days 32
 
   defp get_config do
     Application.get_env(:brolga, :monitoring)
@@ -396,6 +398,31 @@ defmodule Brolga.Monitoring do
       |> where(monitor_id: ^monitor_id)
 
     Repo.all(query |> offset(^last_number))
+  end
+
+  @doc """
+  Deletes all the monitor results that are older than the retention threshold.
+  This should be run regularly to avoid clutering the database with data that is not
+  relevant anymore
+
+  ## Examples
+
+      iex> cleanup_monitor_results()
+      {1, [%MonitorResult{}]}
+
+      iex> cleanup_monitor_results()
+      {0, nil}
+
+  """
+  @spec cleanup_monitor_results() ::
+          {count :: non_neg_integer(), results :: [MonitorResult.t()] | nil}
+  def cleanup_monitor_results do
+    threshold = Timex.now() |> Timex.shift(days: -@retention_days)
+
+    Repo.delete_all(
+      from r in MonitorResult,
+        where: r.inserted_at <= ^threshold
+    )
   end
 
   @doc """
