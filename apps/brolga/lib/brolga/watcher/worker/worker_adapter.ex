@@ -11,6 +11,8 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
   @behaviour Brolga.Watcher.Worker.WorkerBehaviour
 
   @max_delay_in_seconds 120
+  # Chrome user agent
+  @user_agent "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36"
 
   use Task
   require Logger
@@ -75,7 +77,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     client = get_http_client()
     client.start()
 
-    headers = []
+    headers = [{"User-Agent", @user_agent}]
 
     options = [
       timeout: timeout * 1000,
