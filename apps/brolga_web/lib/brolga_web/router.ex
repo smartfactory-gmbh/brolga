@@ -65,6 +65,9 @@ defmodule BrolgaWeb.Router do
       put "/dashboards/:id/set-default", DashboardController, :set_default
       live "/users/settings", UserSettingsLive, :edit
       live "/users/settings/confirm_email/:token", UserSettingsLive, :confirm_email
+
+      live "/monitor-results", MonitorResultLive, :index
+      live "/monitor-results/:id", MonitorResultLive, :index
     end
   end
 

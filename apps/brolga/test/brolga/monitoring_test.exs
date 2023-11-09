@@ -122,6 +122,48 @@ defmodule Brolga.MonitoringTest do
       assert length(Monitoring.list_monitor_results()) == 4
     end
 
+    test "get_previous_monitor_results/2 returns limited monitor_results" do
+      monitor = monitor_fixture()
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+
+      assert length(Monitoring.get_previous_monitor_results(nil, length: 2)) == 2
+      assert length(Monitoring.get_previous_monitor_results(0, length: 2)) == 2
+      assert length(Monitoring.get_previous_monitor_results(2, length: 2)) == 2
+      assert length(Monitoring.get_previous_monitor_results(4, length: 2)) == 1
+    end
+
+    test "get_previous_monitor_results/2 respects cutoff date" do
+      monitor = monitor_fixture()
+      _ = monitor_result_fixture(%{monitor_id: monitor.id})
+      yesterday = Timex.now() |> Timex.shift(days: -1)
+      tomorrow = Timex.now() |> Timex.shift(days: 1)
+
+      assert length(Monitoring.get_previous_monitor_results(0, length: 2, cutoff_date: tomorrow)) ==
+               1
+
+      assert Monitoring.get_previous_monitor_results(0, length: 2, cutoff_date: yesterday)
+             |> Enum.empty?()
+    end
+
+    test "get_previous_monitor_results_for/3 returns limited monitor_results" do
+      m1 = monitor_fixture()
+      m2 = monitor_fixture()
+      _ = monitor_result_fixture(%{monitor_id: m1.id})
+      _ = monitor_result_fixture(%{monitor_id: m1.id})
+      _ = monitor_result_fixture(%{monitor_id: m1.id})
+      _ = monitor_result_fixture(%{monitor_id: m2.id})
+      _ = monitor_result_fixture(%{monitor_id: m2.id})
+
+      assert length(Monitoring.get_previous_monitor_results_for(m1.id, nil, length: 2)) == 2
+      assert length(Monitoring.get_previous_monitor_results_for(m1.id, 0, length: 2)) == 2
+      assert length(Monitoring.get_previous_monitor_results_for(m1.id, 2, length: 2)) == 1
+      assert length(Monitoring.get_previous_monitor_results_for(m2.id, 0, length: 2)) == 2
+    end
+
     test "get_monitor_result!/1 returns the monitor_result with given id" do
       monitor = monitor_fixture()
       monitor_result = monitor_result_fixture(%{monitor_id: monitor.id})
