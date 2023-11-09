@@ -1,0 +1,29 @@
+<.header>
+  Listing Monitor results
+  <:subtitle>
+    <%= if @monitor do %>
+      for <%= @monitor.name %>
+    <% else %>
+      for all monitors
+    <% end %>
+  </:subtitle>
+</.header>
+
+<%= if @live_mode do %>
+  <.button id="disable-live-mode" class="mt-8" phx-click="disable-live-mode">
+    Stop live mode
+  </.button>
+<% else %>
+  <.button id="enable-live-mode" class="mt-8" phx-click="enable-live-mode">
+    Start live mode
+  </.button>
+<% end %>
+
+<div
+  id="monitor_results"
+  phx-update={@update_type}
+  phx-viewport-bottom={not @live_mode && "next-page"}
+  class="flex flex-col gap-4 mt-8"
+>
+  <.monitor_result :for={{id, result} <- @streams.monitor_results} id={id} result={result} />
+</div>

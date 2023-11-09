@@ -24,6 +24,9 @@
   <:item title="Interval in minutes"><%= @monitor.interval_in_minutes %></:item>
   <:item title="Timeout in seconds"><%= @monitor.timeout_in_seconds %></:item>
   <:item title="Active?"><%= @monitor.active %></:item>
+  <:item title="Monitor results">
+    <.link navigate={~p"/admin/monitor-results/#{@monitor}"}>See results</.link>
+  </:item>
 </.list>
 
 <div class="flex flex-row-reverse mt-8 gap-2">

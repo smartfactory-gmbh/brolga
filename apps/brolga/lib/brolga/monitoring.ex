@@ -287,14 +287,106 @@ defmodule Brolga.Monitoring do
   @doc """
   Returns the list of monitor_results.
 
+  ## Options
+
+  * `:with_monitors` - Preloads the related monitors
+  * `:order` - Specifies the order to use
+
   ## Examples
 
       iex> list_monitor_results()
       [%MonitorResult{}, ...]
 
   """
-  def list_monitor_results do
-    Repo.all(MonitorResult)
+  def list_monitor_results(options \\ []) do
+    with_monitors = options |> Keyword.get(:with_monitors, false)
+    query = from(m in MonitorResult)
+    order = options |> Keyword.get(:order, nil)
+
+    query =
+      if with_monitors do
+        query |> preload(:monitor)
+      else
+        query
+      end
+
+    query =
+      if order do
+        query |> order_by(^order)
+      else
+        query
+      end
+
+    Repo.all(query)
+  end
+
+  defp get_previous_monitor_results_query(options) do
+    length = options |> Keyword.get(:length, 15)
+    cutoff_date = options |> Keyword.get(:cutoff_date, nil)
+
+    query = from(m in MonitorResult)
+
+    query =
+      if is_nil(cutoff_date) do
+        query
+      else
+        query |> where([m], m.inserted_at <= ^cutoff_date)
+      end
+
+    query
+    |> order_by(desc: :inserted_at)
+    |> limit(^length)
+    |> preload(:monitor)
+  end
+
+  @doc """
+  Returns the previous result related to the row number given in the param
+
+  ## Options
+
+  * `:length` - Specifies how many records should be returned
+  * `:cutoff_date` - from which date it should count (should reuse the attribute used for order)
+
+  ## Examples
+
+      iex> get_previous_monitor_results(5, length: 10)
+      [%MonitorResult{}, ...]
+
+  """
+  def get_previous_monitor_results(last_number, options \\ [])
+  def get_previous_monitor_results(nil, options), do: get_previous_monitor_results(0, options)
+
+  def get_previous_monitor_results(last_number, options) do
+    query = get_previous_monitor_results_query(options)
+    Repo.all(query |> offset(^last_number))
+  end
+
+  @doc """
+  Returns the previous result related to the row number given in the param.
+  Only fetches results for a specific monitor
+
+  ## Options
+
+  * `:length` - Specifies how many records should be returned
+  * `:cutoff_date` - from which date it should count (should reuse the attribute used for order)
+
+  ## Examples
+
+      iex> get_previous_monitor_results_for("id", 5, length: 10)
+      [%MonitorResult{}, ...]
+
+  """
+  def get_previous_monitor_results_for(monitor_id, last_number, options \\ [])
+
+  def get_previous_monitor_results_for(monitor_id, nil, options),
+    do: get_previous_monitor_results_for(monitor_id, 0, options)
+
+  def get_previous_monitor_results_for(monitor_id, last_number, options) do
+    query =
+      get_previous_monitor_results_query(options)
+      |> where(monitor_id: ^monitor_id)
+
+    Repo.all(query |> offset(^last_number))
   end
 
   @doc """

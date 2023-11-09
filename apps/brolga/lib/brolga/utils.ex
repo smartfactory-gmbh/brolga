@@ -13,11 +13,16 @@ defmodule Brolga.Utils do
     Application.get_env(:brolga, :utils)
   end
 
-  @spec format_datetime!(DateTime.t()) :: String.t()
-  def format_datetime!(datetime) do
+  @spec localize_datetime!(DateTime.t()) :: DateTime.t()
+  def localize_datetime!(datetime) do
     config = get_config()
     default_tz = config[:default_timezone]
-    datetime |> Timex.Timezone.convert(default_tz) |> Timex.format!(@datetime_format)
+    datetime |> Timex.to_datetime("Etc/UTC") |> Timex.Timezone.convert(default_tz)
+  end
+
+  @spec format_datetime!(DateTime.t()) :: String.t()
+  def format_datetime!(datetime) do
+    datetime |> localize_datetime! |> Timex.format!(@datetime_format)
   end
 
   @spec float_to_percentage_format(float()) :: String.t()
