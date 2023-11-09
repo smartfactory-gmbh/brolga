@@ -35,7 +35,8 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
       result = monitor.monitor_results |> Enum.at(0)
 
       assert result.reached == true
-      assert result.message == "Successful hit: 200"
+      assert result.status_code == 200
+      assert result.message == "Successful hit"
     end
 
     test "should create an entry with error state" do
@@ -61,6 +62,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
       result = monitor.monitor_results |> Enum.at(0)
 
       assert result.reached == false
+      assert result.status_code == 500
       assert result.message == "Error: Broken!"
     end
 
@@ -82,7 +84,8 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
       result = monitor.monitor_results |> Enum.at(0)
 
       assert result.reached == false
-      assert result.message == ""
+      assert result.status_code == nil
+      assert result.message == "Something went wrong: "
     end
   end
 

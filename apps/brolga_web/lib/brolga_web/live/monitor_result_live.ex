@@ -169,7 +169,12 @@ defmodule BrolgaWeb.MonitorResultLive do
         <div><%= format_datetime!(@result.inserted_at) %></div>
         <div><%= @result.monitor.name %></div>
       </div>
-      <div><%= @result.message %></div>
+      <div>
+        <%= if @result.status_code do %>
+          <p class="font-bold">Status code: <%= @result.status_code %></p>
+        <% end %>
+        <p><%= @result.message %></p>
+      </div>
     </div>
     """
   end

@@ -15,6 +15,7 @@ defmodule Brolga.Monitoring.MonitorResult do
   schema "monitor_results" do
     field :reached, :boolean, default: false
     field :message, :string, default: ""
+    field :status_code, :integer, default: nil
     belongs_to :monitor, Monitor
 
     timestamps()
@@ -23,7 +24,7 @@ defmodule Brolga.Monitoring.MonitorResult do
   @doc false
   def changeset(monitor_result, attrs) do
     monitor_result
-    |> cast(attrs, [:reached, :monitor_id, :message])
+    |> cast(attrs, [:reached, :monitor_id, :message, :status_code])
     |> validate_required([:reached, :monitor_id])
   end
 end
