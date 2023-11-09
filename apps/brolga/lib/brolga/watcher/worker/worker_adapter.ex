@@ -60,7 +60,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
   defp validate_response(response, monitor) do
     {success, message} =
       if response.status_code in 200..300 do
-        {true, "Successful hit: #{response.status_code}"}
+        {true, "Successful hit"}
       else
         {false, "Error: #{response.body}"}
       end
@@ -68,6 +68,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
     Monitoring.create_monitor_result(%{
       reached: success,
       monitor_id: monitor.id,
+      status_code: response.status_code,
       message: String.slice(message, 0..254)
     })
   end
@@ -88,8 +89,14 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
       {:ok, response} ->
         validate_response(response, monitor)
 
-      {:error, _error} ->
-        Monitoring.create_monitor_result(%{reached: false, monitor_id: monitor.id})
+      {:error, error} ->
+        message = "Something went wrong: #{error}" |> String.slice(0..254)
+
+        Monitoring.create_monitor_result(%{
+          reached: false,
+          monitor_id: monitor.id,
+          message: message
+        })
     end
   end
 
