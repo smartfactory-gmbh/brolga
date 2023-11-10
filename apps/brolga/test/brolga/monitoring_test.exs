@@ -83,15 +83,15 @@ defmodule Brolga.MonitoringTest do
     test "populate_host/1 correctly fills the host field with http" do
       monitor = monitor_fixture(url: "http://test.com/hello")
 
-      host = monitor |> Monitor.populate_host() |> Map.get("host")
-      assert host = "test.com"
+      host = monitor |> Monitor.populate_host() |> Map.get(:host)
+      assert host == "test.com"
     end
 
     test "populate_host/1 correctly fills the host field with https" do
       monitor = monitor_fixture(url: "http://test.com/hello")
 
-      host = monitor |> Monitor.populate_host() |> Map.get("host")
-      assert host = "test.com"
+      host = monitor |> Monitor.populate_host() |> Map.get(:host)
+      assert host == "test.com"
     end
 
     test "populate_hosts/1 correctly fills the host field of a list of monitors" do
@@ -102,7 +102,7 @@ defmodule Brolga.MonitoringTest do
       ]
 
       hosts = monitors |> Monitor.populate_hosts() |> Enum.map(fn monitor -> monitor.host end)
-      assert hosts = ["test.com", "test1.com", "test.tld.com"]
+      assert hosts == ["test.com", "test1.com", "test.tld.com"]
     end
   end
 
