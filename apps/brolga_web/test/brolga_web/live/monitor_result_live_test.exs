@@ -37,14 +37,14 @@ defmodule BrolgaWeb.MonitorResultLiveTest do
       refute html =~ m2.name
     end
 
-    test "can enter live mode", %{conn: conn, monitors: [m1, m2]} do
+    test "can enter live mode", %{conn: conn, monitors: [_m1, _m2]} do
       {:ok, index_live, _html} = live(conn, ~p"/admin/monitor-results")
 
       assert index_live
              |> render_click("enable-live-mode", %{}) =~ "Stop live mode"
     end
 
-    test "can leave live mode", %{conn: conn, monitors: [m1, m2]} do
+    test "can leave live mode", %{conn: conn, monitors: [_m1, _m2]} do
       {:ok, index_live, _html} = live(conn, ~p"/admin/monitor-results")
 
       assert index_live

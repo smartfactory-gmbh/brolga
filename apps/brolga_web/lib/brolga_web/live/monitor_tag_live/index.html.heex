@@ -1,0 +1,47 @@
+<.header>
+  Listing Monitor tags
+  <:actions>
+    <.link patch={~p"/admin/monitor-tags/new"}>
+      <.button>New Monitor tag</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="monitor_tags"
+  rows={@streams.monitor_tags}
+  row_click={fn {_id, monitor_tag} -> JS.navigate(~p"/admin/monitor-tags/#{monitor_tag}") end}
+>
+  <:col :let={{_id, tag}} label="Name"><%= tag.name %></:col>
+
+  <:action :let={{_id, monitor_tag}}>
+    <div class="sr-only">
+      <.link navigate={~p"/admin/monitor-tags/#{monitor_tag}"}>Show</.link>
+    </div>
+    <.link patch={~p"/admin/monitor-tags/#{monitor_tag}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, monitor_tag}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: monitor_tag.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="monitor_tag-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/monitor-tags")}
+>
+  <.live_component
+    module={BrolgaWeb.MonitorTagLive.FormComponent}
+    id={@monitor_tag.id || :new}
+    title={@page_title}
+    action={@live_action}
+    monitor_tag={@monitor_tag}
+    patch={~p"/admin/monitor-tags"}
+  />
+</.modal>
