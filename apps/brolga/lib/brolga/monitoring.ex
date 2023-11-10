@@ -86,7 +86,9 @@ defmodule Brolga.Monitoring do
     end
   end
 
-  def list_monitors_with_latest_results do
+  def list_monitors_with_latest_results(opts \\ []) do
+    with_tags = opts |> Keyword.get(:with_tags, false)
+
     result_partition_query =
       from result in MonitorResult,
         order_by: [desc: :inserted_at],
@@ -107,6 +109,13 @@ defmodule Brolga.Monitoring do
         as: :monitor,
         preload: [monitor_results: ^results_query],
         order_by: m.name
+
+    monitor_query =
+      if with_tags do
+        monitor_query |> preload(:monitor_tags)
+      else
+        monitor_query
+      end
 
     Repo.all(monitor_query)
   end
