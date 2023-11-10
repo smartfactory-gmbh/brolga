@@ -4,10 +4,8 @@
   Monitor <%= @monitor.name %>
   <:subtitle>This is a monitor record from your database.</:subtitle>
   <:extra>
-    <div class="flex gap-2 mt-2">
-      <%= for tag <- @monitor.monitor_tags do %>
-        <div class="bg-blue-500 text-white rounded px-2 py-1 italic"><%= tag.name %></div>
-      <% end %>
+    <div class="mt-2">
+      <.tags tags={@monitor.monitor_tags} />
     </div>
   </:extra>
   <:actions>
