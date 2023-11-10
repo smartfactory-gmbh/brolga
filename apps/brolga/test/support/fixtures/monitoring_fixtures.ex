@@ -32,7 +32,8 @@ defmodule Brolga.MonitoringFixtures do
     {:ok, monitor_result} =
       attrs
       |> Enum.into(%{
-        reached: true
+        reached: true,
+        monitor_id: monitor_fixture().id
       })
       |> Brolga.Monitoring.create_monitor_result()
 

@@ -1,0 +1,31 @@
+<.back navigate={~p"/admin/monitor-tags"}>Back to monitor tags</.back>
+
+<.header>
+  Monitor tag <%= @monitor_tag.id %>
+  <:subtitle>This is a monitor tag record from your database.</:subtitle>
+  <:actions>
+    <.link patch={~p"/admin/monitor-tags/#{@monitor_tag}/show/edit"} phx-click={JS.push_focus()}>
+      <.button>Edit monitor tag</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.list>
+  <:item title="Name"><%= @monitor_tag.name %></:item>
+</.list>
+
+<.modal
+  :if={@live_action == :edit}
+  id="monitor_tag-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/monitor-tags/#{@monitor_tag}")}
+>
+  <.live_component
+    module={BrolgaWeb.MonitorTagLive.FormComponent}
+    id={@monitor_tag.id}
+    title={@page_title}
+    action={@live_action}
+    monitor_tag={@monitor_tag}
+    patch={~p"/admin/monitor-tags/#{@monitor_tag}"}
+  />
+</.modal>

@@ -68,6 +68,13 @@ defmodule BrolgaWeb.Router do
 
       live "/monitor-results", MonitorResultLive, :index
       live "/monitor-results/:id", MonitorResultLive, :index
+
+      live "/monitor-tags", MonitorTagLive.Index, :index
+      live "/monitor-tags/new", MonitorTagLive.Index, :new
+      live "/monitor-tags/:id/edit", MonitorTagLive.Index, :edit
+
+      live "/monitor-tags/:id", MonitorTagLive.Show, :show
+      live "/monitor-tags/:id/show/edit", MonitorTagLive.Show, :edit
     end
   end
 
