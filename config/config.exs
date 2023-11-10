@@ -87,6 +87,11 @@ config :brolga, :monitoring,
   attempts_before_notification: 1,
   uptime_lookback_days: 30
 
+config :brolga_cron,
+  adapters: [
+    tasks_provider: BrolgaCron.Task.StaticProvider
+  ]
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{config_env()}.exs"
