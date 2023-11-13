@@ -101,7 +101,10 @@ anyways.
 
 In order to make your changes, you have to get the application up and running. Here is how to do so:
 
-1. Startup the dev database/redis: `docker-compose -f docker-compose.dev.yml up -d`
-2. Run the migrations: `mix ecto.migrate`
-3. Seed the database: `mix run apps/brolga/priv/repo/seeds.exs`
-3. Run `iex -S mix phx.server`, `mix phx.server` or through your IDE if supported
+First make sure you have Elixir and Docker installed locally and follow these steps:
+
+1. Startup the dev database/redis: `docker compose -f docker-compose.dev.yml up -d`
+2. Install the dependencies `mix deps.get`
+3. Run the migrations: `mix ecto.migrate`
+4. Seed the database: `mix run apps/brolga/priv/repo/seeds.exs`
+5. Run `iex -S mix phx.server`, `mix phx.server` or through your IDE if supported
