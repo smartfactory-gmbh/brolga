@@ -69,7 +69,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
       reached: success,
       monitor_id: monitor.id,
       status_code: response.status_code,
-      message: String.slice(message, 0..254)
+      message: String.slice(message, 0..231)
     })
   end
 
@@ -89,8 +89,17 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
       {:ok, response} ->
         validate_response(response, monitor)
 
-      {:error, error} ->
-        message = "Something went wrong: #{error}" |> String.slice(0..254)
+      {:error, %HTTPoison.Error{reason: error}} ->
+        message = "Something went wrong: #{error}" |> String.slice(0..231)
+
+        Monitoring.create_monitor_result(%{
+          reached: false,
+          monitor_id: monitor.id,
+          message: message
+        })
+
+      {:error, _} ->
+        message = "An unknown error occurred"
 
         Monitoring.create_monitor_result(%{
           reached: false,

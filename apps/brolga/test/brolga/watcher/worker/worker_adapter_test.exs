@@ -39,6 +39,33 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
       assert result.message == "Successful hit"
     end
 
+    test "should truncate the status message" do
+      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
+
+      expect(Brolga.HttpClientMock, :start, fn -> :ok end)
+
+      expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
+        assert url == "http://test.unknown/"
+
+        {:ok,
+         %HTTPoison.Response{
+           status_code: 400,
+           body: String.pad_trailing("All is broken", 300)
+         }}
+      end)
+
+      WorkerAdapter.run_once(monitor.id)
+
+      monitor = monitor |> Repo.preload(:monitor_results)
+      assert length(monitor.monitor_results) == 1
+
+      result = monitor.monitor_results |> Enum.at(0)
+
+      assert result.reached == false
+      assert result.status_code == 400
+      assert String.length(result.message) == 232
+    end
+
     test "should create an entry with error state" do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
 
@@ -73,7 +100,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
 
       expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
         assert url == "http://test.unknown/"
-        {:error, nil}
+        {:error, %HTTPoison.Error{id: nil, reason: :timeout}}
       end)
 
       WorkerAdapter.run_once(monitor.id)
@@ -85,7 +112,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
 
       assert result.reached == false
       assert result.status_code == nil
-      assert result.message == "Something went wrong: "
+      assert result.message == "Something went wrong: timeout"
     end
   end
 
