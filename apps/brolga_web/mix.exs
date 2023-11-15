@@ -52,7 +52,7 @@ defmodule BrolgaWeb.MixProject do
       {:jason, "~> 1.2"},
       {:hackney, "~> 1.8"},
       {:plug_cowboy, "~> 2.5"},
-      {:sentry, "~> 8.0"},
+      {:sentry, "~> 9.1"},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
     ]
   end
