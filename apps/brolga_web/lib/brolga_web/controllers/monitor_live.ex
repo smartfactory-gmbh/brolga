@@ -18,7 +18,7 @@ defmodule BrolgaWeb.MonitorLive do
             not monitor.is_down && "border-[#78BE20]"
           ]}>
             <div class={[
-              "rounded-sm px-2 py-1 flex-0 font-bold text-[18px] min-w-full",
+              "rounded-t-sm px-2 py-0.5 flex-0 font-bold text-[18px] min-w-full",
               monitor.is_down && "bg-[#FF3B59]",
               not monitor.is_down && "bg-[#78BE20]"
             ]}>
