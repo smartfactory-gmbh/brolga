@@ -28,7 +28,7 @@ where you would like to deploy it, **CHANGE THE SECRET KEY**, and run it with
 docker-compose up -d
 ```
 
-It will serve it on port 4000. The admin GUI is located on `/monitors`
+It will serve it on port 4000. The admin GUI is located on `/admin`
 
 **Note**: The key has to be at least 64 bytes long.
 
