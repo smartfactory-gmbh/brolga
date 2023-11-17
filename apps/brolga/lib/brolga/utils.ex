@@ -32,6 +32,6 @@ defmodule Brolga.Utils do
 
   def float_to_percentage_format(number) do
     rounded = Float.round(number * 100, 1)
-    "#{rounded}%"
+    "#{rounded}"
   end
 end
