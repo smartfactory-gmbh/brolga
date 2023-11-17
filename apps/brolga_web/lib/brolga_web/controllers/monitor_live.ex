@@ -9,7 +9,7 @@ defmodule BrolgaWeb.MonitorLive do
 
   def render(assigns) do
     ~H"""
-    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3">
+    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3 auto-rows-fr">
       <%= for monitor <- @monitors do %>
         <a target="_blank" href={~p"/admin/monitors/#{monitor.id}"}>
           <div class={[
