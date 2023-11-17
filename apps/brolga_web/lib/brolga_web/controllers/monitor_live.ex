@@ -25,7 +25,9 @@ defmodule BrolgaWeb.MonitorLive do
               <%= float_to_percentage_format(monitor.uptime) %><span class="text-[12px]"> %</span>
             </div>
             <div class="flex-1 flex items-center">
-              <div class="text-[12px] md:text-[13px] lg:text-[14px] font-semibold line-clamp-2 leading-4"><%= monitor.name %> </div>
+              <div class="text-[12px] md:text-[13px] lg:text-[14px] font-semibold line-clamp-2 leading-4">
+                <%= monitor.name %>
+              </div>
             </div>
           </div>
         </a>
