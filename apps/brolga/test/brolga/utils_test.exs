@@ -25,26 +25,26 @@ defmodule Brolga.UtilsTest do
   describe "float_to_percentage/1" do
     test "keeps only one decimal place" do
       result = Utils.float_to_percentage_format(0.3454)
-      assert result == "34.5%"
+      assert result == "34.5"
     end
 
     test "accepts both floats and decimals" do
       result = Utils.float_to_percentage_format(0.3454)
-      assert result == "34.5%"
+      assert result == "34.5"
 
       input = Decimal.new("0.3454")
       result = Utils.float_to_percentage_format(input)
-      assert result == "34.5%"
+      assert result == "34.5"
     end
 
     test "floors when decimal part is below .5" do
       result = Utils.float_to_percentage_format(0.3432)
-      assert result == "34.3%"
+      assert result == "34.3"
     end
 
     test "ceils when decimal part is above .5" do
       result = Utils.float_to_percentage_format(0.3438)
-      assert result == "34.4%"
+      assert result == "34.4"
     end
   end
 end
