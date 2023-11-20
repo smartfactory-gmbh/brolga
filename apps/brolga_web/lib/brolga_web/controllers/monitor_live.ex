@@ -9,23 +9,23 @@ defmodule BrolgaWeb.MonitorLive do
 
   def render(assigns) do
     ~H"""
-    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3">
+    <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3 auto-rows-fr">
       <%= for monitor <- @monitors do %>
         <a target="_blank" href={~p"/admin/monitors/#{monitor.id}"}>
           <div class={[
-            "border h-full pb-2 rounded flex flex-col items-center justify-top text-center gap-1 bg-black/25",
+            "border h-full pb-1 md:pb-2 rounded flex flex-col items-center justify-top text-center gap-1 bg-black/25",
             monitor.is_down && "border-[#FF3B59]",
             not monitor.is_down && "border-[#78BE20]"
           ]}>
             <div class={[
-              "rounded-sm px-2 py-1 flex-0 font-bold text-[18px] min-w-full",
+              "rounded-t-sm px-2 py-0.5 flex-0 font-bold text-[16px] md:text-[18px] min-w-full",
               monitor.is_down && "bg-[#FF3B59]",
               not monitor.is_down && "bg-[#78BE20]"
             ]}>
               <%= float_to_percentage_format(monitor.uptime) %><span class="text-[12px]"> %</span>
             </div>
             <div class="flex-1 flex items-center">
-              <div class="text-[12px] md:text-[13px] lg:text-[14px] font-semibold line-clamp-2 leading-4">
+              <div class="text-[12px] md:text-[13px] lg:text-[14px] font-semibold line-clamp-2 leading-3 md:leading-4">
                 <%= monitor.name %>
               </div>
             </div>
