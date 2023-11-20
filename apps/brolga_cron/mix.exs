@@ -11,7 +11,8 @@ defmodule BrolgaCron.MixProject do
       lockfile: "../../mix.lock",
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
-      deps: deps()
+      deps: deps(),
+      aliases: aliases()
     ]
   end
 
@@ -28,6 +29,12 @@ defmodule BrolgaCron.MixProject do
     [
       {:brolga, in_umbrella: true},
       {:mox, "~> 1.0", only: :test}
+    ]
+  end
+
+  defp aliases do
+    [
+      setup: ["deps.get"]
     ]
   end
 end

@@ -103,9 +103,12 @@ In order to make your changes, you have to get the application up and running. H
 
 First make sure you Docker installed locally and follow these steps:
 
-1. Startup the dev database/redis: `docker-compose -f docker-compose.dev.yml up -d db redis`
-2. Create the database: `docker-compose -f docker-compose.dev.yml run brolga_dev ecto.create`
-2. Run the migrations: `docker-compose -f docker-compose.dev.yml run brolga_dev ecto.migrate`
-3. Seed the database: `docker-compose -f docker-compose.dev.yml run brolga_dev run apps/brolga/priv/repo/seeds.exs`
-3. Run `docker-compose -f docker-compose.dev.yml up -d`
+1. Startup the dev stack: `docker-compose -f docker-compose.dev.yml up -d`
+2. Run setup command: `docker-compose -f docker-compose.dev.yml exec -it brolga_dev setup`
+3. Run `docker-compose -f docker-compose.dev.yml exec -it brolga_dev iex -S mix phx.server`
 4. Access it at `http://localhost:4000/
+
+*Notes*:
+- to exit the dev server, just press `Ctrl-c` twice
+- The `iex` command from step 3 also opens a console where you can run Elixir code directly, in case you want to quickly check the output of a function.
+- Changes in the `brolga_dev` will be recompiled automatically. To apply the changes from other apps, you'll need to run `recompile` in the dev console. Quit and restart the server also works.

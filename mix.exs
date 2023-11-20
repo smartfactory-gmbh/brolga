@@ -68,7 +68,7 @@ defmodule Brolga.Umbrella.MixProject do
   defp aliases do
     [
       # run `mix setup` in all child apps
-      setup: ["cmd mix setup"],
+      setup: ["deps.get", "cmd mix setup"],
       sentry_recompile: ["compile", "deps.compile sentry --force"]
     ]
   end
