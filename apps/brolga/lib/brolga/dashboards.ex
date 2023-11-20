@@ -5,6 +5,7 @@ defmodule Brolga.Dashboards do
 
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
+  alias Ecto.UUID
   alias Brolga.Repo
   alias Brolga.Monitoring
 
@@ -51,6 +52,25 @@ defmodule Brolga.Dashboards do
 
   """
   def get_dashboard!(id), do: Repo.get!(Dashboard, id)
+
+  @doc """
+  Gets a single dashboard.
+
+  ## Examples
+
+      iex> get_dashboard!(123)
+      {:ok, %Dashboard{}}
+
+      iex> get_dashboard!(456)
+      {:error, :not_found}
+
+  """
+  def get_dashboard(id) do
+    case UUID.cast(id) do
+      {:ok, uuid} -> Repo.get(Dashboard, uuid)
+      :error -> {:error, "not a valid id"}
+    end
+  end
 
   @doc """
   ## Examples
