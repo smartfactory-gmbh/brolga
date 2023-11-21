@@ -103,10 +103,11 @@ In order to make your changes, you have to get the application up and running. H
 
 First make sure you Docker installed locally and follow these steps:
 
-1. Startup the dev stack: `docker-compose -f docker-compose.dev.yml up -d`
-2. Run setup command: `docker-compose -f docker-compose.dev.yml exec -it brolga_dev setup`
-3. Run `docker-compose -f docker-compose.dev.yml exec -it brolga_dev iex -S mix phx.server`
-4. Access it at `http://localhost:4000/
+1. Copy the git hooks: `cp -f .hooks/* .git/hooks
+2. Startup the dev stack: `docker-compose -f docker-compose.dev.yml up -d`
+3. Run setup command: `docker-compose -f docker-compose.dev.yml exec -it brolga_dev setup`
+4. Run `docker-compose -f docker-compose.dev.yml exec -it brolga_dev iex -S mix phx.server`
+5. Access it at `http://localhost:4000/
 
 *Notes*:
 - to exit the dev server, just press `Ctrl-c` twice
