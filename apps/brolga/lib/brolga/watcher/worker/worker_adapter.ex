@@ -82,6 +82,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapter do
 
     options = [
       timeout: timeout * 1000,
+      recv_timeout: timeout * 1000,
       follow_redirect: true
     ]
 
