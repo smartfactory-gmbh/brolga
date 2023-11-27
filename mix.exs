@@ -51,8 +51,7 @@ defmodule Brolga.Umbrella.MixProject do
       # Required to run "mix format" on ~H/.heex files from the umbrella root
       {:phoenix_live_view, ">= 0.0.0"},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
-      {:tzdata, "~> 1.1"},
-      {:pre_commit, "~> 0.3.4", only: :dev}
+      {:tzdata, "~> 1.1"}
     ]
   end
 
@@ -68,7 +67,7 @@ defmodule Brolga.Umbrella.MixProject do
   defp aliases do
     [
       # run `mix setup` in all child apps
-      setup: ["cmd mix setup"],
+      setup: ["deps.get", "cmd mix setup"],
       sentry_recompile: ["compile", "deps.compile sentry --force"]
     ]
   end

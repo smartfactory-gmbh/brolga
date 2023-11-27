@@ -45,8 +45,8 @@ services:
       redis:
         condition: service_healthy
     working_dir: /usr/src/app
-    entrypoint: mix
-    command: phx.server
+    stdin_open: true
+    tty: true
 
 volumes:
   db-data:

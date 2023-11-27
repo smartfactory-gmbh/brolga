@@ -1,0 +1,9 @@
+#!/bin/sh
+
+run() {
+  docker-compose -f docker-compose.dev.yml run -T brolga_dev $1
+}
+
+run "mix format --check-formatted" || exit 1
+run "mix credo" || exit 1
+run "mix dialyzer" || exit 1
