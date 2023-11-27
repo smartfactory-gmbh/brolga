@@ -2,3 +2,5 @@ FROM elixir:slim
 
 RUN apt update && apt install -y build-essential inotify-tools nodejs
 RUN mix local.hex --force && mix local.rebar --force
+
+ENV RUNNING_IN_DOCKER "true"

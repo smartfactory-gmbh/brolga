@@ -3,15 +3,24 @@ import Config
 # Only in tests, remove the complexity from the password hashing algorithm
 config :bcrypt_elixir, :log_rounds, 1
 
+running_in_docker = System.get_env("RUNNING_IN_DOCKER", "false") == "true"
+
 # Configure your database
 #
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
+{db_host, redis_host} =
+  if running_in_docker do
+    {"db", "redis"}
+  else
+    {"localhost", "localhost"}
+  end
+
 config :brolga, Brolga.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "localhost",
+  hostname: db_host,
   database: "brolga_test#{System.get_env("MIX_TEST_PARTITION")}",
   pool: Ecto.Adapters.SQL.Sandbox,
   pool_size: 10
@@ -36,7 +45,7 @@ config :swoosh, :api_client, false
 config :phoenix, :plug_init_mode, :runtime
 
 config :brolga, :redis,
-  host: "localhost",
+  host: redis_host,
   port: 6379,
   username: nil,
   password: nil
