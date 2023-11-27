@@ -3,14 +3,12 @@ defmodule Brolga.Monitoring do
   The Monitoring context.
   """
 
-  import Brolga.CustomSql
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
 
   alias Brolga.Repo
   alias Brolga.Monitoring.{Monitor, MonitorResult, MonitorTag}
   alias Brolga.Alerting
-  alias Brolga.Alerting.Incident
 
   @last_results_count 25
   # keeping a bit more than a month to be sure
@@ -21,30 +19,13 @@ defmodule Brolga.Monitoring do
   end
 
   defp get_base_monitor_query() do
+    alias Brolga.Monitoring.Monitor.Query
     config = get_config()
-    lookback_start = Timex.now() |> Timex.shift(days: -config[:uptime_lookback_days])
 
-    down_monitor_ids =
-      from i in Incident,
-        where: is_nil(i.ended_at),
-        select: i.monitor_id
-
-    uptime_query =
-      from mr in MonitorResult,
-        where: mr.inserted_at >= ^lookback_start,
-        group_by: mr.monitor_id,
-        select: %{monitor_id: mr.monitor_id, uptime: avg(case_when(mr.reached, 1, 0))}
-
-    from m in Monitor,
-      as: :monitor,
-      left_join: up in subquery(uptime_query),
-      on: up.monitor_id == m.id,
-      order_by: m.name,
-      # The select below populates the virtual field(s), since they are not persisted
-      select_merge: %{
-        is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
-        uptime: up.uptime |> coalesce(0)
-      }
+    Query.base()
+    |> Query.with_down_state()
+    |> Query.with_uptime(config[:uptime_lookback_days])
+    |> Query.order_by_name()
   end
 
   @doc """
@@ -61,25 +42,13 @@ defmodule Brolga.Monitoring do
   end
 
   def list_monitors_for_dashboard(dashboard_id) do
+    alias Brolga.Monitoring.Monitor.Query
     query = get_base_monitor_query()
 
-    direct_monitors =
-      from m in Monitor,
-        select: m.id,
-        # check the dashboards through the direct relationship
-        join: d in assoc(m, :dashboards),
-        where: d.id == ^dashboard_id
-
-    all_monitors =
-      from m in Monitor,
-        select: m.id,
-        join: t in assoc(m, :monitor_tags),
-        # check the dashboards through the tags relationship
-        join: td in assoc(t, :dashboards),
-        where: td.id == ^dashboard_id,
-        union: ^direct_monitors
-
-    monitors = Repo.all(from m in query, where: m.id in subquery(all_monitors))
+    monitors =
+      query
+      |> Query.where_dashboard(dashboard_id)
+      |> Repo.all()
 
     if monitors == [] do
       list_monitors()
@@ -89,41 +58,27 @@ defmodule Brolga.Monitoring do
   end
 
   def list_monitors_with_latest_results(opts \\ []) do
+    alias Brolga.Monitoring.Monitor.Query
+
     with_tags = opts |> Keyword.get(:with_tags, false)
 
-    result_partition_query =
-      from result in MonitorResult,
-        order_by: [desc: :inserted_at],
-        select: %{
-          id: result.id,
-          reached: result.reached,
-          row_number: over(row_number(), :results_partition)
-        },
-        windows: [results_partition: [partition_by: :monitor_id, order_by: [desc: :inserted_at]]]
-
-    results_query =
-      from result in MonitorResult,
-        join: r in subquery(result_partition_query),
-        on: result.id == r.id and r.row_number <= @last_results_count
-
-    monitor_query =
-      from m in Monitor,
-        as: :monitor,
-        preload: [monitor_results: ^results_query],
-        order_by: m.name
-
-    monitor_query =
-      if with_tags do
-        monitor_query |> preload(:monitor_tags)
-      else
-        monitor_query
-      end
-
-    Repo.all(monitor_query)
+    if with_tags do
+      Query.base() |> Query.with_monitor_tags()
+    else
+      Query.base()
+    end
+    |> Query.with_latest_results(@last_results_count)
+    |> Query.order_by_name()
+    |> Repo.all()
   end
 
   def list_active_monitor_ids do
-    Repo.all(from m in Monitor, select: m.id, where: m.active == true)
+    alias Brolga.Monitoring.Monitor.Query
+
+    Query.base()
+    |> Query.filter_active(true)
+    |> Query.to_ids()
+    |> Repo.all()
   end
 
   @doc """
@@ -144,42 +99,28 @@ defmodule Brolga.Monitoring do
   def get_monitors!(ids), do: Repo.all(from m in Monitor, where: m.id in ^ids)
 
   def get_monitor_with_details!(id) do
+    alias Brolga.Monitoring.Monitor.Query
     config = get_config()
-    lookback_start = Timex.now() |> Timex.shift(days: -config[:uptime_lookback_days])
-
-    down_monitor_ids =
-      from i in Incident,
-        where: is_nil(i.ended_at),
-        select: i.monitor_id
-
-    uptime_query =
-      from mr in MonitorResult,
-        where: mr.inserted_at >= ^lookback_start,
-        group_by: mr.monitor_id,
-        select: %{monitor_id: mr.monitor_id, uptime: avg(case_when(mr.reached, 1, 0))}
-
-    results_query = from r in MonitorResult, order_by: [desc: r.inserted_at], limit: 25
-    incidents_query = from i in Incident, order_by: [desc: i.started_at], limit: 5
 
     monitor_query =
-      from m in Monitor,
-        where: m.id == ^id,
-        preload: [
-          :monitor_tags,
-          incidents: ^incidents_query,
-          monitor_results: ^results_query
-        ],
-        left_join: up in subquery(uptime_query),
-        on: up.monitor_id == m.id,
-        select_merge: %{
-          is_down: case_when(m.id in subquery(down_monitor_ids), true, false),
-          uptime: up.uptime
-        }
+      Query.base()
+      |> Query.with_uptime(config[:uptime_lookback_days])
+      |> Query.with_down_state()
+      |> Query.with_monitor_tags()
+      |> Query.with_latest_incidents(5)
+      |> Query.with_latest_results(25)
 
-    Repo.one!(monitor_query)
+    Repo.one!(from monitor_query, where: [id: ^id])
   end
 
-  def get_active_monitor!(id), do: Repo.get_by!(Monitor, id: id, active: true)
+  def get_active_monitor!(id) do
+    alias Brolga.Monitoring.Monitor.Query
+
+    Query.base()
+    |> Query.filter_active(true)
+    |> where([m], m.id == ^id)
+    |> Repo.one!()
+  end
 
   @doc """
   Creates a monitor.
@@ -310,13 +251,16 @@ defmodule Brolga.Monitoring do
 
   """
   def list_monitor_results(options \\ []) do
+    alias Brolga.Monitoring.MonitorResult.Query
+
     with_monitors = options |> Keyword.get(:with_monitors, false)
-    query = from(m in MonitorResult)
     order = options |> Keyword.get(:order, nil)
+
+    query = Query.base()
 
     query =
       if with_monitors do
-        query |> preload(:monitor)
+        query |> Query.with_monitors()
       else
         query
       end
@@ -332,22 +276,16 @@ defmodule Brolga.Monitoring do
   end
 
   defp get_previous_monitor_results_query(options) do
+    alias Brolga.Monitoring.MonitorResult.Query
+
     length = options |> Keyword.get(:length, 15)
     cutoff_date = options |> Keyword.get(:cutoff_date, nil)
 
-    query = from(m in MonitorResult)
-
-    query =
-      if is_nil(cutoff_date) do
-        query
-      else
-        query |> where([m], m.inserted_at <= ^cutoff_date)
-      end
-
-    query
-    |> order_by(desc: :inserted_at)
+    Query.base()
+    |> Query.before_cutoff_date(cutoff_date)
+    |> Query.order_by_latest()
+    |> Query.with_monitors()
     |> limit(^length)
-    |> preload(:monitor)
   end
 
   @doc """
