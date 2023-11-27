@@ -251,13 +251,16 @@ defmodule Brolga.Monitoring do
 
   """
   def list_monitor_results(options \\ []) do
+    alias Brolga.Monitoring.MonitorResult.Query
+
     with_monitors = options |> Keyword.get(:with_monitors, false)
-    query = from(m in MonitorResult)
     order = options |> Keyword.get(:order, nil)
+
+    query = Query.base()
 
     query =
       if with_monitors do
-        query |> preload(:monitor)
+        query |> Query.with_monitors()
       else
         query
       end
@@ -273,22 +276,16 @@ defmodule Brolga.Monitoring do
   end
 
   defp get_previous_monitor_results_query(options) do
+    alias Brolga.Monitoring.MonitorResult.Query
+
     length = options |> Keyword.get(:length, 15)
     cutoff_date = options |> Keyword.get(:cutoff_date, nil)
 
-    query = from(m in MonitorResult)
-
-    query =
-      if is_nil(cutoff_date) do
-        query
-      else
-        query |> where([m], m.inserted_at <= ^cutoff_date)
-      end
-
-    query
-    |> order_by(desc: :inserted_at)
+    Query.base()
+    |> Query.before_cutoff_date(cutoff_date)
+    |> Query.order_by_latest()
+    |> Query.with_monitors()
     |> limit(^length)
-    |> preload(:monitor)
   end
 
   @doc """

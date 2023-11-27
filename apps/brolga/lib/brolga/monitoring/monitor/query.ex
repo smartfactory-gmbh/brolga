@@ -7,6 +7,7 @@ defmodule Brolga.Monitoring.Monitor.Query do
   import Brolga.CustomSql
   alias Brolga.Monitoring.{Monitor, MonitorResult}
   alias Brolga.Alerting.Incident
+  alias Brolga.Monitoring.MonitorResult.Query, as: MonitorResultQuery
 
   def base() do
     from m in Monitor, as: :monitors
@@ -34,15 +35,7 @@ defmodule Brolga.Monitoring.Monitor.Query do
   Preload the `monitor_results` relation with the `nb` latest results
   """
   def with_latest_results(query \\ base(), nb) do
-    result_partition_query =
-      from result in MonitorResult,
-        order_by: [desc: :inserted_at],
-        select: %{
-          id: result.id,
-          reached: result.reached,
-          row_number: over(row_number(), :results_partition)
-        },
-        windows: [results_partition: [partition_by: :monitor_id, order_by: [desc: :inserted_at]]]
+    result_partition_query = MonitorResultQuery.latest_per_monitor()
 
     results_query =
       from result in MonitorResult,
