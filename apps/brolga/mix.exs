@@ -49,7 +49,7 @@ defmodule Brolga.MixProject do
       {:mox, "~> 1.0", only: :test},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gen_smtp, "~> 1.2"},
-      {:sentry, "~> 8.0"},
+      {:sentry, "~> 10.0"},
       {:hackney, "~> 1.8"}
     ]
   end
