@@ -8,6 +8,7 @@ defmodule Brolga.Monitoring.Monitor.Query do
   alias Brolga.Monitoring.{Monitor, MonitorResult}
   alias Brolga.Alerting.Incident
   alias Brolga.Monitoring.MonitorResult.Query, as: MonitorResultQuery
+  alias Brolga.Alerting.Incident.Query, as: IncidentQuery
 
   def base() do
     from m in Monitor, as: :monitors
@@ -25,7 +26,10 @@ defmodule Brolga.Monitoring.Monitor.Query do
   Preload the `incidents` relation with the `nb` latest incidents
   """
   def with_latest_incidents(query \\ base(), nb) do
-    incidents_query = from i in Incident, order_by: [desc: i.started_at], limit: ^nb
+    incidents_query =
+      IncidentQuery.base()
+      |> IncidentQuery.order_by_latest()
+      |> limit(^nb)
 
     from query,
       preload: [incidents: ^incidents_query]
@@ -74,9 +78,9 @@ defmodule Brolga.Monitoring.Monitor.Query do
   """
   def with_down_state(query \\ base()) do
     down_monitor_ids =
-      from i in Incident,
-        where: is_nil(i.ended_at),
-        select: i.monitor_id
+      IncidentQuery.base()
+      |> IncidentQuery.filter_open()
+      |> IncidentQuery.to_monitor_ids()
 
     from query,
       select_merge: %{
