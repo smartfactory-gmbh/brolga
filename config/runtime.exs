@@ -45,12 +45,6 @@ if config_env() == :prod do
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
-  config :brolga, :redis,
-    host: System.get_env("REDIS_HOST", "localhost"),
-    port: String.to_integer(System.get_env("REDIS_PORT", "6379")),
-    username: System.get_env("REDIS_USER"),
-    password: System.get_env("REDIS_PASSWORD")
-
   # The secret key base is used to sign/encrypt cookies and other secrets.
   # A default value is used in config/dev.exs and config/test.exs but you
   # want to use a different value for prod and you most likely don't want

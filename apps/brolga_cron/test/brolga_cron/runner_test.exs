@@ -24,16 +24,6 @@ defmodule BrolgaCron.RunnerTest do
       }
     ]
 
-  defp mock_sending_tasks(pid),
-    do: [
-      %BrolgaCron.Task{
-        id: :test,
-        interval_in_seconds: 1,
-        action: fn -> send(pid, :called) end,
-        args: []
-      }
-    ]
-
   describe "execute_now/1" do
     test "executes existing action" do
       tasks = mock_tasks()

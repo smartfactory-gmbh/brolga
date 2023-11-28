@@ -71,14 +71,8 @@ config :logger, :console,
 config :phoenix, :json_library, Jason
 
 config :brolga,
-  redis: [
-    host: nil,
-    port: nil,
-    username: nil,
-    password: nil
-  ],
   adapters: [
-    watcher_worker: Brolga.Watcher.Worker.WorkerAdapter
+    # http: HTTPoison
   ]
 
 config :brolga, Brolga.AlertNotifiers, notifiers: :default

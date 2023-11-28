@@ -1,6 +1,8 @@
 defmodule BrolgaCron.MixProject do
   use Mix.Project
 
+  @description "Dead simple application that runs tasks periodically"
+
   def project do
     [
       app: :brolga_cron,
@@ -12,7 +14,8 @@ defmodule BrolgaCron.MixProject do
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      aliases: aliases()
+      aliases: aliases(),
+      description: @description
     ]
   end
 

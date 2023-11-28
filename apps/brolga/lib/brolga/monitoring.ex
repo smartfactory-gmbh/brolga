@@ -84,6 +84,44 @@ defmodule Brolga.Monitoring do
   @doc """
   Gets a single monitor.
 
+  Returns `nil` if the Monitor does not exist.
+
+  ## Examples
+
+      iex> get_monitor(123)
+      %Monitor{}
+
+      iex> get_monitor(456)
+      nil
+
+  """
+  def get_monitor(id), do: Repo.get(Monitor, id)
+
+  @doc """
+  Gets a single, active monitor.
+
+  Returns `nil` if the Monitor does not exist or if it's inactive.
+
+  ## Examples
+
+      iex> get_active_monitor(123)
+      %Monitor{}
+
+      iex> get_active_monitor(456)
+      nil
+
+  """
+  def get_active_monitor(id) do
+    alias Brolga.Monitoring.Monitor.Query
+
+    Query.base()
+    |> Query.filter_active(true)
+    |> Repo.get(id)
+  end
+
+  @doc """
+  Gets a single monitor.
+
   Raises `Ecto.NoResultsError` if the Monitor does not exist.
 
   ## Examples
@@ -151,7 +189,7 @@ defmodule Brolga.Monitoring do
     case result do
       {:ok, monitor} ->
         # An new worker is started, matching this new monitor
-        Brolga.Watcher.Worker.start(monitor.id)
+        Brolga.Scheduler.start_monitor(monitor.id)
 
       _ ->
         nil
@@ -195,7 +233,7 @@ defmodule Brolga.Monitoring do
       {:ok, monitor} ->
         # Note: we start it *even* if active = false, because it will cleanup previous workers as well
         # if active is false, it will stop directly anyway
-        Brolga.Watcher.Worker.start(monitor.id)
+        Brolga.Scheduler.start_monitor(monitor.id)
 
       _ ->
         nil
@@ -217,7 +255,7 @@ defmodule Brolga.Monitoring do
 
   """
   def delete_monitor(%Monitor{} = monitor) do
-    Brolga.Watcher.Worker.stop(monitor.id)
+    Brolga.Scheduler.stop_monitor(monitor.id)
     Repo.delete(monitor)
   end
 

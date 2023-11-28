@@ -1,11 +1,9 @@
-defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
+defmodule Brolga.Watcher.CheckTaskTest do
   alias Ecto.Repo
   use Brolga.DataCase
 
-  alias Brolga.Watcher.Worker.WorkerAdapter
+  alias Brolga.Watcher.CheckTask
   import Brolga.MonitoringFixtures
-
-  import ExUnit.CaptureLog
 
   import Mox
 
@@ -27,7 +25,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
          }}
       end)
 
-      WorkerAdapter.run_once(monitor.id)
+      CheckTask.run(monitor.id)
 
       monitor = monitor |> Repo.preload(:monitor_results)
       assert length(monitor.monitor_results) == 1
@@ -54,7 +52,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
          }}
       end)
 
-      WorkerAdapter.run_once(monitor.id)
+      CheckTask.run(monitor.id)
 
       monitor = monitor |> Repo.preload(:monitor_results)
       assert length(monitor.monitor_results) == 1
@@ -81,7 +79,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
          }}
       end)
 
-      WorkerAdapter.run_once(monitor.id)
+      CheckTask.run(monitor.id)
 
       monitor = monitor |> Repo.preload(:monitor_results)
       assert length(monitor.monitor_results) == 1
@@ -103,7 +101,7 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
         {:error, %HTTPoison.Error{id: nil, reason: :timeout}}
       end)
 
-      WorkerAdapter.run_once(monitor.id)
+      CheckTask.run(monitor.id)
 
       monitor = monitor |> Repo.preload(:monitor_results)
       assert length(monitor.monitor_results) == 1
@@ -113,75 +111,6 @@ defmodule Brolga.Watcher.Worker.WorkerAdapterTest do
       assert result.reached == false
       assert result.status_code == nil
       assert result.message == "Something went wrong: timeout"
-    end
-  end
-
-  describe "start/1" do
-    test "should try to kill existing process for the monitor" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
-
-      expect(Brolga.RedixMock, :get!, fn key ->
-        assert key == "monitor-#{monitor.id}"
-        nil
-      end)
-
-      expect(Brolga.RedixMock, :store!, fn key, _value ->
-        assert key == "monitor-#{monitor.id}"
-        :ok
-      end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :all)
-
-      logs =
-        capture_log(fn ->
-          WorkerAdapter.start(monitor.id)
-        end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :none)
-
-      assert logs =~ "Monitor #{monitor.id} was already stopped"
-    end
-  end
-
-  describe "stop/1" do
-    test "should try to delete non-existing processes without issue" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
-
-      expect(Brolga.RedixMock, :get!, fn key ->
-        assert key == "monitor-#{monitor.id}"
-        nil
-      end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :all)
-
-      logs =
-        capture_log(fn ->
-          WorkerAdapter.stop(monitor.id)
-        end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :none)
-
-      assert logs =~ "Monitor #{monitor.id} was already stopped"
-    end
-
-    test "should delete existing processes without issue" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
-
-      expect(Brolga.RedixMock, :get!, fn key ->
-        assert key == "monitor-#{monitor.id}"
-        "<0.4.1>"
-      end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :all)
-
-      logs =
-        capture_log(fn ->
-          WorkerAdapter.stop(monitor.id)
-        end)
-
-      Logger.put_module_level(Brolga.Watcher.Worker.WorkerAdapter, :none)
-
-      assert logs =~ "Monitor #{monitor.id} has been stopped"
     end
   end
 end

@@ -21,7 +21,6 @@ defmodule Brolga.Umbrella.MixProject do
           BrolgaWeb.Release,
           BrolgaWeb.PageHTML,
           BrolgaWeb.Layouts,
-          Brolga.Watcher.Redix,
           Mix.Tasks.TestNotifiers
         ]
       ]

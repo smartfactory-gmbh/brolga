@@ -1,6 +1,8 @@
 defmodule BrolgaWeb.MixProject do
   use Mix.Project
 
+  @description "Web interface for the Brolga application"
+
   def project do
     [
       app: :brolga_web,
@@ -13,7 +15,8 @@ defmodule BrolgaWeb.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      description: @description
     ]
   end
 

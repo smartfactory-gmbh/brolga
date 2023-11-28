@@ -10,11 +10,13 @@ running_in_docker = System.get_env("RUNNING_IN_DOCKER", "false") == "true"
 # The MIX_TEST_PARTITION environment variable can be used
 # to provide built-in test partitioning in CI environment.
 # Run `mix help test` for more information.
-{db_host, redis_host} =
+
+# Setting the hosts of difference services depending on whether or not it's running in docker
+{db_host} =
   if running_in_docker do
-    {"db", "redis"}
+    {"db"}
   else
-    {"localhost", "localhost"}
+    {"localhost"}
   end
 
 config :brolga, Brolga.Repo,
@@ -43,12 +45,6 @@ config :swoosh, :api_client, false
 
 # Initialize plugs at runtime for faster test compilation
 config :phoenix, :plug_init_mode, :runtime
-
-config :brolga, :redis,
-  host: redis_host,
-  port: 6379,
-  username: nil,
-  password: nil
 
 config :brolga, :auth,
   default_admin_email: "test-admin@brolga.test",
