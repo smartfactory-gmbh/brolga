@@ -1,6 +1,8 @@
 defmodule Brolga.MixProject do
   use Mix.Project
 
+  @description "A monitoring engine for HTTP endpoints"
+
   def project do
     [
       app: :brolga,
@@ -13,7 +15,8 @@ defmodule Brolga.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
-      deps: deps()
+      deps: deps(),
+      description: @description
     ]
   end
 
@@ -45,7 +48,6 @@ defmodule Brolga.MixProject do
       {:finch, "~> 0.13"},
       {:timex, "~> 3.0"},
       {:httpoison, "~> 2.0"},
-      {:redix, "~> 1.2"},
       {:mox, "~> 1.0", only: :test},
       {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gen_smtp, "~> 1.2"},

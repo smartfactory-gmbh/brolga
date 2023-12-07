@@ -3,7 +3,7 @@ defmodule Brolga.MonitoringTest do
 
   alias Brolga.Monitoring
 
-  import Mox
+  setup :stop_scheduled_timers
 
   describe "monitors" do
     alias Brolga.Monitoring.Monitor
@@ -29,8 +29,6 @@ defmodule Brolga.MonitoringTest do
     test "create_monitor/1 with valid data creates a monitor" do
       valid_attrs = %{name: "some name", url: "some url", interval_in_minutes: 42}
 
-      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
-
       assert {:ok, %Monitor{} = monitor} = Monitoring.create_monitor(valid_attrs)
       assert monitor.name == "some name"
       assert monitor.url == "some url"
@@ -50,8 +48,6 @@ defmodule Brolga.MonitoringTest do
         interval_in_minutes: 43
       }
 
-      expect(Brolga.Watcher.WorkerMock, :start, fn _id, _immediate -> :ok end)
-
       assert {:ok, %Monitor{} = monitor} = Monitoring.update_monitor(monitor, update_attrs)
       assert monitor.name == "some updated name"
       assert monitor.url == "some updated url"
@@ -66,10 +62,6 @@ defmodule Brolga.MonitoringTest do
 
     test "delete_monitor/1 deletes the monitor" do
       monitor = monitor_fixture()
-
-      expect(Brolga.Watcher.WorkerMock, :stop, fn monitor_id ->
-        assert monitor_id == monitor.id
-      end)
 
       assert {:ok, %Monitor{}} = Monitoring.delete_monitor(monitor)
       assert_raise Ecto.NoResultsError, fn -> Monitoring.get_monitor!(monitor.id) end

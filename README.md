@@ -41,10 +41,6 @@ These are the settings you can modify with environment variables (i.e. by puttin
 | Variable                       | Default value | Notes                                                                        |
 | ------------------------------ | ------------- | ---------------------------------------------------------------------------- |
 | `SECRET_KEY_BASE`              | -             | (required) Random string of at least 64 bytes length                         |
-| `REDIS_HOST`                   | `localhost`   | Host of the Redis DB                                                         |
-| `REDIS_PORT`                   | `6379`        | Port to use with the Redis connection                                        |
-| `REDIS_USER`                   | -             | Username to use with the Redis connection                                    |
-| `REDIS_PASSWORD`               | -             | Password to use with the Redis connection                                    |
 | `DEFAULT_TZ`                   | `Etc/UTC`     | The default timezone to use for datetime displays                            |
 | `UPTIME_LOOKBACK_DAYS`         | `30`          | The number of days to take in account when calculating the uptime percentage |
 | `ATTEMPTS_BEFORE_NOTIFICATION` | `1`           | Number of failed hit to get in order to trigger a notification               |

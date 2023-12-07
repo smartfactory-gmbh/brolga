@@ -15,17 +15,6 @@ services:
       test: ["CMD-SHELL", "pg_isready"]
       interval: 5s
 
-  redis:
-    image: redis:7-alpine
-    ports:
-      - 6379:6379
-    volumes:
-      - redis-data:/data
-    command: ["redis-server", "--save", "60", "1"]
-    healthcheck:
-      test: ["CMD-SHELL", "redis-cli", "--raw", "incr", "ping"]
-      interval: 5s
-
   brolga_dev:
     build:
       dockerfile: Dockerfile.dev
@@ -33,8 +22,8 @@ services:
     environment:
       SECRET_KEY_BASE: 9WAXlLWMehEKcGi6o/SJjrPgls7X+vswSxdBWiIuuXRNvNEyyH50esphx+vjQoHx
       DATABASE_URL: postgres://postgres:postgres@postgres/brolga_dev
-      REDIS_HOST: redis
       HOST: localhost
+      RUNNING_IN_DOCKER: "true"
     ports:
       - "4000:4000"
     volumes:
@@ -42,12 +31,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
-      redis:
-        condition: service_healthy
     working_dir: /usr/src/app
     stdin_open: true
     tty: true
 
 volumes:
   db-data:
-  redis-data:

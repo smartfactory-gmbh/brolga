@@ -28,10 +28,3 @@ config :logger, level: :info
 
 # Runtime production configuration, including reading
 # of environment variables, is done on config/runtime.exs.
-
-# Redis config
-config :brolga, :redis,
-  host: "localhost",
-  port: 6379,
-  username: nil,
-  password: nil
