@@ -1,8 +1,0 @@
-<.back navigate={~p"/admin/monitors"}>Back to monitors</.back>
-
-<.header>
-  Edit Monitor <%= @monitor.name %>
-  <:subtitle>Use this form to manage monitor records in your database.</:subtitle>
-</.header>
-
-<.monitor_form changeset={@changeset} action={~p"/admin/monitors/#{@monitor}"} />
