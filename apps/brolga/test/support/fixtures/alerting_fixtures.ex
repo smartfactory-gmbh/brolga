@@ -18,4 +18,18 @@ defmodule Brolga.AlertingFixtures do
 
     incident
   end
+
+  @doc """
+  Generate an open incident.
+  """
+  def open_incident_fixture(attrs \\ %{}) do
+    {:ok, incident} =
+      attrs
+      |> Enum.into(%{
+        started_at: ~N[2023-07-24 09:21:00]
+      })
+      |> Brolga.Alerting.create_incident()
+
+    incident
+  end
 end
