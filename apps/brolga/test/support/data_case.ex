@@ -34,16 +34,14 @@ defmodule Brolga.DataCase do
 
   @doc """
   Make sure that the scheduler canceled all timers that may have been setup in test cases 
-
-  use it as a setup callback:
-
-      setup :stop_scheduled_timers
-
+  Is always set as a cleanup method when Brolga.DataCase is used
   """
   @spec stop_scheduled_timers(term()) :: :ok
   def stop_scheduled_timers(_context \\ %{}) do
     on_exit(&Brolga.Scheduler.stop_all/0)
   end
+
+  setup :stop_scheduled_timers
 
   @doc """
   Sets up the sandbox based on the test tags.
