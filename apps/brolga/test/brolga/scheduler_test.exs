@@ -4,8 +4,6 @@ defmodule Brolga.SchedulerTest do
   alias Brolga.Scheduler
   import Brolga.MonitoringFixtures
 
-  setup :stop_scheduled_timers
-
   describe "start_monitor/1" do
     test "should always return ok" do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
