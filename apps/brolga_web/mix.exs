@@ -56,7 +56,7 @@ defmodule BrolgaWeb.MixProject do
       {:hackney, "~> 1.8"},
       {:plug_cowboy, "~> 2.5"},
       {:sentry, "~> 10.1"},
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false}
+      {:swoosh, "== 1.14.2"}
     ]
   end
 

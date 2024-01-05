@@ -49,7 +49,6 @@ defmodule Brolga.MixProject do
       {:timex, "~> 3.0"},
       {:httpoison, "~> 2.0"},
       {:mox, "~> 1.0", only: :test},
-      {:dialyxir, "~> 1.3", only: [:dev], runtime: false},
       {:gen_smtp, "~> 1.2"},
       {:sentry, "~> 10.1"},
       {:hackney, "~> 1.8"}

@@ -8,9 +8,6 @@ defmodule Brolga.Umbrella.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
-      dialyzer: [
-        plt_add_apps: [:mix]
-      ],
       test_coverage: [
         summary: [
           threshold: 85

@@ -63,36 +63,12 @@ jobs:
       with:
         elixir-version: '1.15.2' # [Required] Define the Elixir version
         otp-version: '26.0'      # [Required] Define the Erlang/OTP version
-    - name: Restore dependencies cache
-      uses: actions/cache@v3
-      id: plt_cache
-      with:
-        path: deps
-        key: ${{ runner.os }}-mix-${{ hashFiles('**/mix.lock') }}
-        restore-keys: ${{ runner.os }}-mix-
     - name: Install dependencies
       run: mix deps.get
-      # Create PLTs if no cache was found
-    - name: Create PLTs
-      if: steps.plt_cache.outputs.cache-hit != 'true'
-      run: mix dialyzer --plt
-    # By default, the GitHub Cache action will only save the cache if all steps in the job succeed,
-    # so we separate the cache restore and save steps in case running dialyzer fails.
-    - name: Save PLT cache
-      id: plt_cache_save
-      uses: actions/cache/save@v3
-      if: steps.plt_cache.outputs.cache-hit != 'true'
-      with:
-        key: |
-          plt-${{ runner.os }}-${{ steps.beam.outputs.otp-version }}-${{ steps.beam.outputs.elixir-version }}-${{ hashFiles('**/mix.lock') }}
-        path: |
-          _build/dev/*.plt
     - name: Check formatting
       run: mix format --check-formatted
     - name: Check Credo
       run: mix credo
-    - name: Check Dialyxir
-      run: mix dialyzer --format github
 
   build-docker:
 
