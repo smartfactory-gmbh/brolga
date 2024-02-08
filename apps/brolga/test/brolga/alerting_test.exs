@@ -10,8 +10,6 @@ defmodule Brolga.AlertingTest do
     import Brolga.AlertingFixtures
     import Brolga.MonitoringFixtures
 
-    import Mox
-
     @invalid_attrs %{started_at: nil, ended_at: nil}
 
     test "list_incidents/0 returns all incidents" do
@@ -62,13 +60,10 @@ defmodule Brolga.AlertingTest do
       assert %Ecto.Changeset{} = Alerting.change_incident(incident)
     end
 
-    test "open_incident/1 creates a new incident for the given monitor" do
+    test "open_incident/1 creates a new incident for the given monitor", %{slack_bypass: bypass} do
       monitor = monitor_fixture()
 
-      expect(Brolga.HttpClientMock, :post, fn _url, _data, _headers ->
-        # Sending to slack by default
-        {:ok, %{status_code: 200}}
-      end)
+      Bypass.expect_once(bypass, "POST", "/", fn conn -> Plug.Conn.resp(conn, 200, "") end)
 
       Alerting.open_incident(monitor)
 
@@ -79,14 +74,11 @@ defmodule Brolga.AlertingTest do
       assert incident.ended_at == nil
     end
 
-    test "close_incident/1 modifies the existing incident" do
+    test "close_incident/1 modifies the existing incident", %{slack_bypass: bypass} do
       monitor = monitor_fixture()
       incident_fixture(%{ended_at: nil, monitor_id: monitor.id})
 
-      expect(Brolga.HttpClientMock, :post, fn _url, _data, _headers ->
-        # Sending to slack by default
-        {:ok, %{status_code: 200}}
-      end)
+      Bypass.expect_once(bypass, "POST", "/", fn conn -> Plug.Conn.resp(conn, 200, "") end)
 
       Alerting.close_incident(monitor)
 

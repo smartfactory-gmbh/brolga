@@ -59,7 +59,6 @@ defmodule BrolgaWeb.Router do
 
     live_session :require_authenticated_user,
       on_mount: [{BrolgaWeb.UserAuth, :ensure_authenticated}] do
-      get "/", MonitorController, :admin
       resources "/dashboards", DashboardController
       put "/dashboards/:id/set-default", DashboardController, :set_default
       live "/users/settings", UserSettingsLive, :edit

@@ -70,11 +70,6 @@ config :logger, :console,
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
-config :brolga,
-  adapters: [
-    # http: HTTPoison
-  ]
-
 config :brolga, Brolga.AlertNotifiers, notifiers: :default
 
 config :brolga, :monitoring,

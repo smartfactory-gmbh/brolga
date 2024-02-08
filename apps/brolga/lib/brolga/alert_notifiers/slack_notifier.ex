@@ -13,14 +13,6 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
     Application.get_env(:brolga, :slack_notifier)
   end
 
-  defp get_http_client do
-    Keyword.get(
-      Application.get_env(:brolga, :adapters),
-      :http,
-      HTTPoison
-    )
-  end
-
   def enabled? do
     get_config()[:enabled] == true
   end
@@ -161,18 +153,23 @@ defmodule Brolga.AlertNotifiers.SlackNotifier do
 
       url ->
         encoded_data =
-          data |> Map.merge(%{username: username, channel: channel}) |> Jason.encode!()
+          data |> Map.merge(%{username: username, channel: channel})
 
         make_request(url, encoded_data)
     end
   end
 
   defp make_request(url, encoded_data) do
-    client = get_http_client()
+    req =
+      Req.new(
+        url: url,
+        headers: @headers,
+        json: encoded_data
+      )
 
-    case client.post(url, encoded_data, @headers) do
+    case Req.post(req) do
       {:ok, response} ->
-        if response.status_code in 200..299 do
+        if response.status in 200..299 do
           :ok
         else
           :error

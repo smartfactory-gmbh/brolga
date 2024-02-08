@@ -3,7 +3,6 @@ defmodule BrolgaWeb.MonitorLive.Show do
 
   alias Brolga.Monitoring
   alias BrolgaWeb.IncidentsListComponent
-  import BrolgaWeb.IncidentComponents
 
   @impl true
   def mount(_params, _session, socket) do

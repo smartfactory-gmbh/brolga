@@ -2,17 +2,6 @@ defmodule BrolgaCron.RunnerTest do
   use Brolga.DataCase
   import ExUnit.CaptureLog
   require Logger
-  import Mox
-
-  defp mock_tasks(),
-    do: [
-      %BrolgaCron.Task{
-        id: :test,
-        interval_in_seconds: 1,
-        action: fn -> :called end,
-        args: []
-      }
-    ]
 
   defp mock_logging_tasks(),
     do: [
@@ -26,18 +15,12 @@ defmodule BrolgaCron.RunnerTest do
 
   describe "execute_now/1" do
     test "executes existing action" do
-      tasks = mock_tasks()
-      expect(BrolgaCron.Task.ProviderMock, :tasks, fn -> tasks end)
+      result = BrolgaCron.Runner.execute_now(:cleanup_monitoring_results)
 
-      result = BrolgaCron.Runner.execute_now(:test)
-
-      assert result == :called
+      assert result == {0, nil}
     end
 
     test "returns flag when action is not found" do
-      tasks = mock_tasks()
-      expect(BrolgaCron.Task.ProviderMock, :tasks, fn -> tasks end)
-
       result = BrolgaCron.Runner.execute_now(:nonexistent)
 
       assert result == :not_found

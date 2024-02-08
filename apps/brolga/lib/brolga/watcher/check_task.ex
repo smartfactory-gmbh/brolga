@@ -18,10 +18,6 @@ defmodule Brolga.Watcher.CheckTask do
     Task.start_link(__MODULE__, :run, [monitor_id])
   end
 
-  defp get_http_client do
-    Application.fetch_env!(:brolga, :adapters) |> Keyword.get(:http, HTTPoison)
-  end
-
   @spec run(monitor_id :: Ecto.UUID.t()) :: no_return
   def run(monitor_id) do
     monitor = refresh_monitor(monitor_id)
@@ -36,48 +32,52 @@ defmodule Brolga.Watcher.CheckTask do
   @spec validate_response(HTTPoison.Response.t(), Monitor.t()) :: no_return
   defp validate_response(response, monitor) do
     {success, message} =
-      if response.status_code in 200..300 do
-        {true, "Successful hit"}
-      else
-        {false, "Error: #{response.body}"}
+      cond do
+        response.status in 200..300 -> {true, "Successful hit"}
+        is_nil(response.body) -> {false, "Unknown Error"}
+        response.body == "" -> {false, "Unknown Error"}
+        true -> {false, "Error: #{response.body}"}
       end
 
     Monitoring.create_monitor_result(%{
       reached: success,
       monitor_id: monitor.id,
-      status_code: response.status_code,
+      status_code: response.status,
       message: String.slice(message, 0..231)
     })
   end
 
   @spec process(Monitor.t()) :: no_return
   defp process(%Monitor{url: url, timeout_in_seconds: timeout} = monitor) do
-    client = get_http_client()
-    client.start()
-
-    headers = [{"User-Agent", @user_agent}]
+    retry = Application.get_env(:brolga, :http_client)[:no_retry] != true
 
     options = [
-      timeout: timeout * 1000,
-      recv_timeout: timeout * 1000,
-      follow_redirect: true
+      url: url,
+      headers: %{user_agent: @user_agent},
+      pool_timeout: timeout * 1000,
+      receive_timeout: timeout * 1000
     ]
 
-    case client.get(url, headers, options) do
+    options =
+      case retry do
+        false -> options |> Keyword.put(:retry, false)
+        true -> options
+      end
+
+    req = Req.new(options)
+
+    case Req.get(req) do
       {:ok, response} ->
         validate_response(response, monitor)
 
-      {:error, %HTTPoison.Error{reason: error}} ->
-        message = "Something went wrong: #{error}" |> String.slice(0..231)
-
-        Monitoring.create_monitor_result(%{
-          reached: false,
-          monitor_id: monitor.id,
-          message: message
-        })
-
-      {:error, _} ->
-        message = "An unknown error occurred"
+      {:error, exception} ->
+        message =
+          case exception do
+            %{message: message} -> "Something went wrong: #{message}"
+            %{reason: reason} -> "Something went wrong: #{reason}"
+            _ -> "Something went wrong."
+          end
+          |> String.slice(0..231)
 
         Monitoring.create_monitor_result(%{
           reached: false,

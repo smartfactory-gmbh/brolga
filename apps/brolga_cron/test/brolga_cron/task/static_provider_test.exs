@@ -1,8 +1,6 @@
 defmodule BrolgaCron.Task.StaticProviderTest do
   use Brolga.DataCase
-  import ExUnit.CaptureLog
   require Logger
-  import Mox
 
   describe "tasks/0" do
     test "returns the expected job lists" do
