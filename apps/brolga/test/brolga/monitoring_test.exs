@@ -3,8 +3,6 @@ defmodule Brolga.MonitoringTest do
 
   alias Brolga.Monitoring
 
-  setup :stop_scheduled_timers
-
   describe "monitors" do
     alias Brolga.Monitoring.Monitor
 

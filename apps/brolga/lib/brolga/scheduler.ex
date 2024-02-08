@@ -30,6 +30,10 @@ defmodule Brolga.Scheduler do
     GenServer.cast(__MODULE__, {:stop, monitor_id})
   end
 
+  def stop_monitor_sync(monitor_id) do
+    GenServer.call(__MODULE__, {:stop, monitor_id})
+  end
+
   @spec get_monitored_ids() :: [Ecto.UUID.t()]
   def get_monitored_ids() do
     GenServer.call(__MODULE__, :list_ids)
@@ -37,8 +41,9 @@ defmodule Brolga.Scheduler do
 
   @spec stop_all() :: :ok
   def stop_all() do
-    ids = get_monitored_ids()
-    Enum.each(ids, fn id -> stop_monitor(id) end)
+    get_monitored_ids()
+    |> Enum.each(&stop_monitor_sync/1)
+
     :ok
   end
 
@@ -64,6 +69,16 @@ defmodule Brolga.Scheduler do
   def handle_cast({:stop, monitor_id}, state) do
     {
       :noreply,
+      state
+      |> remove_monitor(monitor_id)
+    }
+  end
+
+  @impl true
+  def handle_call({:stop, monitor_id}, _from, state) do
+    {
+      :reply,
+      :ok,
       state
       |> remove_monitor(monitor_id)
     }

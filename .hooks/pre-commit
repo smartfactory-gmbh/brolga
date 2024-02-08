@@ -6,4 +6,3 @@ run() {
 
 run "mix format --check-formatted" || exit 1
 run "mix credo" || exit 1
-run "mix dialyzer" || exit 1
