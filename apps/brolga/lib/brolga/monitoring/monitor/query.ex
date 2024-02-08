@@ -6,7 +6,6 @@ defmodule Brolga.Monitoring.Monitor.Query do
   import Ecto.Query
   import Brolga.CustomSql
   alias Brolga.Monitoring.{Monitor, MonitorResult}
-  alias Brolga.Alerting.Incident
   alias Brolga.Monitoring.MonitorResult.Query, as: MonitorResultQuery
   alias Brolga.Alerting.Incident.Query, as: IncidentQuery
 

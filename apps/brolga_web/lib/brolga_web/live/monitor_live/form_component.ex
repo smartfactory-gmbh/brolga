@@ -2,7 +2,6 @@ defmodule BrolgaWeb.MonitorLive.FormComponent do
   use BrolgaWeb, :live_component
 
   alias Brolga.Monitoring
-  import BrolgaWeb.MonitorTagComponents
   import BrolgaWeb.MonitorComponents
 
   @impl true

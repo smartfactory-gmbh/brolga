@@ -1,28 +1,16 @@
 defmodule Brolga.Watcher.CheckTaskTest do
   alias Ecto.Repo
-  use Brolga.DataCase
+  use Brolga.DataCase, async: false
 
   alias Brolga.Watcher.CheckTask
   import Brolga.MonitoringFixtures
 
-  import Mox
-
-  setup :verify_on_exit!
-
   describe "validate_response/1" do
-    test "should create an entry with success state" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
+    test "should create an entry with success state", %{target_bypass: bypass} do
+      monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8888/"})
 
-      expect(Brolga.HttpClientMock, :start, fn -> :ok end)
-
-      expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
-        assert url == "http://test.unknown/"
-
-        {:ok,
-         %HTTPoison.Response{
-           status_code: 200,
-           body: "All good!"
-         }}
+      Bypass.expect_once(bypass, "GET", "/", fn conn ->
+        Plug.Conn.resp(conn, 200, "All good!")
       end)
 
       CheckTask.run(monitor.id)
@@ -37,19 +25,11 @@ defmodule Brolga.Watcher.CheckTaskTest do
       assert result.message == "Successful hit"
     end
 
-    test "should truncate the status message" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
+    test "should truncate the status message", %{target_bypass: bypass} do
+      monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8888/"})
 
-      expect(Brolga.HttpClientMock, :start, fn -> :ok end)
-
-      expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
-        assert url == "http://test.unknown/"
-
-        {:ok,
-         %HTTPoison.Response{
-           status_code: 400,
-           body: String.pad_trailing("All is broken", 300)
-         }}
+      Bypass.expect_once(bypass, "GET", "/", fn conn ->
+        Plug.Conn.resp(conn, 400, String.pad_trailing("All is broken", 300))
       end)
 
       CheckTask.run(monitor.id)
@@ -64,19 +44,11 @@ defmodule Brolga.Watcher.CheckTaskTest do
       assert String.length(result.message) == 232
     end
 
-    test "should create an entry with error state" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
+    test "should create an entry with error state", %{target_bypass: bypass} do
+      monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8888/"})
 
-      expect(Brolga.HttpClientMock, :start, fn -> :ok end)
-
-      expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
-        assert url == "http://test.unknown/"
-
-        {:ok,
-         %HTTPoison.Response{
-           status_code: 500,
-           body: "Broken!"
-         }}
+      Bypass.expect(bypass, "GET", "/", fn conn ->
+        Plug.Conn.resp(conn, 500, "Broken!")
       end)
 
       CheckTask.run(monitor.id)
@@ -92,14 +64,7 @@ defmodule Brolga.Watcher.CheckTaskTest do
     end
 
     test "should create an entry with error state if http client fails" do
-      monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
-
-      expect(Brolga.HttpClientMock, :start, fn -> :ok end)
-
-      expect(Brolga.HttpClientMock, :get, fn url, _data, _header ->
-        assert url == "http://test.unknown/"
-        {:error, %HTTPoison.Error{id: nil, reason: :timeout}}
-      end)
+      monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8889/"})
 
       CheckTask.run(monitor.id)
 
@@ -110,7 +75,7 @@ defmodule Brolga.Watcher.CheckTaskTest do
 
       assert result.reached == false
       assert result.status_code == nil
-      assert result.message == "Something went wrong: timeout"
+      assert result.message == "Something went wrong: econnrefused"
     end
   end
 end

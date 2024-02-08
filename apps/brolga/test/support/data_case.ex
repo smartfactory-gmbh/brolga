@@ -32,6 +32,27 @@ defmodule Brolga.DataCase do
     :ok
   end
 
+  setup do
+    Application.put_env(:brolga, :slack_notifier,
+      enabled: true,
+      webhook_url: "http://localhost:7777",
+      username: "slack_user",
+      channel: "#slack_channel"
+    )
+
+    {
+      :ok,
+      slack_bypass: Bypass.open(port: 7777)
+    }
+  end
+
+  setup do
+    {
+      :ok,
+      target_bypass: Bypass.open(port: 8888)
+    }
+  end
+
   @doc """
   Make sure that the scheduler canceled all timers that may have been setup in test cases 
   Is always set as a cleanup method when Brolga.DataCase is used

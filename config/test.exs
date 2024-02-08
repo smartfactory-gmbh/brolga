@@ -66,3 +66,5 @@ config :brolga, :slack_notifier,
   webhook_url: "https://hooks.slack.com/services/FaKe/WeBhOoK",
   username: "Brolga",
   channel: "#sysops"
+
+config :brolga, :http_client, no_retry: true

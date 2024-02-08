@@ -47,8 +47,8 @@ defmodule Brolga.MixProject do
       {:swoosh, "~> 1.3"},
       {:finch, "~> 0.13"},
       {:timex, "~> 3.0"},
-      {:httpoison, "~> 2.0"},
-      {:mox, "~> 1.0", only: :test},
+      {:req, "~> 0.4.0"},
+      {:bypass, "~> 2.1", only: :test},
       {:gen_smtp, "~> 1.2"},
       {:sentry, "~> 10.1"},
       {:hackney, "~> 1.8"}

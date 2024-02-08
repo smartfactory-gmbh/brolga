@@ -1,13 +1,3 @@
-Mox.defmock(
-  Brolga.HttpClientMock,
-  for: HTTPoison.Base
-)
-
-Application.put_env(
-  :brolga,
-  :adapters,
-  http: Brolga.HttpClientMock
-)
-
 ExUnit.start()
+Application.ensure_all_started(:bypass)
 Ecto.Adapters.SQL.Sandbox.mode(Brolga.Repo, :manual)

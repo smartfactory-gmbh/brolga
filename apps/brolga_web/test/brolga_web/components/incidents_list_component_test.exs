@@ -10,7 +10,7 @@ defmodule BrolgaWeb.IncidentsListComponentTest do
   setup :register_and_log_in_user
 
   describe "render/1" do
-    test "renders a list of incidents", %{conn: conn} do
+    test "renders a list of incidents" do
       monitor = monitor_fixture()
       incident_fixture(%{monitor_id: monitor.id})
       incident_fixture(%{monitor_id: monitor.id})

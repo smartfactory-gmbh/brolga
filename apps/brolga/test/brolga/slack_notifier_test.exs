@@ -6,8 +6,6 @@ defmodule Brolga.SlackNotifierTest do
   import Brolga.MonitoringFixtures
   import Brolga.AlertingFixtures
 
-  import Mox
-
   setup [:open_incident, :closed_incident]
 
   defp open_incident(_context) do
@@ -45,25 +43,34 @@ defmodule Brolga.SlackNotifierTest do
   end
 
   describe "new_incident/1" do
-    test "injects the monitor name in the content", context do
-      expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
+    test "injects the monitor name in the content", %{slack_bypass: bypass, open: open} do
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
+
         main_text =
-          extract_main_blocks(data)
+          extract_main_blocks(body)
           |> Enum.at(0)
           |> Map.get("text")
           |> Map.get("text")
 
         assert main_text =~ "Test down monitor"
-        {:ok, %{status_code: 200}}
+
+        Plug.Conn.resp(conn, 200, "")
       end)
 
-      SlackNotifier.new_incident(context[:open])
+      SlackNotifier.new_incident(open)
     end
 
-    test "injects the time of alert", context do
-      expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
+    test "injects the time of alert", %{slack_bypass: bypass, open: open} do
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
+
         main_text =
-          extract_main_blocks(data)
+          extract_main_blocks(body)
           # Date field
           |> Enum.at(1)
           |> Map.get("text")
@@ -71,33 +78,42 @@ defmodule Brolga.SlackNotifierTest do
 
         # Timestamp of started_at
         assert main_text =~ "1641128400"
-        {:ok, %{status_code: 200}}
+
+        Plug.Conn.resp(conn, 200, "")
       end)
 
-      SlackNotifier.new_incident(context[:open])
+      SlackNotifier.new_incident(open)
     end
   end
 
   describe "incident_resolved/1" do
-    test "injects the monitor name in the content", context do
-      expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
+    test "injects the monitor name in the content", %{slack_bypass: bypass, closed: closed} do
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
+
         main_text =
-          extract_main_blocks(data)
+          extract_main_blocks(body)
           |> Enum.at(0)
           |> Map.get("text")
           |> Map.get("text")
 
         assert main_text =~ "Test up monitor"
-        {:ok, %{status_code: 200}}
+        Plug.Conn.resp(conn, 200, "")
       end)
 
-      SlackNotifier.incident_resolved(context[:closed])
+      SlackNotifier.incident_resolved(closed)
     end
 
-    test "injects the time of alert", context do
-      expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
+    test "injects the time of alert", %{slack_bypass: bypass, closed: closed} do
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
+
         main_text =
-          extract_main_blocks(data)
+          extract_main_blocks(body)
           # Date field
           |> Enum.at(1)
           |> Map.get("text")
@@ -105,43 +121,53 @@ defmodule Brolga.SlackNotifierTest do
 
         # Timestamp of started_at
         assert main_text =~ "1641128400"
-        {:ok, %{status_code: 200}}
+        Plug.Conn.resp(conn, 200, "")
       end)
 
-      SlackNotifier.incident_resolved(context[:closed])
+      SlackNotifier.incident_resolved(closed)
     end
   end
 
   describe "test_notifications/0" do
-    expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
-      decoded = Jason.decode!(data)
+    test "sends a test notification", %{slack_bypass: bypass} do
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
 
-      text =
-        decoded["blocks"]
-        |> Enum.at(0)
-        |> Map.get("text")
-        |> Map.get("text")
+        decoded = Jason.decode!(body)
 
-      assert text == "This is a test notification"
+        text =
+          decoded["blocks"]
+          |> Enum.at(0)
+          |> Map.get("text")
+          |> Map.get("text")
 
-      {:ok, %{status_code: 200}}
-    end)
+        assert text == "This is a test notification"
 
-    SlackNotifier.test_notification()
+        Plug.Conn.resp(conn, 200, "")
+      end)
+
+      SlackNotifier.test_notification()
+    end
   end
 
   describe "send/1" do
-    test "injects the configured user and channel", context do
+    test "injects the configured user and channel", %{slack_bypass: bypass, open: open} do
       # Testing through a public method, since send is private
-      expect(Brolga.HttpClientMock, :post, fn _url, data, _headers ->
-        decoded = Jason.decode!(data)
+      Bypass.expect_once(bypass, "POST", "/", fn conn ->
+        {:ok, body, conn} =
+          conn
+          |> Plug.Conn.read_body()
 
-        assert decoded["username"] == "Brolga"
-        assert decoded["channel"] == "#sysops"
-        {:ok, %{status_code: 200}}
+        decoded = Jason.decode!(body)
+
+        assert decoded["username"] == "slack_user"
+        assert decoded["channel"] == "#slack_channel"
+        Plug.Conn.resp(conn, 200, "")
       end)
 
-      SlackNotifier.new_incident(context[:open])
+      SlackNotifier.new_incident(open)
     end
   end
 
