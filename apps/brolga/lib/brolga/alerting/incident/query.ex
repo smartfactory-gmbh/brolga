@@ -26,6 +26,11 @@ defmodule Brolga.Alerting.Incident.Query do
       where: is_nil(as(:incidents).ended_at)
   end
 
+  def filter_monitor_id(query \\ base(), monitor_id) do
+    from query,
+      where: as(:incidents).monitor_id == ^monitor_id
+  end
+
   @doc """
   Pluck a distinct list of monitor ids from the incident query
   """

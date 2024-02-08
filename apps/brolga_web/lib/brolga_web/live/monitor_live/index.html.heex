@@ -1,0 +1,60 @@
+<.header>
+  Listing Monitors
+  <:actions>
+    <.link patch={~p"/admin/monitors/new"}>
+      <.button>New Monitor</.button>
+    </.link>
+  </:actions>
+</.header>
+
+<.table
+  id="monitors"
+  rows={@streams.monitors}
+  row_click={fn {_id, monitor} -> JS.navigate(~p"/admin/monitors/#{monitor}") end}
+>
+  <:col :let={{_id, monitor}} label="Name"><%= monitor.name %></:col>
+  <:col :let={{_id, monitor}} label="Host"><%= monitor.host %></:col>
+  <:col :let={{_id, monitor}} label="Tags"><.tags tags={monitor.monitor_tags} /></:col>
+  <:col :let={{_id, monitor}} label="Latest checks">
+    <div class="flex flex-row-reverse gap-1">
+      <%= for result <- monitor.monitor_results do %>
+        <div class={
+          ["h-full", "rounded", "w-1"] ++
+            [if(result.reached, do: "bg-green-500", else: "bg-red-500")]
+        }>
+          &nbsp;
+        </div>
+      <% end %>
+    </div>
+  </:col>
+  <:action :let={{_id, monitor}}>
+    <div class="sr-only">
+      <.link navigate={~p"/admin/monitors/#{monitor}"}>Show</.link>
+    </div>
+    <.link patch={~p"/admin/monitors/#{monitor}/edit"}>Edit</.link>
+  </:action>
+  <:action :let={{id, monitor}}>
+    <.link
+      phx-click={JS.push("delete", value: %{id: monitor.id}) |> hide("##{id}")}
+      data-confirm="Are you sure?"
+    >
+      Delete
+    </.link>
+  </:action>
+</.table>
+
+<.modal
+  :if={@live_action in [:new, :edit]}
+  id="monitor-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/monitors")}
+>
+  <.live_component
+    module={BrolgaWeb.MonitorLive.FormComponent}
+    id={@monitor.id || :new}
+    title={@page_title}
+    action={@live_action}
+    monitor={@monitor}
+    patch={~p"/admin/monitors"}
+  />
+</.modal>

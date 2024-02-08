@@ -1,15 +1,10 @@
 <.back navigate={~p"/admin/monitors"}>Back to monitors</.back>
 
 <.header>
-  Monitor <%= @monitor.name %>
+  Monitor <%= @monitor.id %>
   <:subtitle>This is a monitor record from your database.</:subtitle>
-  <:extra>
-    <div class="mt-2">
-      <.tags tags={@monitor.monitor_tags} />
-    </div>
-  </:extra>
   <:actions>
-    <.link href={~p"/admin/monitors/#{@monitor}/edit"}>
+    <.link patch={~p"/admin/monitors/#{@monitor}/show/edit"} phx-click={JS.push_focus()}>
       <.button>Edit monitor</.button>
     </.link>
   </:actions>
@@ -37,4 +32,20 @@
   <% end %>
 </div>
 
-<.incidents_list monitor={@monitor} />
+<.live_component module={IncidentsListComponent} id="incidents-list" monitor={@monitor} />
+
+<.modal
+  :if={@live_action == :edit}
+  id="monitor-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/monitors/#{@monitor}")}
+>
+  <.live_component
+    module={BrolgaWeb.MonitorLive.FormComponent}
+    id={@monitor.id}
+    title={@page_title}
+    action={@live_action}
+    monitor={@monitor}
+    patch={~p"/admin/monitors/#{@monitor}"}
+  />
+</.modal>

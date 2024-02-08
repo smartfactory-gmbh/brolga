@@ -38,6 +38,16 @@ defmodule Brolga.Alerting do
   """
   def get_incident!(id), do: Repo.get!(Incident, id)
 
+  def get_last_incidents!(monitor_id) do
+    alias Brolga.Alerting.Incident.Query
+
+    Query.base()
+    |> Query.filter_monitor_id(monitor_id)
+    |> Query.order_by_latest()
+    |> limit(5)
+    |> Repo.all()
+  end
+
   @doc """
   Creates a incident.
 
@@ -114,21 +124,27 @@ defmodule Brolga.Alerting do
   @spec close_incident(monitor :: Monitor.t()) :: Incident.t()
   def close_incident(monitor) do
     incident =
-      Repo.one!(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
+      Repo.one(from i in Incident, where: is_nil(i.ended_at) and i.monitor_id == ^monitor.id)
 
-    results = update_incident(incident, %{ended_at: DateTime.utc_now()})
-
-    case results do
-      {:ok, incident} ->
-        incident
-        |> Repo.preload(:monitor)
-        |> Brolga.AlertNotifiers.incident_resolved()
-
-      _ ->
+    case incident do
+      nil ->
         nil
-    end
 
-    results
+      incident ->
+        results = update_incident(incident, %{ended_at: DateTime.utc_now()})
+
+        case results do
+          {:ok, incident} ->
+            incident
+            |> Repo.preload(:monitor)
+            |> Brolga.AlertNotifiers.incident_resolved()
+
+          _ ->
+            nil
+        end
+
+        results
+    end
   end
 
   @doc """
