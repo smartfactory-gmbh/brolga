@@ -23,7 +23,7 @@
   id="monitor_results"
   phx-update={@update_type}
   phx-viewport-bottom={not @live_mode && "next-page"}
-  class="flex flex-col gap-4 mt-8"
+  class="flex flex-col gap-4 mt-8 pb-[200vh]"
 >
   <.monitor_result :for={{id, result} <- @streams.monitor_results} id={id} result={result} />
 </div>
