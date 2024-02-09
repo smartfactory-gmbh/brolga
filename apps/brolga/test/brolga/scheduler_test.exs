@@ -17,11 +17,11 @@ defmodule Brolga.SchedulerTest do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://test.unknown/"})
       initial_state = %{}
 
-      {:noreply, new_state} = Scheduler.handle_cast({:start, monitor.id}, initial_state)
+      {:noreply, new_state} = Scheduler.handle_cast({:start, monitor.id, []}, initial_state)
       assert Map.has_key?(new_state, monitor.id)
 
       # Re-adding
-      {:noreply, new_state} = Scheduler.handle_cast({:start, monitor.id}, initial_state)
+      {:noreply, new_state} = Scheduler.handle_cast({:start, monitor.id, []}, initial_state)
       assert Map.has_key?(new_state, monitor.id)
     end
   end

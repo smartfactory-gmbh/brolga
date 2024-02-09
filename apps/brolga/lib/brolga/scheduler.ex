@@ -20,9 +20,24 @@ defmodule Brolga.Scheduler do
     GenServer.start_link(__MODULE__, %{}, name: __MODULE__)
   end
 
-  @spec start_monitor(monitor_id :: Ecto.UUID.t()) :: :ok
-  def start_monitor(monitor_id) do
-    GenServer.cast(__MODULE__, {:start, monitor_id})
+  @doc """
+  Add the monitor to the list of scheduled tasks. Will run checks periodically
+  until stop_monitor(monitor_id) is called.
+
+  ## Options
+
+  :with_delay - bool (default false) - Whether a delay should be applied instead
+  of starting the monitoring immediately. The delay time is a random value within
+  the period time.
+
+  ## Examples
+
+  iex> Brolga.Scheduler.start_monitor("f399c25d-dc86-4742-9591-3b0c9db0d648", with_delay: true)
+  :ok
+  """
+  @spec start_monitor(monitor_id :: Ecto.UUID.t(), opts :: Keyword.t()) :: :ok
+  def start_monitor(monitor_id, opts \\ []) do
+    GenServer.cast(__MODULE__, {:start, monitor_id, opts})
   end
 
   @spec stop_monitor(monitor_id :: Ecto.UUID.t()) :: :ok
@@ -56,12 +71,24 @@ defmodule Brolga.Scheduler do
   end
 
   @impl true
-  def handle_cast({:start, monitor_id}, state) do
+  def handle_cast({:start, monitor_id, opts}, state) do
+    with_delay = opts |> Keyword.get(:with_delay, false)
+
+    delay_in_ms =
+      if with_delay do
+        case Monitoring.get_monitor(monitor_id) do
+          nil -> @monitor_start_delay
+          monitor -> :rand.uniform(monitor.interval_in_minutes * 60 * 1000)
+        end
+      else
+        @monitor_start_delay
+      end
+
     {
       :noreply,
       state
       |> remove_monitor(monitor_id)
-      |> upsert_monitor(monitor_id)
+      |> upsert_monitor(monitor_id, delay_in_ms)
     }
   end
 
@@ -109,7 +136,7 @@ defmodule Brolga.Scheduler do
   @impl true
   def handle_info(:init, state) do
     Monitoring.list_active_monitor_ids()
-    |> Enum.each(fn id -> start_monitor(id) end)
+    |> Enum.each(fn id -> start_monitor(id, with_delay: true) end)
 
     {:noreply, state}
   end
