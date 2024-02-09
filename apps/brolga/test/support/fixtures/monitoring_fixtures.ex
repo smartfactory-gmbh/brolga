@@ -13,7 +13,7 @@ defmodule Brolga.MonitoringFixtures do
       attrs
       |> Enum.into(%{
         name: "some name",
-        url: "some url",
+        url: "https://some-url/",
         interval_in_minutes: 42
       })
       |> Brolga.Monitoring.create_monitor()

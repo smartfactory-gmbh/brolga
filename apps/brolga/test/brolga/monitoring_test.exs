@@ -25,11 +25,11 @@ defmodule Brolga.MonitoringTest do
     end
 
     test "create_monitor/1 with valid data creates a monitor" do
-      valid_attrs = %{name: "some name", url: "some url", interval_in_minutes: 42}
+      valid_attrs = %{name: "some name", url: "https://some-url/", interval_in_minutes: 42}
 
       assert {:ok, %Monitor{} = monitor} = Monitoring.create_monitor(valid_attrs)
       assert monitor.name == "some name"
-      assert monitor.url == "some url"
+      assert monitor.url == "https://some-url/"
       assert monitor.interval_in_minutes == 42
     end
 
@@ -42,13 +42,13 @@ defmodule Brolga.MonitoringTest do
 
       update_attrs = %{
         name: "some updated name",
-        url: "some updated url",
+        url: "https://some-updated-url/",
         interval_in_minutes: 43
       }
 
       assert {:ok, %Monitor{} = monitor} = Monitoring.update_monitor(monitor, update_attrs)
       assert monitor.name == "some updated name"
-      assert monitor.url == "some updated url"
+      assert monitor.url == "https://some-updated-url/"
       assert monitor.interval_in_minutes == 43
     end
 

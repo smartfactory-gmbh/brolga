@@ -54,6 +54,7 @@ defmodule Brolga.Monitoring.Monitor do
     |> validate_required([:name, :url, :interval_in_minutes])
     |> validate_length(:name, min: 5)
     |> validate_length(:url, min: 5)
+    |> validate_format(:url, ~r"^https?://", message: "should start with http:// or https://")
     |> validate_number(:interval_in_minutes, greater_than_or_equal_to: 0)
     |> validate_number(:timeout_in_seconds, greater_than_or_equal_to: 1)
     |> check_constraint(:timeout_in_seconds,
