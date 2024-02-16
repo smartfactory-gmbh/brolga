@@ -1,8 +1,9 @@
 defmodule BrolgaWeb.MonitorLive do
   use Phoenix.LiveView
   alias Brolga.{Monitoring, Dashboards}
-  import Brolga.Utils
   use BrolgaWeb, :html
+
+  import BrolgaWeb.MonitorComponents
 
   # 1 minute interval
   @refresh_interval 1000 * 60
@@ -17,26 +18,7 @@ defmodule BrolgaWeb.MonitorLive do
     >
       <div class="grid grid-cols-3 md:grid-cols-6 lg:grid-cols-9 gap-3 auto-rows-fr">
         <%= for monitor <- @monitors do %>
-          <a target="_blank" href={~p"/admin/monitors/#{monitor.id}"}>
-            <div class={[
-              "border h-full pb-1 md:pb-2 rounded flex flex-col items-center justify-top text-center gap-1 bg-black/25",
-              monitor.is_down && "border-[#FF3B59]",
-              not monitor.is_down && "border-[#78BE20]"
-            ]}>
-              <div class={[
-                "rounded-t-sm px-2 py-0.5 flex-0 font-bold text-[16px] md:text-[18px] min-w-full",
-                monitor.is_down && "bg-[#FF3B59]",
-                not monitor.is_down && "bg-[#78BE20]"
-              ]}>
-                <%= float_to_percentage_format(monitor.uptime) %><span class="text-[12px]"> %</span>
-              </div>
-              <div class="flex-1 flex items-center">
-                <div class="text-[12px] md:text-[13px] lg:text-[14px] font-semibold line-clamp-2 leading-3 md:leading-4">
-                  <%= monitor.name %>
-                </div>
-              </div>
-            </div>
-          </a>
+          <.monitor_state_card monitor={monitor} />
         <% end %>
       </div>
     </div>

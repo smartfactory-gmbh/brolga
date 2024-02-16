@@ -9,6 +9,7 @@ defmodule Brolga.Monitoring do
   alias Brolga.Repo
   alias Brolga.Monitoring.{Monitor, MonitorResult, MonitorTag}
   alias Brolga.Alerting
+  alias Brolga.Dashboards
 
   @last_results_count 25
   # keeping a bit more than a month to be sure
@@ -31,29 +32,69 @@ defmodule Brolga.Monitoring do
   @doc """
   Returns the list of monitors.
 
+  ## Options
+
+  * `:only_actives` - Filter out all inactive monitors
+
   ## Examples
 
       iex> list_monitors()
       [%Monitor{}, ...]
 
+      iex> list_monitors(only_actives: true)
+      [%Monitor{}, ...]
   """
-  def list_monitors do
-    Repo.all(get_base_monitor_query())
-  end
+  def list_monitors(opts \\ []) do
+    alias Monitor.Query
+    only_actives = opts[:only_actives] || false
 
-  def list_monitors_for_dashboard(dashboard_id) do
-    alias Brolga.Monitoring.Monitor.Query
     query = get_base_monitor_query()
 
-    monitors =
-      query
-      |> Query.where_dashboard(dashboard_id)
-      |> Repo.all()
+    query =
+      case only_actives do
+        false -> query
+        true -> query |> Query.filter_active(true)
+      end
 
-    if monitors == [] do
-      list_monitors()
-    else
-      monitors
+    query |> Repo.all()
+  end
+
+  @doc """
+  List all monitors that are selected by this dashboard, either directly or through tags.
+
+  If no dashboard matching this id is found, returns all monitors.
+  If a dashboard is found, but the query results in no monitors, returns all monitors with the active filtering
+  applied according to the dashboard settings
+  """
+  @spec list_monitors_for_dashboard(dashboard_id :: Ecto.UUID.t()) :: [Monitor.t()]
+  def list_monitors_for_dashboard(dashboard_id) do
+    alias Brolga.Monitoring.Monitor.Query
+
+    case Dashboards.get_dashboard(dashboard_id) do
+      {:ok, dashboard} ->
+        query =
+          get_base_monitor_query()
+          |> Query.where_dashboard(dashboard.id)
+
+        # Hide inactives as per defined by the dashboard
+        query =
+          case dashboard.hide_inactives do
+            false -> query
+            true -> query |> Query.filter_active(true)
+          end
+
+        monitors =
+          query
+          |> Repo.all()
+
+        case monitors do
+          # If the result is empty but we have a dashboard, we still use its logic to hide/show monitors
+          [] -> list_monitors(only_actives: dashboard.hide_inactives)
+          monitors -> monitors
+        end
+
+      {:error, _} ->
+        list_monitors()
     end
   end
 
@@ -291,8 +332,8 @@ defmodule Brolga.Monitoring do
   def list_monitor_results(options \\ []) do
     alias Brolga.Monitoring.MonitorResult.Query
 
-    with_monitors = options |> Keyword.get(:with_monitors, false)
-    order = options |> Keyword.get(:order, nil)
+    with_monitors = options[:with_monitors] || false
+    order = options[:order]
 
     query = Query.base()
 
@@ -316,8 +357,8 @@ defmodule Brolga.Monitoring do
   defp get_previous_monitor_results_query(options) do
     alias Brolga.Monitoring.MonitorResult.Query
 
-    length = options |> Keyword.get(:length, 15)
-    cutoff_date = options |> Keyword.get(:cutoff_date, nil)
+    length = options[:length] || 15
+    cutoff_date = options[:cutoff_date]
 
     Query.base()
     |> Query.before_cutoff_date(cutoff_date)

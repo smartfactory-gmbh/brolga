@@ -58,16 +58,16 @@ defmodule Brolga.Dashboards do
 
   ## Examples
 
-      iex> get_dashboard!(123)
+      iex> get_dashboard(123)
       {:ok, %Dashboard{}}
 
-      iex> get_dashboard!(456)
+      iex> get_dashboard(456)
       {:error, :not_found}
 
   """
   def get_dashboard(id) do
     case UUID.cast(id) do
-      {:ok, uuid} -> Repo.get(Dashboard, uuid)
+      {:ok, uuid} -> {:ok, Repo.get(Dashboard, uuid)}
       :error -> {:error, "not a valid id"}
     end
   end
