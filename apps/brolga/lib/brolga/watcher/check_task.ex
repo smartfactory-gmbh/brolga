@@ -18,18 +18,21 @@ defmodule Brolga.Watcher.CheckTask do
     Task.start_link(__MODULE__, :run, [monitor_id])
   end
 
+  @doc """
+  Entrypoint of the task.
+
+  Simply check if the monitor is still active. If so, process the task.
+  """
   @spec run(monitor_id :: Ecto.UUID.t()) :: no_return
   def run(monitor_id) do
-    monitor = refresh_monitor(monitor_id)
-    process(monitor)
+    monitor = Monitoring.get_active_monitor(monitor_id)
+
+    if monitor do
+      process(monitor)
+    end
   end
 
-  @spec refresh_monitor(Ecto.UUID.t()) :: Monitor.t()
-  defp refresh_monitor(monitor_id) do
-    Monitoring.get_active_monitor!(monitor_id)
-  end
-
-  @spec validate_response(HTTPoison.Response.t(), Monitor.t()) :: no_return
+  @spec validate_response(Req.Response.t(), Monitor.t()) :: no_return
   defp validate_response(response, monitor) do
     {success, message} =
       cond do

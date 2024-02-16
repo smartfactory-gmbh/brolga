@@ -14,6 +14,7 @@ defmodule Brolga.Dashboards.Dashboard do
           id: Ecto.UUID.t(),
           name: String.t(),
           default: boolean(),
+          hide_inactives: boolean(),
           monitors: [Monitor.t()]
         }
 
@@ -22,6 +23,7 @@ defmodule Brolga.Dashboards.Dashboard do
 
   schema "dashboards" do
     field :name, :string
+    field :hide_inactives, :boolean, default: false
     field :default, :boolean, default: false
 
     many_to_many :monitors, Monitor, join_through: "monitors_dashboards", on_replace: :delete
@@ -36,7 +38,7 @@ defmodule Brolga.Dashboards.Dashboard do
   @doc false
   def changeset(dashboard, attrs) do
     dashboard
-    |> cast(attrs, [:name, :default])
+    |> cast(attrs, [:name, :default, :hide_inactives])
     |> validate_required([:name])
   end
 end
