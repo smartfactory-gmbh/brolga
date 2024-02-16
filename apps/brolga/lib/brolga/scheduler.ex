@@ -156,7 +156,7 @@ defmodule Brolga.Scheduler do
     end
   end
 
-  defp upsert_monitor(state, monitor_id, start_delay \\ @monitor_start_delay) do
+  defp upsert_monitor(state, monitor_id, start_delay) do
     # Insert or update the given monitor id
     # NOTE: does not cancel the running timer, use remove_monitor/2 beforehand if that's the wanted behaviour
 
