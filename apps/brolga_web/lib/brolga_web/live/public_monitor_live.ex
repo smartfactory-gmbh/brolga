@@ -1,4 +1,4 @@
-defmodule BrolgaWeb.MonitorLive do
+defmodule BrolgaWeb.PublicMonitorLive do
   use Phoenix.LiveView
   alias Brolga.{Monitoring, Dashboards}
   use BrolgaWeb, :html
