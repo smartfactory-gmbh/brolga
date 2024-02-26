@@ -22,14 +22,13 @@
   </:item>
 </.list>
 
-<div class="flex flex-row-reverse mt-8 gap-2">
-  <%= for result <- @monitor.monitor_results do %>
-    <div class={
-      ["w-[4%]", "h-8", "rounded"] ++ [if(result.reached, do: "bg-green-500", else: "bg-red-500")]
-    }>
-      &nbsp;
-    </div>
-  <% end %>
+<div class="mt-8">
+  <.live_component
+    id={"ticker-#{@monitor.id}"}
+    module={MonitorLastResultsComponent}
+    prefill={true}
+    monitor_id={@monitor.id}
+  />
 </div>
 
 <.live_component module={IncidentsListComponent} id="incidents-list" monitor={@monitor} />

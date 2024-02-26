@@ -56,4 +56,9 @@ defmodule Brolga.Monitoring.MonitorResult.Query do
     |> with_numbered_rows_per_monitor()
     |> order_by_latest()
   end
+
+  def for_monitor(query \\ base(), monitor_id) do
+    from query,
+      where: as(:monitor_results).monitor_id == ^monitor_id
+  end
 end

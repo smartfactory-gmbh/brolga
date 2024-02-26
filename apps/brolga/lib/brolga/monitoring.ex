@@ -6,12 +6,12 @@ defmodule Brolga.Monitoring do
   import Ecto.Query, warn: false
   import Ecto.Changeset, only: [put_assoc: 3]
 
+  alias Phoenix.PubSub
   alias Brolga.Repo
   alias Brolga.Monitoring.{Monitor, MonitorResult, MonitorTag}
   alias Brolga.Alerting
   alias Brolga.Dashboards
 
-  @last_results_count 25
   # keeping a bit more than a month to be sure
   @retention_days 32
 
@@ -34,7 +34,8 @@ defmodule Brolga.Monitoring do
 
   ## Options
 
-  * `:only_actives` - Filter out all inactive monitors
+  * `:only_actives` - {boolean} - Filter out all inactive monitors, default: false
+  * `:with_tags` - {boolean} - Preload monitor tags, default: false
 
   ## Examples
 
@@ -47,8 +48,16 @@ defmodule Brolga.Monitoring do
   def list_monitors(opts \\ []) do
     alias Monitor.Query
     only_actives = opts[:only_actives] || false
+    with_tags = opts[:with_tags] || false
 
     query = get_base_monitor_query()
+
+    query =
+      if with_tags do
+        query |> Query.with_monitor_tags()
+      else
+        query
+      end
 
     query =
       case only_actives do
@@ -96,21 +105,6 @@ defmodule Brolga.Monitoring do
       {:error, _} ->
         list_monitors()
     end
-  end
-
-  def list_monitors_with_latest_results(opts \\ []) do
-    alias Brolga.Monitoring.Monitor.Query
-
-    with_tags = opts |> Keyword.get(:with_tags, false)
-
-    if with_tags do
-      Query.base() |> Query.with_monitor_tags()
-    else
-      Query.base()
-    end
-    |> Query.with_latest_results(@last_results_count)
-    |> Query.order_by_name()
-    |> Repo.all()
   end
 
   def list_active_monitor_ids do
@@ -187,7 +181,6 @@ defmodule Brolga.Monitoring do
       |> Query.with_down_state()
       |> Query.with_monitor_tags()
       |> Query.with_latest_incidents(5)
-      |> Query.with_latest_results(25)
 
     Repo.one!(from monitor_query, where: [id: ^id])
   end
@@ -281,6 +274,12 @@ defmodule Brolga.Monitoring do
     end
 
     result
+  end
+
+  def toggle_monitor_state(%Monitor{} = monitor, up?) do
+    monitor
+    |> Monitor.changeset_toggle_state(%{up: up?})
+    |> Repo.update()
   end
 
   @doc """
@@ -417,6 +416,18 @@ defmodule Brolga.Monitoring do
     Repo.all(query |> offset(^last_number))
   end
 
+  def get_latest_results(monitor_id, opts \\ []) do
+    alias Brolga.Monitoring.MonitorResult.Query
+
+    limit = opts[:limit] || 25
+
+    Query.base()
+    |> Query.for_monitor(monitor_id)
+    |> Query.order_by_latest()
+    |> Ecto.Query.limit(^limit)
+    |> Repo.all()
+  end
+
   @doc """
   Deletes all the monitor results that are older than the retention threshold.
   This should be run regularly to avoid clutering the database with data that is not
@@ -458,11 +469,6 @@ defmodule Brolga.Monitoring do
   """
   def get_monitor_result!(id), do: Repo.get!(MonitorResult, id)
 
-  defp get_closed_incident_pattern do
-    config = get_config()
-    (0..(config[:attempts_before_notification] - 1) |> Enum.map(fn _i -> true end)) ++ [false]
-  end
-
   @doc """
   Creates a monitor_result.
 
@@ -476,8 +482,6 @@ defmodule Brolga.Monitoring do
 
   """
   def create_monitor_result(attrs \\ %{}) do
-    config = get_config()
-
     result =
       %MonitorResult{}
       |> MonitorResult.changeset(attrs)
@@ -485,26 +489,30 @@ defmodule Brolga.Monitoring do
 
     case result do
       {:ok, monitor_result} ->
-        monitor = get_monitor_with_details!(monitor_result.monitor_id)
+        PubSub.broadcast!(
+          Brolga.PubSub,
+          "monitor:#{monitor_result.monitor_id}:new-result",
+          {:result_created, monitor_result}
+        )
 
-        last_results =
-          monitor.monitor_results
-          |> Enum.slice(0..config[:attempts_before_notification])
-          |> Enum.map(fn monitor_result -> monitor_result.reached end)
+        PubSub.broadcast!(
+          Brolga.PubSub,
+          "monitor:new-result",
+          {:result_created, monitor_result}
+        )
 
-        closed_incident = get_closed_incident_pattern()
-        open_incident = closed_incident |> Enum.map(fn value -> not value end)
+        monitor = get_monitor!(monitor_result.monitor_id)
 
-        case last_results do
-          ^closed_incident ->
-            # If reached correctly twice, we close the incident
+        cond do
+          monitor_result.reached and not monitor.up ->
+            toggle_monitor_state(monitor, true)
             Alerting.close_incident(monitor)
 
-          ^open_incident ->
-            # If reached incorrectly twice, we open an incident
+          not monitor_result.reached and monitor.up ->
+            toggle_monitor_state(monitor, false)
             Alerting.open_incident(monitor)
 
-          _ ->
+          true ->
             nil
         end
 

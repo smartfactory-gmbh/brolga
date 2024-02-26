@@ -25,8 +25,15 @@ defmodule Brolga.Watcher.CheckTaskTest do
       assert result.message == "Successful hit"
     end
 
-    test "should truncate the status message", %{target_bypass: bypass} do
+    test "should truncate the status message", %{
+      target_bypass: bypass,
+      slack_bypass: slack_bypass
+    } do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8888/"})
+
+      Bypass.expect(slack_bypass, "POST", "/", fn conn ->
+        Plug.Conn.resp(conn, 200, "ok")
+      end)
 
       Bypass.expect_once(bypass, "GET", "/", fn conn ->
         Plug.Conn.resp(conn, 400, String.pad_trailing("All is broken", 300))
@@ -44,8 +51,15 @@ defmodule Brolga.Watcher.CheckTaskTest do
       assert String.length(result.message) == 232
     end
 
-    test "should create an entry with error state", %{target_bypass: bypass} do
+    test "should create an entry with error state", %{
+      target_bypass: bypass,
+      slack_bypass: slack_bypass
+    } do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8888/"})
+
+      Bypass.expect(slack_bypass, "POST", "/", fn conn ->
+        Plug.Conn.resp(conn, 200, "ok")
+      end)
 
       Bypass.expect(bypass, "GET", "/", fn conn ->
         Plug.Conn.resp(conn, 500, "Broken!")
@@ -63,8 +77,14 @@ defmodule Brolga.Watcher.CheckTaskTest do
       assert result.message == "Error: Broken!"
     end
 
-    test "should create an entry with error state if http client fails" do
+    test "should create an entry with error state if http client fails", %{
+      slack_bypass: slack_bypass
+    } do
       monitor = monitor_fixture(%{name: "Test monitor", url: "http://localhost:8889/"})
+
+      Bypass.expect(slack_bypass, "POST", "/", fn conn ->
+        Plug.Conn.resp(conn, 200, "ok")
+      end)
 
       CheckTask.run(monitor.id)
 
