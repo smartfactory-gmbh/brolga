@@ -9,7 +9,7 @@ defmodule BrolgaWeb.PageController do
     dashboard =
       case Dashboards.get_dashboard(dashboard_id) do
         {:error, _error} -> nil
-        dashboard -> dashboard
+        {:ok, dashboard} -> dashboard
       end
 
     if is_nil(dashboard) and not is_nil(dashboard_id) do
