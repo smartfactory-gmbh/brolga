@@ -65,6 +65,23 @@ defmodule BrolgaWeb do
     end
   end
 
+  def fullscreen_live_view do
+    quote do
+      use Phoenix.LiveView,
+        root_layout: false,
+        layout: {BrolgaWeb.Layouts, :fullscreen}
+
+      def stream_batch_insert(socket, key, items, opts \\ %{}) do
+        items
+        |> Enum.reduce(socket, fn item, socket ->
+          stream_insert(socket, key, item, opts)
+        end)
+      end
+
+      unquote(html_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent

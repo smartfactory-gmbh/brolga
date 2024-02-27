@@ -50,7 +50,7 @@ defmodule BrolgaWeb.MonitorComponents do
       |> assign(:border_class, border_class)
 
     ~H"""
-    <a target="_blank" href={~p"/admin/monitors/#{@monitor.id}"}>
+    <.link target="_blank" navigate={~p"/admin/monitors/#{@monitor.id}"}>
       <div class={[
         "border h-full pb-1 md:pb-2 rounded flex flex-col items-center justify-top text-center gap-1 bg-black/25",
         @border_class
@@ -71,7 +71,7 @@ defmodule BrolgaWeb.MonitorComponents do
           </div>
         </div>
       </div>
-    </a>
+    </.link>
     """
   end
 end

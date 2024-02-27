@@ -6,7 +6,6 @@ defmodule Brolga.Monitoring.Monitor.Query do
   import Ecto.Query
   import Brolga.CustomSql
   alias Brolga.Monitoring.{Monitor, MonitorResult}
-  alias Brolga.Monitoring.MonitorResult.Query, as: MonitorResultQuery
   alias Brolga.Alerting.Incident.Query, as: IncidentQuery
 
   def base() do
@@ -32,21 +31,6 @@ defmodule Brolga.Monitoring.Monitor.Query do
 
     from query,
       preload: [incidents: ^incidents_query]
-  end
-
-  @doc """
-  Preload the `monitor_results` relation with the `nb` latest results
-  """
-  def with_latest_results(query \\ base(), nb) do
-    result_partition_query = MonitorResultQuery.latest_per_monitor()
-
-    results_query =
-      from result in MonitorResult,
-        join: r in subquery(result_partition_query),
-        on: result.id == r.id and r.row_number <= ^nb
-
-    from query,
-      preload: [monitor_results: ^results_query]
   end
 
   @doc """

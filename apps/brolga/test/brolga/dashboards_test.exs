@@ -12,12 +12,21 @@ defmodule Brolga.DashboardsTest do
 
     test "list_dashboards/0 returns all dashboards" do
       dashboard = dashboard_fixture()
-      assert Dashboards.list_dashboards() == [dashboard]
+
+      expected =
+        Dashboards.list_dashboards()
+        |> Brolga.Repo.preload([:monitor_tags, :monitors])
+
+      assert expected == [dashboard]
     end
 
     test "get_dashboard!/1 returns the dashboard with given id" do
       dashboard = dashboard_fixture()
-      assert Dashboards.get_dashboard!(dashboard.id) == dashboard
+
+      expected =
+        Dashboards.get_dashboard!(dashboard.id) |> Brolga.Repo.preload([:monitor_tags, :monitors])
+
+      assert expected == dashboard
     end
 
     test "create_dashboard/1 with valid data creates a dashboard" do

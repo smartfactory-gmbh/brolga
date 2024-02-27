@@ -9,7 +9,7 @@ defmodule BrolgaWeb.MonitorLive.Index do
   @impl true
   def mount(_params, _session, socket) do
     monitors =
-      Monitoring.list_monitors_with_latest_results(with_tags: true) |> Monitor.populate_hosts()
+      Monitoring.list_monitors(with_tags: true) |> Monitor.populate_hosts()
 
     {:ok, stream(socket, :monitors, monitors)}
   end
@@ -39,7 +39,7 @@ defmodule BrolgaWeb.MonitorLive.Index do
 
   @impl true
   def handle_info({BrolgaWeb.MonitorLive.FormComponent, {:saved, monitor}}, socket) do
-    monitor = Monitoring.get_monitor_with_details!(monitor.id)
+    monitor = Monitoring.get_monitor_with_details!(monitor.id) |> Monitor.populate_host()
     {:noreply, stream_insert(socket, :monitors, monitor)}
   end
 

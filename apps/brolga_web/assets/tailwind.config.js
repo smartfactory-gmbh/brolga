@@ -15,6 +15,9 @@ module.exports = {
     extend: {
       colors: {
         brand: "#FD4F00",
+        gray: {
+          light: "#EEEEF5"
+        },
         state: {
           up: '#78BE20',
           down: '#FF3B59',

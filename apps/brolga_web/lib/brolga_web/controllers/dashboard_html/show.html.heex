@@ -13,8 +13,12 @@
 <.list>
   <:item title="Name"><%= @dashboard.name %></:item>
   <:item title="View link">
-    <a target="_blank" class="text-teal-600 hover:text-teal-800" href={~p"/#{@dashboard.id}"}>
-      <%= ~p"/#{@dashboard.id}" %>
+    <a
+      target="_blank"
+      class="text-teal-600 hover:text-teal-800"
+      href={~p"/dashboard/#{@dashboard.id}"}
+    >
+      <%= ~p"/dashboard/#{@dashboard.id}" %>
     </a>
   </:item>
   <:item title="Default?"><%= @dashboard.default %></:item>

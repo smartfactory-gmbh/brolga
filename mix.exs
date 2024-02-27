@@ -8,17 +8,22 @@ defmodule Brolga.Umbrella.MixProject do
       start_permanent: Mix.env() == :prod,
       deps: deps(),
       aliases: aliases(),
+      cli: cli(),
       test_coverage: [
         summary: [
           threshold: 85
         ],
         ignore_modules: [
+          Brolga.AccountsFixtures,
+          Brolga.AlertingFixtures,
+          Brolga.DashboardsFixtures,
           BrolgaWeb.Application,
           BrolgaWeb.Telemetry,
           BrolgaWeb.Release,
           BrolgaWeb.PageHTML,
           BrolgaWeb.Layouts,
-          Mix.Tasks.TestNotifiers
+          Mix.Tasks.TestNotifiers,
+          Mix.Tasks.CleanupOldResults
         ]
       ]
     ]
@@ -64,7 +69,12 @@ defmodule Brolga.Umbrella.MixProject do
     [
       # run `mix setup` in all child apps
       setup: ["deps.get", "cmd mix setup"],
-      sentry_recompile: ["compile", "deps.compile sentry --force"]
+      sentry_recompile: ["compile", "deps.compile sentry --force"],
+      coverage: ["test --cover --export-coverage default", "test.coverage"]
     ]
+  end
+
+  def cli do
+    [preferred_envs: [coverage: :test]]
   end
 end

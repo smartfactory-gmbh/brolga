@@ -15,6 +15,6 @@ defmodule Brolga.DashboardsFixtures do
       })
       |> Brolga.Dashboards.create_dashboard()
 
-    dashboard
+    Brolga.Repo.preload(dashboard, [:monitor_tags, :monitors])
   end
 end

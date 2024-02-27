@@ -20,6 +20,7 @@ defmodule Brolga.Monitoring.Monitor do
           inserted_at: DateTime.t(),
           timeout_in_seconds: non_neg_integer(),
           active: boolean(),
+          up: boolean(),
           is_down: boolean() | nil,
           uptime: float() | nil,
           host: String.t() | nil
@@ -32,6 +33,7 @@ defmodule Brolga.Monitoring.Monitor do
     field :name, :string
     field :url, :string
     field :host, :string, virtual: true
+    field :up, :boolean, default: true
     field :interval_in_minutes, :integer
     field :active, :boolean, default: true
     field :timeout_in_seconds, :integer, default: 10
@@ -61,6 +63,12 @@ defmodule Brolga.Monitoring.Monitor do
       name: :timout_lower_than_interval,
       message: "Timout cannot exceed the interval timing"
     )
+  end
+
+  def changeset_toggle_state(monitor, attrs) do
+    monitor
+    |> cast(attrs, [:up])
+    |> validate_required([:up])
   end
 
   @spec populate_host(monitor :: t()) :: t()
