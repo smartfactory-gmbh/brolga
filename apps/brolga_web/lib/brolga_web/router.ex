@@ -97,9 +97,11 @@ defmodule BrolgaWeb.Router do
   end
 
   scope "/", BrolgaWeb do
-    pipe_through :browser
+    pipe_through [:browser]
 
-    get "/", PageController, :dashboard
-    get "/:id", PageController, :dashboard
+    live_session :public, root_layout: false do
+      live "/", PublicMonitorLive
+      live "/dashboard/:id", PublicMonitorLive
+    end
   end
 end

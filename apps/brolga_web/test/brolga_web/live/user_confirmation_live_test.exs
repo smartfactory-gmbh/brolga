@@ -3,12 +3,16 @@ defmodule BrolgaWeb.UserConfirmationLiveTest do
 
   import Phoenix.LiveViewTest
   import Brolga.AccountsFixtures
+  import Brolga.DashboardsFixtures
 
   alias Brolga.Accounts
   alias Brolga.Repo
 
   setup do
-    %{user: user_fixture()}
+    %{
+      user: user_fixture(),
+      dashboard: dashboard_fixture(%{default: true})
+    }
   end
 
   describe "Confirm user" do
@@ -64,7 +68,7 @@ defmodule BrolgaWeb.UserConfirmationLiveTest do
         lv
         |> form("#confirmation_form")
         |> render_submit()
-        |> follow_redirect(conn, "/")
+        |> follow_redirect(conn, ~p"/")
 
       assert {:ok, conn} = result
       refute Phoenix.Flash.get(conn.assigns.flash, :error)

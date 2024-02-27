@@ -5,15 +5,9 @@ defmodule BrolgaWeb.MonitorLive.Index do
 
   alias Brolga.Monitoring
   alias Brolga.Monitoring.Monitor
-  alias BrolgaWeb.MonitorLive.MonitorLastResultsComponent
-  alias Phoenix.PubSub
 
   @impl true
   def mount(_params, _session, socket) do
-    if connected?(socket) do
-      PubSub.subscribe(Brolga.PubSub, "monitor:new-result")
-    end
-
     monitors =
       Monitoring.list_monitors(with_tags: true) |> Monitor.populate_hosts()
 
@@ -47,16 +41,6 @@ defmodule BrolgaWeb.MonitorLive.Index do
   def handle_info({BrolgaWeb.MonitorLive.FormComponent, {:saved, monitor}}, socket) do
     monitor = Monitoring.get_monitor_with_details!(monitor.id) |> Monitor.populate_host()
     {:noreply, stream_insert(socket, :monitors, monitor)}
-  end
-
-  @impl true
-  def handle_info({:result_created, result}, socket) do
-    send_update(MonitorLastResultsComponent, id: "ticker-#{result.monitor_id}", result: result)
-
-    {
-      :noreply,
-      socket
-    }
   end
 
   @impl true
