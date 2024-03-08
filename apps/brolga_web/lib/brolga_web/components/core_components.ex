@@ -50,7 +50,11 @@ defmodule BrolgaWeb.CoreComponents do
       data-cancel={JS.exec(@on_cancel, "phx-remove")}
       class="relative z-50 hidden"
     >
-      <div id={"#{@id}-bg"} class="bg-zinc-50/90 fixed inset-0 transition-opacity" aria-hidden="true" />
+      <div
+        id={"#{@id}-bg"}
+        class="bg-zinc-50/90 dark:bg-black/50 fixed inset-0 transition-opacity"
+        aria-hidden="true"
+      />
       <div
         class="fixed inset-0 overflow-y-auto"
         aria-labelledby={"#{@id}-title"}
@@ -66,7 +70,11 @@ defmodule BrolgaWeb.CoreComponents do
               phx-window-keydown={JS.exec("data-cancel", to: "##{@id}")}
               phx-key="escape"
               phx-click-away={JS.exec("data-cancel", to: "##{@id}")}
-              class="shadow-zinc-700/10 ring-zinc-700/10 relative hidden rounded-2xl bg-white p-14 shadow-lg ring-1 transition"
+              class={[
+                "shadow-zinc-700/10 ring-zinc-700/10 bg-white",
+                "dark:shadow-gray-700/10 drak:ring-gray-700/10 dark:bg-gray-900",
+                "relative hidden rounded-2xl p-14 shadow-lg ring-1 transition"
+              ]}
             >
               <div class="absolute top-6 right-5">
                 <button
@@ -196,7 +204,7 @@ defmodule BrolgaWeb.CoreComponents do
   def simple_form(assigns) do
     ~H"""
     <.form :let={f} for={@for} as={@as} {@rest}>
-      <div class="mt-10 space-y-8 bg-white p-4 rounded">
+      <div class="mt-10 space-y-8 p-4 rounded">
         <%= render_slot(@inner_block, f) %>
         <div :for={action <- @actions} class="mt-2 flex items-center justify-between gap-6">
           <%= render_slot(action, f) %>
@@ -226,6 +234,7 @@ defmodule BrolgaWeb.CoreComponents do
       type={@type}
       class={[
         "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
+        "dark:bg-teal-700 dark:hover:bg-teal-800",
         "text-sm font-semibold leading-6 text-white active:text-white/80",
         @class
       ]}
@@ -301,7 +310,7 @@ defmodule BrolgaWeb.CoreComponents do
 
     ~H"""
     <div phx-feedback-for={@name}>
-      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600">
+      <label class="flex items-center gap-4 text-sm leading-6 text-zinc-600 dark:text-zinc-100">
         <input type="hidden" name={@name} value="false" />
         <input
           type="checkbox"
@@ -309,7 +318,11 @@ defmodule BrolgaWeb.CoreComponents do
           name={@name}
           value="true"
           checked={@checked}
-          class="rounded border-zinc-300 text-zinc-900 focus:ring-0"
+          class={[
+            "border-zinc-300 text-zinc-900",
+            "dark:border-gray-800 dark:text-teal-900 dark:bg-gray-800 dark:ring-gray-900",
+            "rounded focus:ring-0"
+          ]}
           {@rest}
         />
         <%= @label %>
@@ -326,7 +339,11 @@ defmodule BrolgaWeb.CoreComponents do
       <select
         id={@id}
         name={@name}
-        class="mt-2 block w-full rounded-md border border-gray-300 bg-white shadow-sm focus:border-zinc-400 focus:ring-0 sm:text-sm"
+        class={[
+          "border-gray-300 bg-white focus:border-zinc-400",
+          "dark:border-gray-700 dark:bg-gray-800 focus:border-gray-600",
+          "mt-2 block w-full rounded-md border shadow-sm focus:ring-0 sm:text-sm"
+        ]}
         multiple={@multiple}
         {@rest}
       >
@@ -369,8 +386,9 @@ defmodule BrolgaWeb.CoreComponents do
         id={@id}
         value={Phoenix.HTML.Form.normalize_value(@type, @value)}
         class={[
-          "mt-2 block w-full rounded-lg text-zinc-900 focus:ring-0 sm:text-sm sm:leading-6",
-          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400",
+          "mt-2 block w-full rounded-lg focus:ring-0 sm:text-sm sm:leading-6",
+          "dark:phx-no-feedback:border-gray-700 dark:phx-no-feedback:focus:border-gray-600 dark:text-zinc-100 dark:bg-gray-800",
+          "phx-no-feedback:border-zinc-300 phx-no-feedback:focus:border-zinc-400 text-zinc-900",
           @errors == [] && "border-zinc-300 focus:border-zinc-400",
           @errors != [] && "border-rose-400 focus:border-rose-400"
         ]}
@@ -378,6 +396,24 @@ defmodule BrolgaWeb.CoreComponents do
       />
       <.error :for={msg <- @errors}><%= msg %></.error>
     </div>
+    """
+  end
+
+  def color_scheme_preference(assigns) do
+    ~H"""
+    <select
+      id="color-preference-picker"
+      phx-hook="ColorSchemePreference"
+      class={[
+        "border-none bg-white border-transparent focus:border-transparent focus:ring-0",
+        "dark:bg-gray-800",
+        "mt-2 block w-full rounded-md shadow-sm text-sm"
+      ]}
+    >
+      <option value="">Use system default</option>
+      <option value="light">Light</option>
+      <option value="dark">Dark</option>
+    </select>
     """
   end
 
@@ -389,7 +425,7 @@ defmodule BrolgaWeb.CoreComponents do
 
   def label(assigns) do
     ~H"""
-    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800">
+    <label for={@for} class="block text-sm font-semibold leading-6 text-zinc-800 dark:text-zinc-200">
       <%= render_slot(@inner_block) %>
     </label>
     """
@@ -423,10 +459,10 @@ defmodule BrolgaWeb.CoreComponents do
     ~H"""
     <header class={[@actions != [] && "flex items-center justify-between gap-6", @class]}>
       <div>
-        <h1 class="text-lg font-semibold leading-8 text-zinc-800">
+        <h1 class="text-lg font-semibold leading-8 text-zinc-800 dark:text-zinc-100">
           <%= render_slot(@inner_block) %>
         </h1>
-        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600">
+        <p :if={@subtitle != []} class="mt-2 text-sm leading-6 text-zinc-600 dark:text-zinc-200">
           <%= render_slot(@subtitle) %>
         </p>
         <div :if={@extra != []}>
@@ -472,7 +508,7 @@ defmodule BrolgaWeb.CoreComponents do
     ~H"""
     <div class="overflow-y-auto px-4 sm:overflow-visible sm:px-0">
       <table class="w-[40rem] mt-11 sm:w-full z-10">
-        <thead class="text-sm text-left leading-6 text-zinc-500 sticky top-0 bg-gray-light z-50">
+        <thead class="text-sm text-left leading-6 text-zinc-500 dark:text-zinc-100 sticky top-0 bg-gray-light dark:bg-gray-900 z-50">
           <tr>
             <th :for={col <- @col} class="p-0 pr-6 pb-4 font-normal"><%= col[:label] %></th>
             <th class="relative p-0 pb-4"><span class="sr-only"><%= gettext("Actions") %></span></th>
@@ -481,27 +517,35 @@ defmodule BrolgaWeb.CoreComponents do
         <tbody
           id={@id}
           phx-update={match?(%Phoenix.LiveView.LiveStream{}, @rows) && "stream"}
-          class="relative divide-y divide-zinc-100 border-t border-zinc-200 text-sm leading-6 text-zinc-700 z-10"
+          class="relative divide-y divide-zinc-100 dark:divide-gray-800 border-t border-zinc-200 dark:border-teal-700 text-sm leading-6 text-zinc-50 z-10"
         >
-          <tr :for={row <- @rows} id={@row_id && @row_id.(row)} class="group hover:bg-zinc-50">
+          <tr
+            :for={row <- @rows}
+            id={@row_id && @row_id.(row)}
+            class="group hover:bg-zinc-50 dark:hover:bg-gray-900"
+          >
             <td
               :for={{col, i} <- Enum.with_index(@col)}
               phx-click={@row_click && @row_click.(row)}
               class={["relative p-0", @row_click && "hover:cursor-pointer"]}
             >
               <div class="block py-4 pr-6">
-                <span class="absolute -inset-y-px right-0 -left-4 group-hover:bg-zinc-50 sm:rounded-l-xl" />
-                <span class={["relative", i == 0 && "font-semibold text-zinc-900"]}>
+                <span class="absolute inset-y-0 right-0 -left-4 group-hover:bg-zinc-50 dark:group-hover:bg-gray-800 sm:rounded-l-xl" />
+                <span class={["relative", i == 0 && "font-semibold text-zinc-900 dark:text-zinc-100"]}>
                   <%= render_slot(col, @row_item.(row)) %>
                 </span>
               </div>
             </td>
             <td :if={@action != []} class="relative w-16 p-0">
               <div class="relative whitespace-nowrap py-4 text-right text-sm font-medium">
-                <span class="absolute -inset-y-px -right-4 left-0 group-hover:bg-zinc-50 sm:rounded-r-xl" />
+                <span class="absolute inset-y-0 -right-4 left-0 group-hover:bg-zinc-50 dark:group-hover:bg-gray-800 sm:rounded-r-xl" />
                 <span
                   :for={action <- @action}
-                  class="relative ml-4 font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+                  class={[
+                    "relative ml-4 font-semibold leading-6",
+                    "text-zinc-900 hover:text-zinc-700",
+                    "dark:text-zinc-100 dark:hover:text-zinc-200"
+                  ]}
                 >
                   <%= render_slot(action, @row_item.(row)) %>
                 </span>
@@ -531,10 +575,10 @@ defmodule BrolgaWeb.CoreComponents do
   def list(assigns) do
     ~H"""
     <div class="mt-14">
-      <dl class="-my-4 divide-y divide-zinc-100">
+      <dl class="-my-4 divide-y divide-zinc-100 dark:divide-gray-800">
         <div :for={item <- @item} class="flex gap-4 py-4 text-sm leading-6 sm:gap-8">
-          <dt class="w-1/4 flex-none text-zinc-500"><%= item.title %></dt>
-          <dd class="text-zinc-700"><%= render_slot(item) %></dd>
+          <dt class="w-1/4 flex-none text-zinc-500 dark:text-zinc-100"><%= item.title %></dt>
+          <dd class="text-zinc-700 dark:text-zinc-200"><%= render_slot(item) %></dd>
         </div>
       </dl>
     </div>
@@ -556,7 +600,11 @@ defmodule BrolgaWeb.CoreComponents do
     <div class="mb-16">
       <.link
         navigate={@navigate}
-        class="text-sm font-semibold leading-6 text-zinc-900 hover:text-zinc-700"
+        class={[
+          "text-zinc-900 hover:text-zinc-700",
+          "dark:text-zinc-100 dark:hover:text-zinc-200",
+          "text-sm font-semibold leading-6"
+        ]}
       >
         <.icon name="hero-arrow-left-solid" class="h-3 w-3" />
         <%= render_slot(@inner_block) %>

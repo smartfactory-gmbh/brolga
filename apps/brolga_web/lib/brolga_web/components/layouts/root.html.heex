@@ -8,18 +8,43 @@
       <%= assigns[:page_title] || "Brolga" %>
     </.live_title>
     <link phx-track-static rel="stylesheet" href={~p"/assets/app.css"} />
+    <script>
+      function updateTheme() {
+        let browserTheme = null
+        const darkThemeMq = window.matchMedia("(prefers-color-scheme: dark)");
+        if (darkThemeMq.matches) {
+          browserTheme = "dark"
+        } else {
+          browserTheme = "light"
+        }
+
+        let theme = localStorage.getItem("theme")
+        const chosenTheme = theme || browserTheme
+
+        const classList = document.querySelector("html").classList
+        const isLight = chosenTheme === "light"
+
+        classList.toggle("dark", !isLight)
+        classList.toggle("light", isLight)
+      }
+      updateTheme()
+    </script>
     <script defer phx-track-static type="text/javascript" src={~p"/assets/app.js"}>
     </script>
   </head>
 
-  <body class="bg-gray-light antialiased text-[#333]">
+  <body class="bg-gray-light dark:bg-gray-900 antialiased text-[#333] dark:text-white">
     <div class="relative z-10 flex items-center justify-between">
       <%= if @current_user do %>
         <ul class="flex items-center gap-4 justify-start">
           <li>
             <.link
               href={~p"/admin/monitors"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700 ml-4"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Monitors
             </.link>
@@ -27,7 +52,11 @@
           <li>
             <.link
               href={~p"/admin/dashboards"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Dashboards
             </.link>
@@ -35,7 +64,11 @@
           <li>
             <.link
               href={~p"/admin/monitor-results"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Monitor results
             </.link>
@@ -43,20 +76,31 @@
           <li>
             <.link
               href={~p"/admin/monitor-tags"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Monitor Tags
             </.link>
           </li>
         </ul>
         <ul class="flex items-center gap-4 justify-end">
-          <li class="text-[0.8125rem] leading-6 text-zinc-900">
+          <li>
+            <.color_scheme_preference />
+          </li>
+          <li class="text-[0.8125rem] leading-6 text-zinc-900 dark:text-zinc-100">
             <%= @current_user.email %>
           </li>
           <li>
             <.link
               href={~p"/admin/users/settings"}
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Settings
             </.link>
@@ -65,7 +109,11 @@
             <.link
               href={~p"/admin/users/log_out"}
               method="delete"
-              class="text-[0.8125rem] leading-6 text-zinc-900 font-semibold hover:text-zinc-700"
+              class={[
+                "text-zinc-900 hover:text-zinc-700",
+                "dark:text-zinc-100 dark:hover:text-zinc-300",
+                "text-[0.8125rem] leading-6 font-semibold ml-4"
+              ]}
             >
               Log out
             </.link>
