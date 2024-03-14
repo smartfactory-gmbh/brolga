@@ -51,12 +51,12 @@ defmodule BrolgaWeb.MixProject do
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
       {:gettext, "~> 0.20"},
-      {:brolga, in_umbrella: true},
       {:jason, "~> 1.2"},
       {:hackney, "~> 1.8"},
       {:plug_cowboy, "~> 2.5"},
       {:sentry, "~> 10.1"},
-      {:swoosh, "== 1.16.3"}
+      {:swoosh, "== 1.16.3"},
+      {:brolga, in_umbrella: true}
     ]
   end
 

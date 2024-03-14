@@ -25,6 +25,15 @@ defmodule Brolga.Umbrella.MixProject do
           Mix.Tasks.TestNotifiers,
           Mix.Tasks.CleanupOldResults
         ]
+      ],
+      releases: [
+        brolga_umbrella: [
+          applications: [
+            brolga: :permanent,
+            brolga_web: :permanent,
+            brolga_cron: :permanent
+          ]
+        ]
       ]
     ]
   end

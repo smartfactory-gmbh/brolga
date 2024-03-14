@@ -19,6 +19,8 @@ running_in_docker = System.get_env("RUNNING_IN_DOCKER", "false") == "true"
     {"localhost"}
   end
 
+config :brolga, :monitoring, test_mode: true
+
 config :brolga, Brolga.Repo,
   username: "postgres",
   password: "postgres",
