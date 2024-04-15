@@ -11,6 +11,20 @@ defmodule Brolga.Monitoring.Monitor do
   use Ecto.Schema
   import Ecto.Changeset
 
+  @derive {
+    Jason.Encoder,
+    only: [
+      :id,
+      :name,
+      :url,
+      :interval_in_minutes,
+      :active,
+      :timeout_in_seconds,
+      :inserted_at,
+      :updated_at
+    ]
+  }
+
   @type t :: %__MODULE__{
           id: Ecto.UUID.t(),
           name: String.t(),

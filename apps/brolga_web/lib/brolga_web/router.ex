@@ -67,6 +67,7 @@ defmodule BrolgaWeb.Router do
 
       live "/monitors", MonitorLive.Index, :index
       live "/monitors/new", MonitorLive.Index, :new
+      live "/monitors/import", MonitorLive.Index, :import
       live "/monitors/:id/edit", MonitorLive.Index, :edit
 
       live "/monitors/:id", MonitorLive.Show, :show
@@ -88,6 +89,7 @@ defmodule BrolgaWeb.Router do
     pipe_through [:browser]
 
     delete "/users/log_out", UserSessionController, :delete
+    get "/export", MonitorController, :export
 
     live_session :current_user,
       on_mount: [{BrolgaWeb.UserAuth, :mount_current_user}] do

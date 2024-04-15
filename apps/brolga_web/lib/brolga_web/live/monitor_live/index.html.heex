@@ -4,6 +4,12 @@
     <.link patch={~p"/admin/monitors/new"}>
       <.button>New Monitor</.button>
     </.link>
+    <.link target="_blank" href={~p"/admin/export"}>
+      <.button variant="secondary">Export</.button>
+    </.link>
+    <.link patch={~p"/admin/monitors/import"}>
+      <.button variant="secondary">Import</.button>
+    </.link>
   </:actions>
 </.header>
 
@@ -46,6 +52,21 @@
     title={@page_title}
     action={@live_action}
     monitor={@monitor}
+    patch={~p"/admin/monitors"}
+  />
+</.modal>
+
+<.modal
+  :if={@live_action == :import}
+  id="monitor-import-modal"
+  show
+  on_cancel={JS.patch(~p"/admin/monitors")}
+>
+  <.live_component
+    module={BrolgaWeb.MonitorLive.FormImportComponent}
+    id={:import}
+    title={@page_title}
+    action={@live_action}
     patch={~p"/admin/monitors"}
   />
 </.modal>

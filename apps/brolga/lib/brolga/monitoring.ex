@@ -232,6 +232,10 @@ defmodule Brolga.Monitoring do
     result
   end
 
+  def bulk_create_monitors(monitors) do
+    Repo.insert_all(Monitor, monitors, on_conflict: :nothing)
+  end
+
   @spec update_monitor(
           Brolga.Monitoring.Monitor.t(),
           :invalid | %{optional(:__struct__) => none, optional(atom | binary) => any}
