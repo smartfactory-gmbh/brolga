@@ -4,6 +4,7 @@ defmodule BrolgaWeb.IncidentComponents do
   """
   use Phoenix.Component
 
+  import BrolgaWeb.CoreComponents
   import Brolga.Utils
 
   attr :monitor, Brolga.Monitoring.Monitor, required: true
@@ -18,7 +19,7 @@ defmodule BrolgaWeb.IncidentComponents do
           incident.ended_at && "border-green-500 bg-green-100 text-green-950",
           !incident.ended_at && "border-red-500 bg-red-100 text-red-950"
         ]}>
-          Incident started at <%= format_datetime!(incident.started_at) %>
+          Incident started at <.time id={"started-at__#{incident.id}"} value={incident.started_at} />
           <%= if incident.ended_at do %>
             <p>The issue has been resolved at <%= format_datetime!(incident.ended_at) %></p>
           <% else %>

@@ -21,7 +21,11 @@ import "phoenix_html"
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
 import topbar from "../vendor/topbar"
+
 import {ColorSchemePreference} from './hooks/color-scheme-preference'
+import {MonitorDashboard} from './hooks/monitor-dashboard'
+import { LocalTime } from "./hooks/local-time"
+import { LocalDate } from "./hooks/local-date"
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
 
@@ -48,14 +52,12 @@ function autoScrollDown(el, lastScrollTop) {
   }
 }
 
-let Hooks = {}
-Hooks.MonitorDashboard = {
-  mounted() {
-    autoScrollDown(this.el)
-  }
+let Hooks = {
+  MonitorDashboard,
+  ColorSchemePreference,
+  LocalTime,
+  LocalDate,
 }
-
-Hooks.ColorSchemePreference = ColorSchemePreference
 
 let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}, hooks: Hooks})
 

@@ -5,7 +5,7 @@ defmodule BrolgaWeb.IncidentsListComponent do
   use BrolgaWeb, :live_component
 
   alias Brolga.Alerting
-  import Brolga.Utils
+  import BrolgaWeb.CoreComponents
 
   def update(assigns, socket) do
     {
@@ -37,9 +37,12 @@ defmodule BrolgaWeb.IncidentsListComponent do
               !incident.ended_at && "border-red-500 bg-red-100 text-red-950"
             ]}
           >
-            Incident started at <%= format_datetime!(incident.started_at) %>
+            Incident started at <.time id={"started_at-#{incident.id}"} value={incident.started_at} />
             <%= if incident.ended_at do %>
-              <p>The issue has been resolved at <%= format_datetime!(incident.ended_at) %></p>
+              <p>
+                The issue has been resolved at
+                <.time id={"ended_at-#{incident.id}"} value={incident.ended_at} />
+              </p>
             <% else %>
               <p>
                 <a phx-click="solve_incident" phx-value-id={incident.id} phx-target={@myself}>
