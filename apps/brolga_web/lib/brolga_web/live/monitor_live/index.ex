@@ -29,6 +29,7 @@ defmodule BrolgaWeb.MonitorLive.Index do
   defp apply_action(socket, :import, _params) do
     socket
     |> assign(:page_title, "Import")
+    |> assign(:search, "")
   end
 
   defp apply_action(socket, :new, _params) do

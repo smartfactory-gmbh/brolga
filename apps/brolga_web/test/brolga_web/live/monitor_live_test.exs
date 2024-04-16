@@ -72,7 +72,12 @@ defmodule BrolgaWeb.MonitorLiveTest do
     end
 
     test "imports new monitor", %{conn: conn} do
-      {:ok, index_live, _html} = live(conn, ~p"/admin/monitors/import")
+      {:ok, index_live, _html} = live(conn, ~p"/admin/monitors")
+
+      assert index_live |> element("a", "Import") |> render_click() =~
+               "Use this form to import monitor records in your database."
+
+      assert_patch(index_live, ~p"/admin/monitors/import")
 
       sample_json =
         [

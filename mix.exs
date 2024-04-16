@@ -14,18 +14,19 @@ defmodule Brolga.Umbrella.MixProject do
           threshold: 85
         ],
         ignore_modules: [
+          Brolga,
+          Brolga.Repo,
           Brolga.AccountsFixtures,
           Brolga.AlertingFixtures,
           Brolga.DashboardsFixtures,
+          BrolgaCron.Application,
           BrolgaWeb.Application,
           BrolgaWeb.Telemetry,
           BrolgaWeb.Release,
           BrolgaWeb.PageHTML,
           BrolgaWeb.Layouts,
           Mix.Tasks.TestNotifiers,
-          Mix.Tasks.CleanupOldResults,
-          Brolga,
-          Brolga.Repo
+          Mix.Tasks.CleanupOldResults
         ]
       ],
       releases: [
