@@ -166,7 +166,9 @@ defmodule BrolgaWeb.MonitorResultLive do
     ~H"""
     <div id={@id} class={"flex flex-col gap-4 min-h-16 border rounded p-4 #{@classes}"}>
       <div class="flex gap-4 italic">
-        <div><%= format_datetime!(@result.inserted_at) %></div>
+        <div>
+          <.datetime id={"inserted_at-#{@result.id}"} value={@result.inserted_at} />
+        </div>
         <div><%= @result.monitor.name %></div>
       </div>
       <div>

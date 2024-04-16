@@ -13,6 +13,17 @@
   </:actions>
 </.header>
 
+<input
+  id="search-input"
+  name="search"
+  value={@search}
+  class="mt-4 text-black"
+  type="search"
+  placeholder="Search..."
+  phx-keyup="search"
+  phx-debounce="300"
+/>
+
 <.table
   id="monitors"
   rows={@streams.monitors}

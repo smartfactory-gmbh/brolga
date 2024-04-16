@@ -677,6 +677,55 @@ defmodule BrolgaWeb.CoreComponents do
     """
   end
 
+  @doc """
+  Just a convenience component to display a time in the correct format and timezone.
+
+  ## Examples
+
+      <.time value={date} />
+  """
+  attr :id, :string, required: true
+  attr :value, :any, required: true
+
+  def time(assigns) do
+    ~H"""
+    <time id={@id} data-value={@value} phx-hook="LocalTime">Loading...</time>
+    """
+  end
+
+  @doc """
+  Just a convenience component to display a date in the correct format and timezone.
+
+  ## Examples
+
+      <.date value={date} />
+  """
+  attr :id, :string, required: true
+  attr :value, :any, required: true
+
+  def date(assigns) do
+    ~H"""
+    <date id={@id} data-value={@value} phx-hook="LocalDate">Loading...</date>
+    """
+  end
+
+  @doc """
+  Just a convenience component to display a datetime in the correct format and timezone.
+
+  ## Examples
+
+      <.datetime value={date} />
+  """
+  attr :id, :string, required: true
+  attr :value, :any, required: true
+
+  def datetime(assigns) do
+    ~H"""
+    <.date id={"#{@id}-date"} value={@value} />
+    <.time id={"#{@id}-time"} value={@value} />
+    """
+  end
+
   ## JS Commands
 
   def show(js \\ %JS{}, selector) do

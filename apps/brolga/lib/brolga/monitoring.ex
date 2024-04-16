@@ -36,6 +36,7 @@ defmodule Brolga.Monitoring do
 
   * `:only_actives` - {boolean} - Filter out all inactive monitors, default: false
   * `:with_tags` - {boolean} - Preload monitor tags, default: false
+  * `:search` - {string} - Search query on the name
 
   ## Examples
 
@@ -49,12 +50,20 @@ defmodule Brolga.Monitoring do
     alias Monitor.Query
     only_actives = opts[:only_actives] || false
     with_tags = opts[:with_tags] || false
+    search = opts[:search] || nil
 
     query = get_base_monitor_query()
 
     query =
       if with_tags do
         query |> Query.with_monitor_tags()
+      else
+        query
+      end
+
+    query =
+      if search do
+        query |> Query.search(search)
       else
         query
       end
