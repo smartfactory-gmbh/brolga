@@ -52,7 +52,9 @@ defmodule Brolga.Monitoring.MonitorResult do
   In test mode, allows to also setup the inserted_at and updated_at, useful for some test cases
   """
   def changeset(monitor_result, attrs, force_public \\ false) do
-    if Mix.env() == :test and not force_public do
+    config = Application.get_env(:brolga, :monitoring)
+
+    if config[:test_mode] and not force_public do
       test_changeset(monitor_result, attrs)
     else
       public_changeset(monitor_result, attrs)

@@ -25,6 +25,11 @@ defmodule BrolgaWeb.MonitorLive.Index do
     |> assign(:monitor, Monitoring.get_monitor_with_details!(id))
   end
 
+  defp apply_action(socket, :import, _params) do
+    socket
+    |> assign(:page_title, "Import")
+  end
+
   defp apply_action(socket, :new, _params) do
     socket
     |> assign(:page_title, "New Monitor")

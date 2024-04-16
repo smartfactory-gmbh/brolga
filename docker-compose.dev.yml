@@ -24,10 +24,12 @@ services:
       DATABASE_URL: postgres://postgres:postgres@postgres/brolga_dev
       HOST: localhost
       RUNNING_IN_DOCKER: "true"
+      MIX_BUILD_ROOT: "/_docker_build"
     ports:
       - "4000:4000"
     volumes:
       - ".:/usr/src/app"
+      - "build-data:/_docker_build"
     depends_on:
       db:
         condition: service_healthy
@@ -37,3 +39,4 @@ services:
 
 volumes:
   db-data:
+  build-data:

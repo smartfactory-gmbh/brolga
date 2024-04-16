@@ -19,7 +19,7 @@ if config_env() == :prod do
   # By default, no Sentry DSN is set, it's only set through env variables
   sentry_dsn = System.get_env("SENTRY_DSN", "")
 
-  if sentry_dsn do
+  if sentry_dsn != "" do
     config :sentry,
       dsn: sentry_dsn,
       environment_name: :prod,
@@ -30,6 +30,13 @@ if config_env() == :prod do
 
     config :logger,
       backends: [:console, Sentry.LoggerBackend]
+  else
+    config :sentry,
+      environment_name: :prod,
+      enable_source_code_context: true,
+      root_source_code_paths: [File.cwd!()],
+      tags: %{env: "production"},
+      included_environments: [:prod]
   end
 
   config :brolga, :utils, default_timezone: System.get_env("DEFAULT_TZ", "Etc/UTC")
@@ -58,7 +65,7 @@ if config_env() == :prod do
       """
 
   port = String.to_integer(System.get_env("PORT") || "4000")
-  host = System.get_env("HOST", "localhost")
+  host = System.get_env("PHX_HOST", "localhost")
 
   config :brolga_web, BrolgaWeb.Endpoint,
     http: [
@@ -74,7 +81,10 @@ if config_env() == :prod do
   # If you are doing OTP releases, you need to instruct Phoenix
   # to start each relevant endpoint:
   #
-  #     config :brolga_web, BrolgaWeb.Endpoint, server: true
+  if System.get_env("PHX_SERVER") && System.get_env("RELEASE_NAME") do
+    config :brolga_web, BrolgaWeb.Endpoint, server: true
+  end
+
   #
   # Then you can assemble a release by calling `mix release`.
   # See `mix help release` for more information.

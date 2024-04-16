@@ -225,17 +225,35 @@ defmodule BrolgaWeb.CoreComponents do
   attr :type, :string, default: nil
   attr :class, :string, default: nil
   attr :rest, :global, include: ~w(disabled form name value)
+  attr :variant, :string, default: "primary"
 
   slot :inner_block, required: true
 
   def button(assigns) do
+    assigns =
+      case assigns.variant do
+        "primary" ->
+          assigns
+          |> assign(:dark_theme, "dark:bg-teal-700 dark:hover:bg-teal-800")
+          |> assign(:light_theme, "bg-zinc-900 hover:bg-zinc-700 text-white active:text-white/80")
+
+        "secondary" ->
+          assigns
+          |> assign(
+            :dark_theme,
+            "dark:text-white dark:hover:text-white/80 dark:active:text-white/80"
+          )
+          |> assign(:light_theme, "text-zinc-900 hover:text-zinc-900/80 active:text-zinc-900/80")
+      end
+
     ~H"""
     <button
       type={@type}
       class={[
-        "phx-submit-loading:opacity-75 rounded-lg bg-zinc-900 hover:bg-zinc-700 py-2 px-3",
-        "dark:bg-teal-700 dark:hover:bg-teal-800",
-        "text-sm font-semibold leading-6 text-white active:text-white/80",
+        "phx-submit-loading:opacity-75 rounded-lg py-2 px-3",
+        "text-sm font-semibold leading-6",
+        @dark_theme,
+        @light_theme,
         @class
       ]}
       {@rest}
