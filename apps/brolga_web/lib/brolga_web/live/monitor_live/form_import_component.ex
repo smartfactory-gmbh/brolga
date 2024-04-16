@@ -28,10 +28,7 @@ defmodule BrolgaWeb.MonitorLive.FormImportComponent do
           <ul>
             <%= for entry <- @uploads.import_file.entries do %>
               <li>
-                <%= entry.client_name %> <%= entry.progress %>
-                <%= if entry.progress == 100 do %>
-                  &check;
-                <% end %>
+                <%= entry.client_name %>
               </li>
             <% end %>
           </ul>
@@ -84,18 +81,8 @@ defmodule BrolgaWeb.MonitorLive.FormImportComponent do
     Monitoring.bulk_create_monitors(monitors)
 
     socket
-    # case Monitoring.update_monitor(socket.assigns.monitor, monitor_params) do
-    #   {:ok, monitor} ->
-    #     notify_parent({:saved, monitor})
-    #
-    #     {:noreply,
-    #      socket
-    #      |> put_flash(:info, "Monitor updated successfully")
-    #      |> push_patch(to: socket.assigns.patch)}
-    #
-    #   {:error, %Ecto.Changeset{} = changeset} ->
-    #     {:noreply, assign_form(socket, changeset)}
-    # end
+    |> put_flash(:info, "File was imported")
+    |> push_patch(to: ~p"/admin/monitors/")
   end
 
   defp save_monitor(socket, :new, monitor_params) do

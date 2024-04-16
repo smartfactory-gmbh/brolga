@@ -23,7 +23,9 @@ defmodule Brolga.Umbrella.MixProject do
           BrolgaWeb.PageHTML,
           BrolgaWeb.Layouts,
           Mix.Tasks.TestNotifiers,
-          Mix.Tasks.CleanupOldResults
+          Mix.Tasks.CleanupOldResults,
+          Brolga,
+          Brolga.Repo
         ]
       ],
       releases: [

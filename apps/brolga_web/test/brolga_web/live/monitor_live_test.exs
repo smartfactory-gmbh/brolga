@@ -1,4 +1,5 @@
 defmodule BrolgaWeb.MonitorLiveTest do
+  alias Brolga.Monitoring
   use BrolgaWeb.ConnCase
 
   import Phoenix.LiveViewTest
@@ -56,6 +57,45 @@ defmodule BrolgaWeb.MonitorLiveTest do
 
       html = render(index_live)
       assert html =~ "Monitor created successfully"
+    end
+
+    test "imports new monitor", %{conn: conn} do
+      {:ok, index_live, _html} = live(conn, ~p"/admin/monitors/import")
+
+      sample_json =
+        [
+          %{
+            id: "c9b4f2a9-085a-4f53-ad8a-97480c167c0d",
+            name: "test",
+            url: "https://test.local",
+            interval_in_minutes: 1,
+            active: true,
+            timeout_in_seconds: 10,
+            inserted_at: ~N"2023-10-26T09:15:18",
+            updated_at: ~N"2024-02-27T10:22:38"
+          }
+        ]
+        |> Jason.encode!()
+
+      assert Monitoring.get_monitor("c9b4f2a9-085a-4f53-ad8a-97480c167c0d") == nil
+
+      index_live
+      |> file_input("#monitor-import-form", :import_file, [
+        %{
+          last_modified: 1_594_171_879_000,
+          name: "test.json",
+          content: sample_json,
+          size: String.length(sample_json),
+          type: "application/json"
+        }
+      ])
+      |> render_upload("test.json")
+
+      assert index_live
+             |> form("#monitor-import-modal #monitor-import-form")
+             |> render_submit() =~ "test.json"
+
+      refute Monitoring.get_monitor("c9b4f2a9-085a-4f53-ad8a-97480c167c0d") == nil
     end
 
     test "updates monitor in listing", %{conn: conn, monitor: monitor} do

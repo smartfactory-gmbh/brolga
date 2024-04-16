@@ -1,10 +1,20 @@
 import Config
 
+# Setting the hosts of difference services depending on whether or not it's running in docker
+running_in_docker = System.get_env("RUNNING_IN_DOCKER", "false") == "true"
+
+{db_host} =
+  if running_in_docker do
+    {"db"}
+  else
+    {"localhost"}
+  end
+
 # Configure your database
 config :brolga, Brolga.Repo,
   username: "postgres",
   password: "postgres",
-  hostname: "db",
+  hostname: db_host,
   database: "brolga_dev",
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
