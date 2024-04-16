@@ -37,6 +37,18 @@ defmodule BrolgaWeb.MonitorLiveTest do
       assert html =~ "Listing Monitors"
     end
 
+    test "searches through monitors", %{conn: conn} do
+      # Non-existing name
+      {:ok, _index_live, html} = live(conn, ~p"/admin/monitors?search=test")
+
+      refute html =~ "some name"
+
+      # Existing name
+      {:ok, _index_live, html} = live(conn, ~p"/admin/monitors?search=name")
+
+      assert html =~ "some name"
+    end
+
     test "saves new monitor", %{conn: conn} do
       {:ok, index_live, _html} = live(conn, ~p"/admin/monitors")
 

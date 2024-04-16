@@ -102,4 +102,9 @@ defmodule Brolga.Monitoring.Monitor.Query do
     from query,
       order_by: as(:monitors).name
   end
+
+  def search(query \\ base(), search) do
+    from query,
+      where: ilike(as(:monitors).name, ^"%#{search}%")
+  end
 end

@@ -22,7 +22,7 @@
   </:item>
 </.list>
 
-<div class="mt-8">
+<div class="mt-8 z-20 relative">
   <.live_component
     id={"ticker-#{@monitor.id}"}
     module={MonitorLastResultsComponent}
@@ -31,7 +31,9 @@
   />
 </div>
 
-<.live_component module={IncidentsListComponent} id="incidents-list" monitor={@monitor} />
+<div class="z-10">
+  <.live_component module={IncidentsListComponent} id="incidents-list" monitor={@monitor} />
+</div>
 
 <.modal
   :if={@live_action == :edit}
