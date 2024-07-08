@@ -55,7 +55,7 @@ defmodule BrolgaWeb.MixProject do
       {:hackney, "~> 1.8"},
       {:plug_cowboy, "~> 2.5"},
       {:sentry, "~> 10.1"},
-      {:swoosh, "== 1.16.7"},
+      {:swoosh, "== 1.16.8"},
       {:brolga, in_umbrella: true}
     ]
   end
